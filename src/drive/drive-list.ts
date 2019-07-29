@@ -1,6 +1,6 @@
 import constants = require('../.constants.js');
 import driveAuth = require('./drive-auth.js');
-import {google} from 'googleapis';
+import { google } from 'googleapis';
 import utils = require('./drive-utils');
 import dlUtils = require('../download_tools/utils');
 
@@ -11,37 +11,59 @@ import dlUtils = require('../download_tools/utils');
  * @param {string} fileName The name of the file to search for
  * @param {function} callback A function to call with an error, or a human-readable message
  */
-export function listFiles (fileName:string, callback:(err:string, message:string)=> void): void {
+export function listFiles(fileName: string, callback: (err: string, message: string) => void): void {
   // Uncommenting the below line will prevent users from asking to list all files
   // if (fileName === '' || fileName ==='*' || fileName === '%') return;
-
+  let parent_dir_id = constants.GDRIVE_PARENT_DIR_ID;
+  if (fileName === 'movies*') {
+    fileName = '*';
+    parent_dir_id = constants.GDRIVE_MOVIES_DIR_ID;
+  } else if (fileName === 'movies_holly') {
+    fileName = '*';
+    parent_dir_id = constants.GDRIVE_HOLLY_DIR_ID;
+  } else if (fileName === 'movies_bolly') {
+    fileName = '*';
+    parent_dir_id = constants.GDRIVE_BOLLY_DIR_ID;
+  } else if (fileName === 'movies_tolly') {
+    fileName = '*';
+    parent_dir_id = constants.GDRIVE_TOLLY_DIR_ID;
+  } else if (fileName === 'tvseries*') {
+    fileName = '*';
+    parent_dir_id = constants.GDRIVE_TVSERIES_DIR_ID;
+  } else if (fileName === 'softwares*') {
+    fileName = '*';
+    parent_dir_id = constants.GDRIVE_SOFTWARE_DIR_ID;
+  } else if (fileName === 'os*') {
+    fileName = '*';
+    parent_dir_id = constants.GDRIVE_OS_DIR_ID;
+  }
   driveAuth.call((err, auth) => {
     if (err) {
       callback(err, null);
       return;
     }
-    const drive = google.drive({version: 'v3', auth});
+    const drive = google.drive({ version: 'v3', auth });
 
     drive.files.list({
       // @ts-ignore Unknown property error
       fields: 'files(id, name, mimeType, size)',
-      q: generateSearchQuery(fileName, constants.GDRIVE_PARENT_DIR_ID),
+      q: generateSearchQuery(fileName, parent_dir_id),
       orderBy: 'modifiedTime desc',
       pageSize: 20
     },
-    (err:Error, res:any) => {
-      if (err) {
-        callback(err.message, null);
-      } else {
-        res = res['data']['files'];
-        getMultipleFileLinks(res);
-        callback(null, generateFilesListMessage(res));
-      }
-    });
+      (err: Error, res: any) => {
+        if (err) {
+          callback(err.message, null);
+        } else {
+          res = res['data']['files'];
+          getMultipleFileLinks(res);
+          callback(null, generateFilesListMessage(res));
+        }
+      });
   });
 }
 
-function generateSearchQuery (fileName:string, parent:string): string {
+function generateSearchQuery(fileName: string, parent: string): string {
   var q = '\'' + parent + '\' in parents and (';
   if (fileName.indexOf(' ') > -1) {
     for (var i = 0; i < 4; i++) {
@@ -68,7 +90,7 @@ function generateSearchQuery (fileName:string, parent:string): string {
   return q;
 }
 
-function getMultipleFileLinks (files:any[]): void {
+function getMultipleFileLinks(files: any[]): void {
   for (var i = 0; i < files.length; i++) {
     files[i]['url'] = utils.getFileLink(
       files[i]['id'],
@@ -77,7 +99,7 @@ function getMultipleFileLinks (files:any[]): void {
   }
 }
 
-function generateFilesListMessage (files:any[]): string {
+function generateFilesListMessage(files: any[]): string {
   var message = '';
   if (files.length > 0) {
     for (var i = 0; i < files.length; i++) {
@@ -87,7 +109,7 @@ function generateFilesListMessage (files:any[]): string {
       else if (files[i]['mimeType'] === 'application/vnd.google-apps.folder')
         message += ' (folder)\n';
       else
-      message += '\n';
+        message += '\n';
 
     }
   } else {
