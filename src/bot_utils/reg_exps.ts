@@ -8,6 +8,7 @@ export class RegExps {
   readonly cancelMirror: RegExp;
   readonly cancelAll: RegExp;
   readonly disk: RegExp;
+  readonly getLink: RegExp;
 
   constructor(commands: string[]) {
     this.start = new RegExp(commands[0], 'i');
@@ -19,5 +20,6 @@ export class RegExps {
     this.cancelMirror = new RegExp(commands[6], 'i');
     this.cancelAll = new RegExp(commands[7], 'i');
     this.disk = new RegExp(commands[8], 'i');
+    this.getLink = new RegExp(commands[8], 'i');
   }
 }
