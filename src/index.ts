@@ -7,6 +7,7 @@ import msgTools = require('./bot_utils/msg-tools.js');
 import dlm = require('./dl_model/dl-manager');
 import driveList = require('./drive/drive-list.js');
 import driveUtils = require('./drive/drive-utils.js');
+import driveDirectLink = require('./drive/drive-directLink.js');
 import details = require('./dl_model/detail');
 import filenameUtils = require('./download_tools/filename-utils');
 import { EventRegex } from './bot_utils/event_regex';
@@ -180,6 +181,20 @@ setEventCallback(eventRegex.commandsRegex.cancelAll, eventRegex.commandsRegexNoN
     });
   } else {
     msgTools.sendUnauthorizedMessage(bot, msg);
+  }
+});
+
+setEventCallback(eventRegex.commandsRegex.getLink, eventRegex.commandsRegexNoName.getLink, (msg, match) => {
+  if (msgTools.isAuthorized(msg) < 0) {
+    msgTools.sendUnauthorizedMessage(bot, msg);
+  } else {
+    driveDirectLink.getLink(match[2], (err, res) => {
+      if (err) {
+        msgTools.sendMessage(bot, msg, 'Failed to fetch the direct link');
+      } else {
+        msgTools.sendMessage(bot, msg, res, -1);
+      }
+    });
   }
 });
 
