@@ -583,12 +583,12 @@ function driveUploadCompleteCallback(err: string, gid: string, url: string, file
       var fileSizeStr = downloadUtils.formatSize(fileSize);
       finalMessage = `<a href='${url}'>${fileName}</a> (${fileSizeStr})`;
       // Add direct link to the final message
-       driveDirectLink.getLink(url, true , (err, res) => {
+       driveDirectLink.getLink(url, false , (err, res) => {
         console.log('called-->');
           if (err) {
             finalMessage = finalMessage + `\nDirect Link: ${err}`;
           } else {
-            finalMessage = finalMessage + `\nDirect Link: ${res}`;
+            finalMessage = finalMessage + `\n${res}`;
           }
           console.log('final message--->', finalMessage);
           cleanupDownload(gid, finalMessage, url);
