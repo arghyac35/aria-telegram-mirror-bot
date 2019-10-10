@@ -31,16 +31,17 @@ export function getLink(url: string, getOnlyLink: boolean, callback: (err: strin
         followRedirect: false
     },
         function (error, response, body) {
+            var dom = new jsdom.JSDOM(body);
+            var fileName_div = dom.window.document.querySelector(".uc-name-size a");
             if (response.headers.location) {
+                console.log(response.headers);
+
                 if (response.headers.location.indexOf("accounts.google.com") !== -1) {
                     //Ignore non public links
                     callback('Non public link', null);
                 }
-                callback(null, getOnlyLink ? response.headers.location : '<a href = \'' + response.headers.location + '\'>' + response.headers.location + '</a>');
-            }
-            var dom = new jsdom.JSDOM(body);
-            var fileName_div = dom.window.document.querySelector(".uc-name-size a");
-            if (fileName_div) {
+                callback(null, getOnlyLink ? response.headers.location : 'Direct Link: <a href = \'' + response.headers.location + '\'>Click Here' + '</a>');
+            } else if (fileName_div) {
                 let fileName = fileName_div.textContent;
                 let myContainer = <Element>dom.window.document.querySelector("#uc-download-link");
                 var dlLink = "https://drive.google.com" + myContainer.getAttribute('href');
@@ -55,7 +56,7 @@ export function getLink(url: string, getOnlyLink: boolean, callback: (err: strin
                             // Non public link
                             callback('Non public link', null);
                         }
-                        callback(null, getOnlyLink ? response.headers.location : '<a href = \'' + response.headers.location + '\'>' + fileName + '</a>');
+                        callback(null, getOnlyLink ? response.headers.location : 'Direct Link: <a href = \'' + response.headers.location + '\'>' + fileName + '</a>');
                     });
             } else {
                 callback('Not a proper gdrive link', null);
