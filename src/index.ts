@@ -188,9 +188,9 @@ setEventCallback(eventRegex.commandsRegex.getLink, eventRegex.commandsRegexNoNam
   if (msgTools.isAuthorized(msg) < 0) {
     msgTools.sendUnauthorizedMessage(bot, msg);
   } else {
-    driveDirectLink.getLink(match[2], (err, res) => {
+    driveDirectLink.getLink(match[2], false , (err, res) => {
       if (err) {
-        msgTools.sendMessage(bot, msg, 'Failed to fetch the direct link');
+        msgTools.sendMessage(bot, msg, err, 6000);
       } else {
         msgTools.sendMessage(bot, msg, res, -1);
       }
@@ -571,7 +571,7 @@ function initAria2(): void {
 
 
 function driveUploadCompleteCallback(err: string, gid: string, url: string, filePath: string, fileName: string, fileSize: number): void {
-  var finalMessage;
+  var finalMessage: string;
   if (err) {
     var message = err;
     console.error(`${gid}: Failed to upload - ${filePath}: ${message}`);
@@ -582,9 +582,20 @@ function driveUploadCompleteCallback(err: string, gid: string, url: string, file
     if (fileSize) {
       var fileSizeStr = downloadUtils.formatSize(fileSize);
       finalMessage = `<a href='${url}'>${fileName}</a> (${fileSizeStr})`;
+      // Add direct link to the final message
+       driveDirectLink.getLink(url, true , (err, res) => {
+        console.log('called-->');
+          if (err) {
+            finalMessage = finalMessage + `\nDirect Link: ${err}`;
+          } else {
+            finalMessage = finalMessage + `\nDirect Link: ${res}`;
+          }
+          console.log('final message--->', finalMessage);
+          cleanupDownload(gid, finalMessage, url);
+      });
     } else {
       finalMessage = `<a href='${url}'>${fileName}</a>`;
+      cleanupDownload(gid, finalMessage, url);
     }
-    cleanupDownload(gid, finalMessage, url);
   }
 }
