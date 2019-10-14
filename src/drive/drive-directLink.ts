@@ -34,8 +34,6 @@ export function getLink(url: string, getOnlyLink: boolean, callback: (err: strin
             var dom = new jsdom.JSDOM(body);
             var fileName_div = dom.window.document.querySelector(".uc-name-size a");
             if (response.headers.location) {
-                console.log(response.headers);
-
                 if (response.headers.location.indexOf("accounts.google.com") !== -1) {
                     //Ignore non public links
                     callback('Non public link', null);
