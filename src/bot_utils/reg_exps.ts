@@ -20,6 +20,6 @@ export class RegExps {
     this.cancelMirror = new RegExp(commands[6], 'i');
     this.cancelAll = new RegExp(commands[7], 'i');
     this.disk = new RegExp(commands[8], 'i');
-    this.getLink = new RegExp(commands[8], 'i');
+    this.getLink = new RegExp(commands[9], 'i');
   }
 }
