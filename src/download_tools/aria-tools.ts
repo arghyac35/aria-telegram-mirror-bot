@@ -209,10 +209,10 @@ function driveUploadFile(dlDetails: DlVars, filePath: string, fileName: string, 
     (err: string, url: string) => {
       if (fileSize) {
       // Add direct link to the final message
-      driveDirectLink.getLink(url, false , (err: string, res: string) => {
+      driveDirectLink.getLink(url, false , (err1: string, res: string) => {
         console.log('called-->');
         let directLink: string;
-          if (err) {
+          if (err1) {
             directLink = `Direct Link: ${err}`;
           } else {
             directLink = res;
