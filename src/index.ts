@@ -570,7 +570,7 @@ function initAria2(): void {
 }
 
 
-function driveUploadCompleteCallback(err: string, gid: string, url: string, filePath: string, fileName: string, fileSize: number): void {
+function driveUploadCompleteCallback(err: string, gid: string, url: string, filePath: string, fileName: string, fileSize: number, getLink? : string): void {
   var finalMessage: string;
   if (err) {
     var message = err;
@@ -579,23 +579,12 @@ function driveUploadCompleteCallback(err: string, gid: string, url: string, file
     cleanupDownload(gid, finalMessage);
   } else {
     console.log(`${gid}: Uploaded `);
-    if (fileSize) {
+    if (fileSize && getLink) {
       var fileSizeStr = downloadUtils.formatSize(fileSize);
-      finalMessage = `<a href='${url}'>${fileName}</a> (${fileSizeStr})`;
-      // Add direct link to the final message
-       driveDirectLink.getLink(url, false , (err, res) => {
-        console.log('called-->');
-          if (err) {
-            finalMessage = finalMessage + `\nDirect Link: ${err}`;
-          } else {
-            finalMessage = finalMessage + `\n${res}`;
-          }
-          console.log('final message--->', finalMessage);
-          cleanupDownload(gid, finalMessage, url);
-      });
+      finalMessage = `<a href='${url}'>${fileName}</a> (${fileSizeStr}) \n${getLink}`;
     } else {
       finalMessage = `<a href='${url}'>${fileName}</a>`;
-      cleanupDownload(gid, finalMessage, url);
     }
+    cleanupDownload(gid, finalMessage, url);
   }
 }

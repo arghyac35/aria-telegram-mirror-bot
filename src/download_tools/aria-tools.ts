@@ -1,5 +1,6 @@
 import downloadUtils = require('./utils');
 import drive = require('../fs-walk');
+import driveDirectLink = require('../drive/drive-directLink.js');
 const Aria2 = require('aria2');
 import constants = require('../.constants');
 import tar = require('../drive/tar');
@@ -149,7 +150,7 @@ export function getFileSize(gid: string, callback: (err: string, fileSize: numbe
 }
 
 interface DriveUploadCompleteCallback {
-  (err: string, gid: string, url: string, filePath: string, fileName: string, fileSize: number): void;
+  (err: string, gid: string, url: string, filePath: string, fileName: string, fileSize: number, getLink? : string): void;
 }
 
 /**
@@ -206,7 +207,22 @@ function driveUploadFile(dlDetails: DlVars, filePath: string, fileName: string, 
     filePath,
     constants.GDRIVE_PARENT_DIR_ID,
     (err: string, url: string) => {
-      callback(err, dlDetails.gid, url, filePath, fileName, fileSize);
+      if (fileSize) {
+      // Add direct link to the final message
+      driveDirectLink.getLink(url, false , (err: string, res: string) => {
+        console.log('called-->');
+        let directLink: string;
+          if (err) {
+            directLink = `Direct Link: ${err}`;
+          } else {
+            directLink = res;
+          }
+          console.log('final directLink--->', directLink);
+          callback(err, dlDetails.gid, url, filePath, fileName, fileSize, directLink);
+      });
+      } else {
+        callback(err, dlDetails.gid, url, filePath, fileName, fileSize);
+      }
     });
 }
 
