@@ -14,7 +14,8 @@ import dlUtils = require('../download_tools/utils');
 export function listFiles(fileName: string, callback: (err: string, message: string) => void): void {
   // Uncommenting the below line will prevent users from asking to list all files
   // if (fileName === '' || fileName ==='*' || fileName === '%') return;
-  let parent_dir_id = constants.GDRIVE_PARENT_DIR_ID;
+  let parent_dir_id: string | string[];
+  parent_dir_id = constants.GDRIVE_PARENT_DIR_ID;
   if (fileName === 'movies*') {
     fileName = '*';
     parent_dir_id = constants.GDRIVE_MOVIES_DIR_ID;
@@ -36,6 +37,10 @@ export function listFiles(fileName: string, callback: (err: string, message: str
   } else if (fileName === 'os*') {
     fileName = '*';
     parent_dir_id = constants.GDRIVE_OS_DIR_ID;
+  } else if (fileName === '*') {
+    parent_dir_id = constants.GDRIVE_PARENT_DIR_ID;
+  } else {
+    parent_dir_id = [constants.GDRIVE_PARENT_DIR_ID, constants.GDRIVE_HOLLY_DIR_ID, constants.GDRIVE_BOLLY_DIR_ID, constants.GDRIVE_TOLLY_DIR_ID, constants.GDRIVE_SOFTWARE_DIR_ID, constants.GDRIVE_TVSERIES_DIR_ID, constants.GDRIVE_OS_DIR_ID];
   }
   driveAuth.call((err, auth) => {
     if (err) {
@@ -63,8 +68,21 @@ export function listFiles(fileName: string, callback: (err: string, message: str
   });
 }
 
-function generateSearchQuery(fileName: string, parent: string): string {
-  var q = '\'' + parent + '\' in parents and (';
+function generateSearchQuery(fileName: string, parent: string | string[]): string {
+  if (Array.isArray(parent)) {
+    var q: string;
+    q = '(';
+    parent.forEach((element, key) => {
+      if (parent.length === key + 1) {
+        q += '\'' + element + '\' in parents)';
+      } else {
+        q += '\'' + element + '\' in parents or ';
+      }
+    });
+    q += ' and (';
+  } else {
+    var q = '\'' + parent + '\' in parents and (';
+  }
   if (fileName.indexOf(' ') > -1) {
     for (var i = 0; i < 4; i++) {
       q += 'name contains \'' + fileName + '\' ';
