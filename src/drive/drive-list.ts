@@ -54,7 +54,9 @@ export function listFiles(fileName: string, callback: (err: string, message: str
       fields: 'files(id, name, mimeType, size)',
       q: generateSearchQuery(fileName, parent_dir_id),
       orderBy: 'modifiedTime desc',
-      pageSize: 20
+      pageSize: 20,
+      supportsAllDrives: true,
+      includeItemsFromAllDrives: true
     },
       (err: Error, res: any) => {
         if (err) {
