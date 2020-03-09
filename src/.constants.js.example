@@ -11,6 +11,10 @@ module.exports = Object.freeze({
   GDRIVE_TVSERIES_DIR_ID: 'id_of_Drive_folder_to_upload_into',
   GDRIVE_SOFTWARE_DIR_ID: 'id_of_Drive_folder_to_upload_into',
   GDRIVE_OS_DIR_ID: 'id_of_Drive_folder_to_upload_into',
+  GDRIVE_HOLLY_DIR_ID: 'id_of_Drive_folder_to_upload_into',
+  GDRIVE_BOLLY_DIR_ID: 'id_of_Drive_folder_to_upload_into',
+  GDRIVE_TOLLY_DIR_ID: 'id_of_Drive_folder_to_upload_into',
+  GDRIVE_GAMES_DIR_ID: 'id_of_Drive_folder_to_upload_into',
   SUDO_USERS: [012, 345],	// Telegram user IDs. These users can use the bot in any chat.
   AUTHORIZED_CHATS: [678, 901],	// Telegram chat IDs. Anyone in these chats can use the bot.
   STATUS_UPDATE_INTERVAL_MS: 12000, // A smaller number will update faster, but might cause rate limiting
