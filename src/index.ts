@@ -53,7 +53,18 @@ setEventCallback(eventRegex.commandsRegex.mirror, eventRegex.commandsRegexNoName
   if (msgTools.isAuthorized(msg) < 0) {
     msgTools.sendUnauthorizedMessage(bot, msg);
   } else {
-    mirror(msg, match);
+    if (match[2] === "file" && msg.hasOwnProperty("reply_to_message") && msg.reply_to_message.hasOwnProperty("document") && msg.reply_to_message.document.hasOwnProperty("file_id")) {
+         bot.getFileLink(msg.reply_to_message.document.file_id).then((res) => {
+           console.log("res---->>", res);
+              match[2] = res;
+              mirror(msg, match);
+          }).catch(err => {
+            console.log("couldn't get file link: ", err.message);
+            msgTools.sendMessage(bot, msg, err.message, 60000);
+          });
+    } else {
+      mirror(msg, match);
+    }
   }
 });
 
