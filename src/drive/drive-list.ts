@@ -37,10 +37,13 @@ export function listFiles(fileName: string, callback: (err: string, message: str
   } else if (fileName === 'os*') {
     fileName = '*';
     parent_dir_id = constants.GDRIVE_OS_DIR_ID;
+  } else if (fileName === 'games') {
+    fileName = '*';
+    parent_dir_id = constants.GDRIVE_GAMES_DIR_ID;
   } else if (fileName === '*') {
     parent_dir_id = constants.GDRIVE_PARENT_DIR_ID;
   } else {
-    parent_dir_id = [constants.GDRIVE_PARENT_DIR_ID, constants.GDRIVE_HOLLY_DIR_ID, constants.GDRIVE_BOLLY_DIR_ID, constants.GDRIVE_TOLLY_DIR_ID, constants.GDRIVE_SOFTWARE_DIR_ID, constants.GDRIVE_TVSERIES_DIR_ID, constants.GDRIVE_OS_DIR_ID];
+    parent_dir_id = [constants.GDRIVE_PARENT_DIR_ID, constants.GDRIVE_HOLLY_DIR_ID, constants.GDRIVE_BOLLY_DIR_ID, constants.GDRIVE_TOLLY_DIR_ID, constants.GDRIVE_SOFTWARE_DIR_ID, constants.GDRIVE_TVSERIES_DIR_ID, constants.GDRIVE_OS_DIR_ID, constants.GDRIVE_GAMES_DIR_ID];
   }
   driveAuth.call((err, auth) => {
     if (err) {
