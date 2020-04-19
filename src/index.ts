@@ -54,14 +54,13 @@ setEventCallback(eventRegex.commandsRegex.mirror, eventRegex.commandsRegexNoName
     msgTools.sendUnauthorizedMessage(bot, msg);
   } else {
     if (match[2] === "file" && msg.hasOwnProperty("reply_to_message") && msg.reply_to_message.hasOwnProperty("document") && msg.reply_to_message.document.hasOwnProperty("file_id")) {
-         bot.getFileLink(msg.reply_to_message.document.file_id).then((res) => {
-           console.log("res---->>", res);
-              match[2] = res;
-              mirror(msg, match);
-          }).catch(err => {
-            console.log("couldn't get file link: ", err.message);
-            msgTools.sendMessage(bot, msg, err.message, 60000);
-          });
+      bot.getFileLink(msg.reply_to_message.document.file_id).then((res) => {
+        match[2] = res;
+        mirror(msg, match);
+      }).catch(err => {
+        console.log("couldn't get file link: ", err.message);
+        msgTools.sendMessage(bot, msg, err.message, 60000);
+      });
     } else {
       mirror(msg, match);
     }
@@ -195,16 +194,22 @@ setEventCallback(eventRegex.commandsRegex.cancelAll, eventRegex.commandsRegexNoN
   }
 });
 
-setEventCallback(eventRegex.commandsRegex.getLink, eventRegex.commandsRegexNoName.getLink, (msg, match) => {
+setEventCallback(eventRegex.commandsRegex.getLink, eventRegex.commandsRegexNoName.getLink, async (msg, match) => {
   if (msgTools.isAuthorized(msg) < 0) {
     msgTools.sendUnauthorizedMessage(bot, msg);
   } else {
-    driveDirectLink.getLink(match[2], false , (err, res) => {
-      if (err) {
-        msgTools.sendMessage(bot, msg, err, 6000);
-      } else {
-        msgTools.sendMessage(bot, msg, res, -1);
-      }
+    // driveDirectLink.getLink(match[2], false, (err, res) => {
+    //   if (err) {
+    //     msgTools.sendMessage(bot, msg, err, 6000);
+    //   } else {
+    //     msgTools.sendMessage(bot, msg, res, -1);
+    //   }
+    // });
+    await driveDirectLink.getGDindexLink(match[2], true).then((gdIndex: { url: string, name: string }) => {
+      let res = 'Direct Shareable Link: <a href = \'' + gdIndex.url + '\'>' + gdIndex.name + '</a>';
+      msgTools.sendMessage(bot, msg, res, -1);
+    }).catch((err: string) => {
+      msgTools.sendMessage(bot, msg, err, 6000);
     });
   }
 });
@@ -582,7 +587,7 @@ function initAria2(): void {
 
 
 function driveUploadCompleteCallback(err: string, gid: string, url: string, filePath: string,
-  fileName: string, fileSize: number, isFolder: boolean, getLink? : string): void {
+  fileName: string, fileSize: number, isFolder: boolean, gdIndexLink?: string): void {
 
   var finalMessage;
   if (err) {
@@ -592,9 +597,9 @@ function driveUploadCompleteCallback(err: string, gid: string, url: string, file
     cleanupDownload(gid, finalMessage);
   } else {
     console.log(`${gid}: Uploaded `);
-    if (fileSize && getLink) {
+    if (fileSize && gdIndexLink) {
       var fileSizeStr = downloadUtils.formatSize(fileSize);
-      finalMessage = `<a href='${url}'>${fileName}</a> (${fileSizeStr}) \n${getLink}`;
+      finalMessage = `<b>GDrive Link</b>: <a href='${url}'>${fileName}</a> (${fileSizeStr}) \n\n<b>Do not share the GDrive Link. \n\nYou can share this link</b>: <a href='${gdIndexLink}'>${fileName}</a>`;
     } else {
       finalMessage = `<a href='${url}'>${fileName}</a>`;
     }

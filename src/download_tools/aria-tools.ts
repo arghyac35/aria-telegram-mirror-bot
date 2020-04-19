@@ -150,7 +150,7 @@ export function getFileSize(gid: string, callback: (err: string, fileSize: numbe
 }
 
 interface DriveUploadCompleteCallback {
-  (err: string, gid: string, url: string, filePath: string, fileName: string, fileSize: number, isFolder: boolean, getLink? : string): void;
+  (err: string, gid: string, url: string, filePath: string, fileName: string, fileSize: number, isFolder: boolean, getLink?: string): void;
 }
 
 /**
@@ -206,23 +206,25 @@ function driveUploadFile(dlDetails: DlVars, filePath: string, fileName: string, 
   drive.uploadRecursive(dlDetails,
     filePath,
     constants.GDRIVE_PARENT_DIR_ID,
-    (err: string, url: string, isFolder: boolean) => {
-      if (fileSize) {
-      // Add direct link to the final message
-      driveDirectLink.getLink(url, false , (err1: string, res: string) => {
-        console.log('called-->');
-        let directLink: string;
-          if (err1) {
-            directLink = `Direct Link: ${err}`;
-          } else {
-            directLink = res;
-          }
-          console.log('final directLink--->', directLink);
-          callback(err, dlDetails.gid, url, filePath, fileName, fileSize, isFolder, directLink);
-      });
-      } else {
-        callback(err, dlDetails.gid, url, filePath, fileName, fileSize, isFolder);
-      }
+    async (err: string, url: string, isFolder: boolean, fileId: string) => {
+        // Add direct link to the final message
+        // driveDirectLink.getLink(url, false , (err1: string, res: string) => {
+        //   console.log('called-->');
+        //   let directLink: string;
+        //     if (err1) {
+        //       directLink = `Direct Link: ${err}`;
+        //     } else {
+        //       directLink = res;
+        //     }
+        //     console.log('final directLink--->', directLink);
+        //     callback(err, dlDetails.gid, url, filePath, fileName, fileSize, isFolder, directLink);
+        // });
+
+        await driveDirectLink.getGDindexLink(fileId).then((gdIndexLink: string) => {
+          callback(err, dlDetails.gid, url, filePath, fileName, fileSize, isFolder, gdIndexLink);
+        }).catch((err: string) => {
+          callback(err, dlDetails.gid, url, filePath, fileName, fileSize, isFolder);
+        });
     });
 }
 

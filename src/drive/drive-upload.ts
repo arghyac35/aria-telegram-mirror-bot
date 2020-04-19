@@ -50,25 +50,25 @@ function createFolderOrEmpty(drive: drive_v3.Drive, filePath: string, parent: st
 }
 
 export function getSharableLink(fileId: string, isFolder: boolean, 
-  callback: (err: string, url: string, isFolder: boolean) => void): void {
+  callback: (err: string, url: string, isFolder: boolean, fileId: string) => void): void {
 
   if (!constants.IS_TEAM_DRIVE || (constants.IS_TEAM_DRIVE && !isFolder)) {
     driveAuth.call((err, auth) => {
       if (err) {
-        callback(err, null, false);
+        callback(err, null, false, null);
         return;
       }
       const drive = google.drive({ version: 'v3', auth });
       createPermissions(drive, fileId)
         .then(() => {
-          callback(null, utils.getFileLink(fileId, isFolder), isFolder);
+          callback(null, utils.getFileLink(fileId, isFolder), isFolder, fileId);
         })
         .catch(err => {
-          callback(err.message, null, false);
+          callback(err.message, null, false, null);
         });
     });
   } else {
-    callback(null, utils.getFileLink(fileId, isFolder), isFolder);
+    callback(null, utils.getFileLink(fileId, isFolder), isFolder, fileId);
   }
 }
 
