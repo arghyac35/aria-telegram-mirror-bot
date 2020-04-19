@@ -1,5 +1,8 @@
 import request = require('request')
 import jsdom = require("jsdom");
+import constants = require('../.constants.js');
+import driveAuth = require('./drive-auth.js');
+import { google } from 'googleapis';
 
 /**
  * TO BE WRITTEN LATER😁😁😁
@@ -60,4 +63,57 @@ export function getLink(url: string, getOnlyLink: boolean, callback: (err: strin
                 callback('Not a proper gdrive link', null);
             }
         });
+}
+
+export async function getGDindexLink(fileId: string, isUrl?: boolean) {
+    if (isUrl) {
+        let url = fileId.match(/[-\w]{25,}/);
+        fileId = Array.isArray(url) && url.length > 0 ? url[0] : ''
+    }
+    return new Promise(async (resolve, reject) => {
+        if (fileId) {
+            driveAuth.call((err, auth) => {
+                if (err) {
+                    reject(err);
+                }
+                const drive = google.drive({ version: 'v3', auth });
+
+                drive.files.get({ fileId: fileId, fields: 'id, name, parents, mimeType' },
+                    async (err: Error, res: any) => {
+                        if (err) {
+                            reject(err.message);
+                        } else {
+                            let url = constants.INDEX_DOMAIN + encodeURIComponent(await getFilePathDrive(res['data']['parents'], drive) + res['data']['name'])
+                            if (res['data']['mimeType'] === 'application/vnd.google-apps.folder') {
+                                url += '/'
+                            }
+                            resolve(isUrl ? { url: url, name: res['data']['name'] } : url);
+                        }
+                    });
+            });
+        } else {
+            reject('🔥 error: %o : File id not found');
+        }
+    });
+}
+
+async function getFilePathDrive(parents: any, drive: any) {
+    let parent = parents;
+    let tree = [];
+    let path: string = '';
+    if (parent) {
+        do {
+            const f = await drive.files.get({ fileId: parent[0], fields: 'id, name, parents' });
+            parent = f.data.parents;
+            if (!parent) break;
+            tree.push({ 'id': parent[0], 'name': f.data.name })
+        } while (true);
+    }
+    tree.reverse();
+    for (const folder of tree) {
+        if (folder.name !== 'Stuffs') {
+            path += folder.name + '/';
+        }
+    }
+    return path;
 }
