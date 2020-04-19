@@ -109,7 +109,7 @@ function generateSearchQuery(fileName: string, parent: string | string[]): strin
   } else {
     q += 'name contains \'' + fileName + '\'';
   }
-  q += ')';
+  q += ') and trashed = false';
   return q;
 }
 
