@@ -9,6 +9,7 @@ export class RegExps {
   readonly cancelAll: RegExp;
   readonly disk: RegExp;
   readonly getLink: RegExp;
+  readonly clone: RegExp;
 
   constructor(commands: string[]) {
     this.start = new RegExp(commands[0], 'i');
@@ -21,5 +22,6 @@ export class RegExps {
     this.cancelAll = new RegExp(commands[7], 'i');
     this.disk = new RegExp(commands[8], 'i');
     this.getLink = new RegExp(commands[9], 'i');
+    this.clone = new RegExp(commands[10], 'i');
   }
 }
