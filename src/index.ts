@@ -8,6 +8,7 @@ import dlm = require('./dl_model/dl-manager');
 import driveList = require('./drive/drive-list.js');
 import driveUtils = require('./drive/drive-utils.js');
 import driveDirectLink = require('./drive/drive-directLink.js');
+import cloneFn = require('./drive/drive-clone.js');
 import details = require('./dl_model/detail');
 import filenameUtils = require('./download_tools/filename-utils');
 import { EventRegex } from './bot_utils/event_regex';
@@ -193,6 +194,42 @@ setEventCallback(eventRegex.commandsRegex.cancelAll, eventRegex.commandsRegexNoN
     msgTools.sendUnauthorizedMessage(bot, msg);
   }
 });
+
+setEventCallback(eventRegex.commandsRegex.clone, eventRegex.commandsRegexNoName.clone, async (msg, match) => {
+  if (msgTools.isAuthorized(msg) < 0) {
+    msgTools.sendUnauthorizedMessage(bot, msg);
+  } else {
+    clone(msg, match);
+  }
+});
+
+/**
+ * Start a clonning Google Drive files. Make sure that this is triggered by an
+ * authorized user, because this function itself does not check for that.
+ * @param {Object} msg The Message that triggered the download
+ * @param {Array} match Message matches
+ */
+async function clone(msg: TelegramBot.Message, match: RegExpExecArray) {
+  // get the drive filed id from url
+  const driveId = match[2].match(/[-\w]{25,}/);
+  const fileId: string = Array.isArray(driveId) && driveId.length > 0 ? driveId[0] : '';
+  if (fileId) {
+    let cloneMsg = await bot.sendMessage(msg.chat.id, `Cloning: <code>` + match[2] + `</code>`, {
+      reply_to_message_id: msg.message_id,
+      parse_mode: 'HTML'
+    });
+    // call the clone function
+    await cloneFn.driveClone(fileId).then((res: string) => {
+      msgTools.deleteMsg(bot, cloneMsg);
+      msgTools.sendMessage(bot, msg, res, -1);
+    }).catch((err: string) => {
+      msgTools.deleteMsg(bot, cloneMsg);
+      msgTools.sendMessage(bot, msg, err, 10000);
+    });
+  } else {
+    msgTools.sendMessage(bot, msg, `Google drive ID could not be found in the provided link`);
+  }
+}
 
 setEventCallback(eventRegex.commandsRegex.getLink, eventRegex.commandsRegexNoName.getLink, async (msg, match) => {
   if (msgTools.isAuthorized(msg) < 0) {
