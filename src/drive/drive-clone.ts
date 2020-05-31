@@ -2,15 +2,23 @@ import constants = require('../.constants.js');
 import driveAuth = require('./drive-auth.js');
 import { google, drive_v3 } from 'googleapis';
 import gdrive = require('./drive-upload');
+import TelegramBot = require('node-telegram-bot-api');
+import msgTools = require('../bot_utils/msg-tools.js');
+import http = require('http');
 
-export async function driveClone(fileId: string) {
+let folderSize = 0;
+
+export async function driveClone(fileId: string, bot: TelegramBot, cloneMsg: TelegramBot.Message) {
     return new Promise(async (resolve, reject) => {
         driveAuth.call(async (err, auth) => {
             if (err) {
                 reject(err);
             }
+            let message = `Cloning: <code>`;
             const drive = google.drive({ version: 'v3', auth });
             await drive.files.get({ fileId: fileId, fields: 'id, name, mimeType, size', supportsAllDrives: true }).then(async (meta) => {
+                message += meta.data.name + `</code>`;
+                msgTools.editMessage(bot, cloneMsg, message);
                 // Check for folders
                 if (meta.data.mimeType === 'application/vnd.google-apps.folder') {
                     // Create directory
@@ -18,14 +26,16 @@ export async function driveClone(fileId: string) {
                         if (err) {
                             reject(err);
                         } else {
+                            message += `\n\nFolder Created, now Ruko zara sabar karo...`;
+                            msgTools.editMessage(bot, cloneMsg, message);
                             // copy dir
-                            await copyFolder(meta.data, dir_id, drive);
+                            await copyFolder(meta.data, dir_id, drive, bot, cloneMsg, message);
                             let msg: string;
                             gdrive.getSharableLink(dir_id, true, (err, url) => {
                                 if (err) {
                                     reject(err);
                                 }
-                                msg = `<a href="` + url + `">` + meta.data.name + `</a>`;
+                                msg = `<a href="` + url + `">` + meta.data.name + `</a> (` + getReadAbleFileSize(folderSize) + `)`;
                                 if (constants.INDEX_DOMAIN) {
                                     msg += `\n\n<a href="` + constants.INDEX_DOMAIN + `GdriveBot/` + encodeURIComponent(meta.data.name) + `/">Index URL</a>`
                                 }
@@ -34,9 +44,13 @@ export async function driveClone(fileId: string) {
                         }
                     });
                 } else {
+                    message += `\n\nRuko zara sabar karo...`;
+                    msgTools.editMessage(bot, cloneMsg, message);
                     //copy file
                     await copyFile(meta.data, constants.GDRIVE_PARENT_DIR_ID, drive).then((res: any) => {
                         let msg: string;
+                        message += `\n\nYo boi copy is done getting shareable link...`;
+                        msgTools.editMessage(bot, cloneMsg, message);
                         gdrive.getSharableLink(res.id, false, (err, url) => {
                             if (err) {
                                 reject(err);
@@ -45,6 +59,8 @@ export async function driveClone(fileId: string) {
                             if (constants.INDEX_DOMAIN) {
                                 msg += `\n\n<a href="` + constants.INDEX_DOMAIN + `GdriveBot/` + encodeURIComponent(res.name) + `">Index URL</a>`
                             }
+                            res.url = url;
+                            notifyExternal(true, cloneMsg.chat.id, res);
                             resolve(msg);
                         });
                     }).catch((err: string) => {
@@ -56,6 +72,10 @@ export async function driveClone(fileId: string) {
             });
         });
     });
+}
+
+async function timeout(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 async function copyFile(file: any, parent: string, drive: drive_v3.Drive) {
@@ -74,18 +94,31 @@ async function copyFile(file: any, parent: string, drive: drive_v3.Drive) {
     });
 }
 
-async function copyFolder(file: any, dir_id: string, drive: drive_v3.Drive) {
-    let searchQuery = `'` + file.id + `' in parents`;
+async function copyFolder(file: drive_v3.Schema$File, dir_id: string, drive: drive_v3.Drive, bot?: TelegramBot, cloneMsg?: TelegramBot.Message, originalMessage?: string) {
+    let searchQuery = `'` + file.id + `' in parents and trashed = false`;
     let files = await driveListFiles(searchQuery, drive);
     for (let index = 0; index < files.length; index++) {
         const element = files[index];
         if (element.mimeType === 'application/vnd.google-apps.folder') {
+            msgTools.editMessage(bot, cloneMsg, originalMessage + `\n\nCopying folder: ` + element.name);
             // recurse
-            createFolder(drive, element.name, dir_id, element.mimeType, (err, id) => {
-                copyFolder(element, id, drive);
+            createFolder(drive, element.name, dir_id, element.mimeType, async (err, id) => {
+                if (err) {
+                    console.error('Create subfolder error: ', err);
+                } else {
+                    copyFolder(element, id, drive);
+                }
             });
         } else {
-            await copyFile(element, dir_id, drive);
+            msgTools.editMessage(bot, cloneMsg, originalMessage + `\n\nCopying file: <code>` + element.name + `</code>`);
+            await Promise.all([
+                copyFile(element, dir_id, drive).then(d => {
+                    folderSize += parseInt(element.size);
+                }).catch(err => {
+                    console.error('Error copying file: ' + element.name + ' Error for: ' + err)
+                }),
+                timeout(1000)
+            ]);
         }
     }
 }
@@ -154,4 +187,35 @@ function createFolder(drive: drive_v3.Drive, directory_name: string, parent: str
                 callback(null, res.data.id);
             }
         });
+}
+
+function notifyExternal(successful: boolean, originGroup: number, values: any) {
+    if (!constants.DOWNLOAD_NOTIFY_TARGET || !constants.DOWNLOAD_NOTIFY_TARGET.enabled) return;
+    const data = JSON.stringify({
+        successful: successful,
+        file: {
+            name: 'Cloning: ' + values.name,
+            driveURL: values.url,
+            size: getReadAbleFileSize(values.size)
+        },
+        originGroup: originGroup
+    });
+
+    const options = {
+        host: constants.DOWNLOAD_NOTIFY_TARGET.host,
+        port: constants.DOWNLOAD_NOTIFY_TARGET.port,
+        path: constants.DOWNLOAD_NOTIFY_TARGET.path,
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(data)
+        }
+    };
+
+    var req = http.request(options);
+    req.on('error', (e) => {
+        console.error(`notifyExternal failed: ${e.message}`);
+    });
+    req.write(data);
+    req.end();
 }
