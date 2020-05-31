@@ -5,6 +5,7 @@ import gdrive = require('./drive-upload');
 import TelegramBot = require('node-telegram-bot-api');
 import msgTools = require('../bot_utils/msg-tools.js');
 import http = require('http');
+import dlUtils = require('../download_tools/utils');
 
 let folderSize = 0;
 
@@ -35,10 +36,11 @@ export async function driveClone(fileId: string, bot: TelegramBot, cloneMsg: Tel
                                 if (err) {
                                     reject(err);
                                 }
-                                msg = `<a href="` + url + `">` + meta.data.name + `</a> (` + getReadAbleFileSize(folderSize) + `)`;
+                                msg = `<a href="` + url + `">` + meta.data.name + `</a> (` + dlUtils.formatSize(folderSize) + `)`;
                                 if (constants.INDEX_DOMAIN) {
                                     msg += `\n\n<a href="` + constants.INDEX_DOMAIN + `GdriveBot/` + encodeURIComponent(meta.data.name) + `/">Index URL</a>`
                                 }
+                                folderSize = 0;
                                 resolve(msg);
                             });
                         }
@@ -55,7 +57,7 @@ export async function driveClone(fileId: string, bot: TelegramBot, cloneMsg: Tel
                             if (err) {
                                 reject(err);
                             }
-                            msg = `<a href="` + url + `">` + res.name + `</a> (` + getReadAbleFileSize(res.size) + `)`;
+                            msg = `<a href="` + url + `">` + res.name + `</a> (` + dlUtils.formatSize(res.size) + `)`;
                             if (constants.INDEX_DOMAIN) {
                                 msg += `\n\n<a href="` + constants.INDEX_DOMAIN + `GdriveBot/` + encodeURIComponent(res.name) + `">Index URL</a>`
                             }
@@ -79,6 +81,7 @@ async function timeout(ms: number) {
 }
 
 async function copyFile(file: any, parent: string, drive: drive_v3.Drive) {
+    console.log('Copying file: ', file.name);
     let body = {
         'parents': [parent],
         'name': file.name
@@ -100,25 +103,32 @@ async function copyFolder(file: drive_v3.Schema$File, dir_id: string, drive: dri
     for (let index = 0; index < files.length; index++) {
         const element = files[index];
         if (element.mimeType === 'application/vnd.google-apps.folder') {
-            msgTools.editMessage(bot, cloneMsg, originalMessage + `\n\nCopying folder: ` + element.name);
+            msgTools.editMessage(bot, cloneMsg, originalMessage + `\n\nCopying folder: ` + element.name + ` ...`);
             // recurse
-            createFolder(drive, element.name, dir_id, element.mimeType, async (err, id) => {
-                if (err) {
-                    console.error('Create subfolder error: ', err);
-                } else {
-                    copyFolder(element, id, drive);
-                }
-            });
+            await timeout(1000);
+            console.log('Creating folder: ', element.name);
+            let id = await createFolder2(drive, element.name, dir_id, element.mimeType);
+            await copyFolder(element, id, drive);
+            // await Promise.all([
+            //     createFolder(drive, element.name, dir_id, element.mimeType, async (err, id) => {
+            //         if (err) {
+            //             console.error('Create subfolder error, file: ', err, element.name);
+            //         } else {
+            //             await copyFolder(element, id, drive);
+            //         }
+            //     }),
+            //     timeout(1000)
+            // ]);
         } else {
             msgTools.editMessage(bot, cloneMsg, originalMessage + `\n\nCopying file: <code>` + element.name + `</code>`);
-            await Promise.all([
-                copyFile(element, dir_id, drive).then(d => {
-                    folderSize += parseInt(element.size);
-                }).catch(err => {
-                    console.error('Error copying file: ' + element.name + ' Error for: ' + err)
-                }),
-                timeout(1000)
-            ]);
+
+            await timeout(1000); // 1 sec
+            await copyFile(element, dir_id, drive).then(d => {
+                folderSize += parseInt(element.size);
+            }).catch(err => {
+                console.error('Error copying file: ' + element.name + ' Error for: ' + err)
+            });
+
         }
     }
 }
@@ -168,6 +178,22 @@ function getReadAbleFileSize(size: number) {
     return parseFloat((size / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
+async function createFolder2(drive: drive_v3.Drive, directory_name: string, parent: string, mime: string): Promise<any> {
+    return await drive.files.create({
+        fields: 'id',
+        supportsAllDrives: true,
+        requestBody: {
+            mimeType: mime,
+            name: directory_name,
+            parents: [parent]
+        }
+    }).then(res => {
+        return res.data.id;
+    }).catch(error => {
+        console.error('Cannont create folder: ', error.message);
+    });
+}
+
 function createFolder(drive: drive_v3.Drive, directory_name: string, parent: string, mime: string,
     callback: (err: string, id: string) => void): void {
     drive.files.create({
@@ -196,7 +222,7 @@ function notifyExternal(successful: boolean, originGroup: number, values: any) {
         file: {
             name: 'Cloning: ' + values.name,
             driveURL: values.url,
-            size: getReadAbleFileSize(values.size)
+            size: dlUtils.formatSize(values.size)
         },
         originGroup: originGroup
     });
