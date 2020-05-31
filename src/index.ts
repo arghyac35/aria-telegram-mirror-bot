@@ -219,7 +219,7 @@ async function clone(msg: TelegramBot.Message, match: RegExpExecArray) {
       parse_mode: 'HTML'
     });
     // call the clone function
-    await cloneFn.driveClone(fileId).then((res: string) => {
+    await cloneFn.driveClone(fileId, bot, cloneMsg).then((res: string) => {
       msgTools.deleteMsg(bot, cloneMsg);
       msgTools.sendMessage(bot, msg, res, -1);
     }).catch((err: string) => {
