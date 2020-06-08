@@ -243,8 +243,8 @@ setEventCallback(eventRegex.commandsRegex.getLink, eventRegex.commandsRegexNoNam
     //   }
     // });
     await driveDirectLink.getGDindexLink(match[2], true).then((gdIndex: { url: string, name: string }) => {
-      let res = 'Direct Shareable Link: <a href = \'' + gdIndex.url + '\'>' + gdIndex.name + '</a>';
-      msgTools.sendMessage(bot, msg, res, -1);
+      let res = 'Direct Shareable Link: <a href = "' + gdIndex.url + '">' + gdIndex.name + '</a>';
+      msgTools.sendMessage(bot, msg, res, 60000);
     }).catch((err: string) => {
       msgTools.sendMessage(bot, msg, err, 6000);
     });
@@ -636,7 +636,7 @@ function driveUploadCompleteCallback(err: string, gid: string, url: string, file
     console.log(`${gid}: Uploaded `);
     if (fileSize && gdIndexLink) {
       var fileSizeStr = downloadUtils.formatSize(fileSize);
-      finalMessage = `<b>GDrive Link</b>: <a href='${url}'>${fileName}</a> (${fileSizeStr}) \n\n<b>Do not share the GDrive Link. \n\nYou can share this link</b>: <a href='${gdIndexLink}'>${fileName}</a>`;
+      finalMessage = `<b>GDrive Link</b>: <a href="${url}">${fileName}</a> (${fileSizeStr}) \n\n<b>Do not share the GDrive Link. \n\nYou can share this link</b>: <a href='${gdIndexLink}'>${fileName}</a>`;
     } else {
       finalMessage = `<a href='${url}'>${fileName}</a>`;
     }
