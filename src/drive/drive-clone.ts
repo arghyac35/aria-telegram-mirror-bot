@@ -7,7 +7,6 @@ import msgTools = require('../bot_utils/msg-tools.js');
 import http = require('http');
 import dlUtils = require('../download_tools/utils');
 
-let folderSize = 0;
 
 export async function driveClone(fileId: string, bot: TelegramBot, cloneMsg: TelegramBot.Message) {
     return new Promise(async (resolve, reject) => {
@@ -27,10 +26,10 @@ export async function driveClone(fileId: string, bot: TelegramBot, cloneMsg: Tel
                         if (err) {
                             reject(err);
                         } else {
-                            message += `\n\nFolder Created, now Ruko zara sabar karo...`;
+                            message += `\n\nFolder Created, now Ruko zara🖐 sabar karo✋...`;
                             msgTools.editMessage(bot, cloneMsg, message);
                             // copy dir
-                            await copyFolder(meta.data, dir_id, drive, bot, cloneMsg, message);
+                            let folderSize = await copyFolder(meta.data, dir_id, drive);
                             let msg: string;
                             gdrive.getSharableLink(dir_id, true, (err, url) => {
                                 if (err) {
@@ -40,6 +39,7 @@ export async function driveClone(fileId: string, bot: TelegramBot, cloneMsg: Tel
                                 if (constants.INDEX_DOMAIN) {
                                     msg += `\n\n<a href="` + constants.INDEX_DOMAIN + `GdriveBot/` + encodeURIComponent(meta.data.name) + `/">Index URL</a>`
                                 }
+                                notifyExternal(true, cloneMsg.chat.id, { name: meta.data.name, url, size: folderSize });
                                 folderSize = 0;
                                 resolve(msg);
                             });
@@ -97,31 +97,18 @@ async function copyFile(file: any, parent: string, drive: drive_v3.Drive) {
     });
 }
 
-async function copyFolder(file: drive_v3.Schema$File, dir_id: string, drive: drive_v3.Drive, bot?: TelegramBot, cloneMsg?: TelegramBot.Message, originalMessage?: string) {
-    let searchQuery = `'` + file.id + `' in parents and trashed = false`;
+async function copyFolder(file: drive_v3.Schema$File, dir_id: string, drive: drive_v3.Drive) {
+    let searchQuery = `'` + file.id + `' in parents and trashed = false`; let folderSize = 0;
     let files = await driveListFiles(searchQuery, drive);
     for (let index = 0; index < files.length; index++) {
         const element = files[index];
         if (element.mimeType === 'application/vnd.google-apps.folder') {
-            msgTools.editMessage(bot, cloneMsg, originalMessage + `\n\nCopying folder: ` + element.name + ` ...`);
             // recurse
             await timeout(1000);
             console.log('Creating folder: ', element.name);
             let id = await createFolder2(drive, element.name, dir_id, element.mimeType);
             await copyFolder(element, id, drive);
-            // await Promise.all([
-            //     createFolder(drive, element.name, dir_id, element.mimeType, async (err, id) => {
-            //         if (err) {
-            //             console.error('Create subfolder error, file: ', err, element.name);
-            //         } else {
-            //             await copyFolder(element, id, drive);
-            //         }
-            //     }),
-            //     timeout(1000)
-            // ]);
         } else {
-            msgTools.editMessage(bot, cloneMsg, originalMessage + `\n\nCopying file: <code>` + element.name + `</code>`);
-
             await timeout(1000); // 1 sec
             await copyFile(element, dir_id, drive).then(d => {
                 folderSize += parseInt(element.size);
@@ -131,6 +118,7 @@ async function copyFolder(file: drive_v3.Schema$File, dir_id: string, drive: dri
 
         }
     }
+    return folderSize;
 }
 
 async function driveListFiles(searchQuery: string, drive: drive_v3.Drive) {
@@ -165,17 +153,6 @@ async function driveListFiles(searchQuery: string, drive: drive_v3.Drive) {
         pageToken = resp.data.nextPageToken;
     } while (pageToken);
     return files;
-}
-
-function getReadAbleFileSize(size: number) {
-    if (size == 0) return '0 Bytes';
-    // tslint:disable-next-line: one-variable-per-declaration
-    const k = 1000,
-        dm = 2,
-        sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
-        i = Math.floor(Math.log(size) / Math.log(k));
-
-    return parseFloat((size / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
 async function createFolder2(drive: drive_v3.Drive, directory_name: string, parent: string, mime: string): Promise<any> {
