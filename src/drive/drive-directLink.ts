@@ -72,9 +72,9 @@ export async function getGDindexLink(fileId: string, isUrl?: boolean) {
     }
     return new Promise(async (resolve, reject) => {
         if (fileId) {
-            driveAuth.call((err, auth) => {
-                if (err) {
-                    reject(err);
+            driveAuth.call((authErr, auth) => {
+                if (authErr) {
+                    reject(authErr);
                 }
                 const drive = google.drive({ version: 'v3', auth });
 
@@ -83,11 +83,15 @@ export async function getGDindexLink(fileId: string, isUrl?: boolean) {
                         if (err) {
                             reject(err.message);
                         } else {
-                            let url = constants.INDEX_DOMAIN + encodeURIComponent(await getFilePathDrive(res['data']['parents'], drive) + res['data']['name'])
-                            if (res['data']['mimeType'] === 'application/vnd.google-apps.folder') {
-                                url += '/'
+                            if (res.data) {
+                                let url = constants.INDEX_DOMAIN + encodeURIComponent(await getFilePathDrive(res.data.parents, drive) + res.data.name);
+                                if (res.data.mimeType === 'application/vnd.google-apps.folder') {
+                                    url += '/'
+                                }
+                                resolve(isUrl ? { url: url, name: res.data.name } : url);
+                            } else {
+                                reject('🔥 error: %o : File not found');
                             }
-                            resolve(isUrl ? { url: url, name: res['data']['name'] } : url);
                         }
                     });
             });
