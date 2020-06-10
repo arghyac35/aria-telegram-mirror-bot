@@ -107,7 +107,7 @@ async function copyFolder(file: drive_v3.Schema$File, dir_id: string, drive: dri
             await timeout(1000);
             console.log('Creating folder: ', element.name);
             let id = await createFolder2(drive, element.name, dir_id, element.mimeType);
-            await copyFolder(element, id, drive);
+            folderSize += await copyFolder(element, id, drive);
         } else {
             await timeout(1000); // 1 sec
             await copyFile(element, dir_id, drive).then(d => {
