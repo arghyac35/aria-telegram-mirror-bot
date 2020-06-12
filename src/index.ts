@@ -42,6 +42,14 @@ setEventCallback(eventRegex.commandsRegex.start, eventRegex.commandsRegexNoName.
   }
 });
 
+setEventCallback(eventRegex.commandsRegex.id, eventRegex.commandsRegexNoName.id, (msg) => {
+  if (msgTools.isAuthorized(msg) < 0) {
+    msgTools.sendUnauthorizedMessage(bot, msg);
+  } else {
+    msgTools.sendMessage(bot, msg, "This chat's id is: <code>" + msg.chat.id + "</code>", 60000);
+  }
+});
+
 setEventCallback(eventRegex.commandsRegex.mirrorTar, eventRegex.commandsRegexNoName.mirrorTar, (msg, match) => {
   if (msgTools.isAuthorized(msg) < 0) {
     msgTools.sendUnauthorizedMessage(bot, msg);
