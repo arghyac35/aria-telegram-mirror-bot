@@ -16,34 +16,9 @@ export function listFiles(fileName: string, callback: (err: string, message: str
   // if (fileName === '' || fileName ==='*' || fileName === '%') return;
   let parent_dir_id: string | string[];
   parent_dir_id = constants.GDRIVE_PARENT_DIR_ID;
-  if (fileName === 'movies*') {
-    fileName = '*';
-    parent_dir_id = constants.GDRIVE_MOVIES_DIR_ID;
-  } else if (fileName === 'movies_holly') {
-    fileName = '*';
-    parent_dir_id = constants.GDRIVE_HOLLY_DIR_ID;
-  } else if (fileName === 'movies_bolly') {
-    fileName = '*';
-    parent_dir_id = constants.GDRIVE_BOLLY_DIR_ID;
-  } else if (fileName === 'movies_tolly') {
-    fileName = '*';
-    parent_dir_id = constants.GDRIVE_TOLLY_DIR_ID;
-  } else if (fileName === 'tvseries*') {
-    fileName = '*';
-    parent_dir_id = constants.GDRIVE_TVSERIES_DIR_ID;
-  } else if (fileName === 'softwares*') {
-    fileName = '*';
-    parent_dir_id = constants.GDRIVE_SOFTWARE_DIR_ID;
-  } else if (fileName === 'os*') {
-    fileName = '*';
-    parent_dir_id = constants.GDRIVE_OS_DIR_ID;
-  } else if (fileName === 'games') {
-    fileName = '*';
-    parent_dir_id = constants.GDRIVE_GAMES_DIR_ID;
-  } else if (fileName === '*') {
-    parent_dir_id = constants.GDRIVE_PARENT_DIR_ID;
-  } else {
-    parent_dir_id = [constants.GDRIVE_PARENT_DIR_ID, constants.GDRIVE_HOLLY_DIR_ID, constants.GDRIVE_BOLLY_DIR_ID, constants.GDRIVE_TOLLY_DIR_ID, constants.GDRIVE_SOFTWARE_DIR_ID, constants.GDRIVE_TVSERIES_DIR_ID, constants.GDRIVE_OS_DIR_ID, constants.GDRIVE_GAMES_DIR_ID];
+  if (fileName !== '*') {
+    constants.OTHER_GDRIVE_DIR_IDS.push(constants.GDRIVE_PARENT_DIR_ID);
+    parent_dir_id = constants.OTHER_GDRIVE_DIR_IDS;
   }
   driveAuth.call((err, auth) => {
     if (err) {
@@ -61,13 +36,13 @@ export function listFiles(fileName: string, callback: (err: string, message: str
       supportsAllDrives: true,
       includeItemsFromAllDrives: true
     },
-      (err: Error, res: any) => {
+      (listErr: Error, res: any) => {
         if (err) {
-          callback(err.message, null);
+          callback(listErr.message, null);
         } else {
           res = res['data']['files'];
           getMultipleFileLinks(res);
-          callback(null, generateFilesListMessage(res));
+          callback(null, generateFilesListMessage(res, fileName));
         }
       });
   });
@@ -122,17 +97,30 @@ function getMultipleFileLinks(files: any[]): void {
   }
 }
 
-function generateFilesListMessage(files: any[]): string {
+function generateFilesListMessage(files: any[], fileName: string): string {
   var message = '';
   if (files.length > 0) {
     for (var i = 0; i < files.length; i++) {
       message += '<a href = \'' + files[i]['url'] + '\'>' + files[i]['name'] + '</a>';
-      if (files[i]['size'])
-        message += ' (' + dlUtils.formatSize(files[i]['size']) + ')\n';
-      else if (files[i]['mimeType'] === 'application/vnd.google-apps.folder')
-        message += ' (folder)\n';
-      else
+      if (files[i]['size']) {
+        message += ' (' + dlUtils.formatSize(files[i]['size']) + ')';
+        //comment this if and 'GdriveBot/' if u want gdindex link in all searches
+        //Even if u dont comment then remove the 'GdriveBot/' from below message
+        if (fileName === '*' && constants.INDEX_DOMAIN) {
+          message += ` | <a href="` + constants.INDEX_DOMAIN + `GdriveBot/` + encodeURIComponent(files[i]['name']) + `">Index URL</a>`;
+        }
         message += '\n';
+      } else if (files[i]['mimeType'] === 'application/vnd.google-apps.folder') {
+        message += ' (folder)';
+        //comment this if and 'GdriveBot/' if u want gdindex link in all searches
+        //Even if u dont comment then remove the 'GdriveBot/' from below message
+        if (fileName === '*' && constants.INDEX_DOMAIN) {
+          message += ` | <a href="` + constants.INDEX_DOMAIN + `GdriveBot/` + encodeURIComponent(files[i]['name']) + `/">Index URL</a>`;
+        }
+        message += '\n';
+      } else {
+        message += '\n';
+      }
 
     }
   } else {
