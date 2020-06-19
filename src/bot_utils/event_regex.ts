@@ -7,13 +7,13 @@ export class EventRegex {
   readonly commandsRegexNoName: regexps.RegExps;
 
   constructor() {
-    var commands = ['^/(?= )|^.start', '^/(?= )|^.mirrorTar', '^/(?= )|^.mirror', '^/(?= )|^.mirrorStatus', '^/(?= )|^.list', '^/(?= )|^.getFolder', '^/(?= )|^.cancelMirror', '^/(?= )|^.cancelAll', '^/(?= )|^.disk', '^/(?= )|^.getLink', '^/(?= )|^.clone', '^/(?= )|^.id'];
+    var commands = ['^[/|.]start', '^[/|.]mirrorTar', '^[/|.]mirror', '^[/|.]mirrorStatus', '^[/|.]list', '^[/|.]getFolder', '^[/|.]cancelMirror', '^[/|.]cancelAll', '^[/|.]disk', '^[/|.]getLink', '^[/|.]clone', '^[/|.]id'];
     var commandsNoName: string[] = [];
     var commandAfter = ['$', ' (.+)', ' (.+)', '$', ' (.+)', '$', '$', '$', '$', ' (.+)', ' (.+)', '$'];
 
     if (constants.COMMANDS_USE_BOT_NAME && constants.COMMANDS_USE_BOT_NAME.ENABLED) {
       commands.forEach((command, i) => {
-        if (command === '^/list') {
+        if (command === '^[/|.]list') {
           // In case of more than one of these bots in the same group, we want all of them to respond to /list
           commands[i] = command + commandAfter[i];
         } else {
