@@ -62,9 +62,9 @@ setEventCallback(eventRegex.commandsRegex.mirror, eventRegex.commandsRegexNoName
   if (msgTools.isAuthorized(msg) < 0) {
     msgTools.sendUnauthorizedMessage(bot, msg);
   } else {
-    if (match[2] === "file" && msg.hasOwnProperty("reply_to_message") && msg.reply_to_message.hasOwnProperty("document") && msg.reply_to_message.document.hasOwnProperty("file_id")) {
+    if (match[4] === "file" && msg.hasOwnProperty("reply_to_message") && msg.reply_to_message.hasOwnProperty("document") && msg.reply_to_message.document.hasOwnProperty("file_id")) {
       bot.getFileLink(msg.reply_to_message.document.file_id).then((res) => {
-        match[2] = res;
+        match[4] = res;
         mirror(msg, match);
       }).catch(err => {
         console.log("couldn't get file link: ", err.message);
@@ -98,8 +98,8 @@ setEventCallback(eventRegex.commandsRegex.disk, eventRegex.commandsRegexNoName.d
  */
 function mirror(msg: TelegramBot.Message, match: RegExpExecArray, isTar?: boolean): void {
   if (websocketOpened) {
-    if (downloadUtils.isDownloadAllowed(match[2])) {
-      prepDownload(msg, match[2], isTar);
+    if (downloadUtils.isDownloadAllowed(match[4])) {
+      prepDownload(msg, match[4], isTar);
     } else {
       msgTools.sendMessage(bot, msg, `Download failed. Blacklisted URL.`);
     }
@@ -120,7 +120,7 @@ setEventCallback(eventRegex.commandsRegex.list, eventRegex.commandsRegexNoName.l
   if (msgTools.isAuthorized(msg) < 0) {
     msgTools.sendUnauthorizedMessage(bot, msg);
   } else {
-    driveList.listFiles(match[2], (err, res) => {
+    driveList.listFiles(match[4], (err, res) => {
       if (err) {
         msgTools.sendMessage(bot, msg, 'Failed to fetch the list of files');
       } else {
@@ -219,10 +219,10 @@ setEventCallback(eventRegex.commandsRegex.clone, eventRegex.commandsRegexNoName.
  */
 async function clone(msg: TelegramBot.Message, match: RegExpExecArray) {
   // get the drive filed id from url
-  const driveId = match[2].match(/[-\w]{25,}/);
+  const driveId = match[4].match(/[-\w]{25,}/);
   const fileId: string = Array.isArray(driveId) && driveId.length > 0 ? driveId[0] : '';
   if (fileId) {
-    let cloneMsg = await bot.sendMessage(msg.chat.id, `Cloning: <code>` + match[2] + `</code>`, {
+    let cloneMsg = await bot.sendMessage(msg.chat.id, `Cloning: <code>` + match[4] + `</code>`, {
       reply_to_message_id: msg.message_id,
       parse_mode: 'HTML'
     });
@@ -250,7 +250,7 @@ setEventCallback(eventRegex.commandsRegex.getLink, eventRegex.commandsRegexNoNam
     //     msgTools.sendMessage(bot, msg, res, -1);
     //   }
     // });
-    await driveDirectLink.getGDindexLink(match[2], true).then((gdIndex: { url: string, name: string }) => {
+    await driveDirectLink.getGDindexLink(match[4], true).then((gdIndex: { url: string, name: string }) => {
       let res = 'Direct Shareable Link: <a href = "' + gdIndex.url + '">' + gdIndex.name + '</a>';
       msgTools.sendMessage(bot, msg, res, 60000);
     }).catch((err: string) => {
