@@ -263,19 +263,23 @@ setEventCallback(eventRegex.commandsRegex.getLink, eventRegex.commandsRegexNoNam
   if (msgTools.isAuthorized(msg) < 0) {
     msgTools.sendUnauthorizedMessage(bot, msg);
   } else {
-    // driveDirectLink.getLink(match[2], false, (err, res) => {
-    //   if (err) {
-    //     msgTools.sendMessage(bot, msg, err, 6000);
-    //   } else {
-    //     msgTools.sendMessage(bot, msg, res, -1);
-    //   }
-    // });
-    await driveDirectLink.getGDindexLink(match[4], true).then((gdIndex: { url: string, name: string }) => {
-      let res = 'Direct Shareable Link: <a href = "' + gdIndex.url + '">' + gdIndex.name + '</a>';
-      msgTools.sendMessage(bot, msg, res, 60000);
-    }).catch((err: string) => {
-      msgTools.sendMessage(bot, msg, err, 6000);
-    });
+    if (constants.INDEX_DOMAIN) {
+      // driveDirectLink.getLink(match[2], false, (err, res) => {
+      //   if (err) {
+      //     msgTools.sendMessage(bot, msg, err, 6000);
+      //   } else {
+      //     msgTools.sendMessage(bot, msg, res, -1);
+      //   }
+      // });
+      await driveDirectLink.getGDindexLink(match[4], true).then((gdIndex: { url: string, name: string }) => {
+        let res = 'Direct Shareable Link: <a href = "' + gdIndex.url + '">' + gdIndex.name + '</a>';
+        msgTools.sendMessage(bot, msg, res, 60000);
+      }).catch((err: string) => {
+        msgTools.sendMessage(bot, msg, err, 6000);
+      });
+    } else {
+      msgTools.sendMessage(bot, msg, 'GdIndex isn\'t configured.', 6000);
+    }
   }
 });
 
