@@ -37,7 +37,7 @@ export async function driveClone(fileId: string, bot: TelegramBot, cloneMsg: Tel
                                 }
                                 msg = `<a href="` + url + `">` + meta.data.name + `</a> (` + dlUtils.formatSize(folderSize) + `)`;
                                 if (constants.INDEX_DOMAIN) {
-                                    msg += `\n\n<a href="` + constants.INDEX_DOMAIN + `GdriveBot/` + encodeURIComponent(meta.data.name) + `/">Index URL</a>`
+                                    msg += `\n\n<a href="` + constants.INDEX_DOMAIN + encodeURIComponent(meta.data.name) + `/">Index URL</a>`
                                 }
                                 notifyExternal(true, cloneMsg.chat.id, { name: meta.data.name, url, size: folderSize });
                                 folderSize = 0;
@@ -59,7 +59,7 @@ export async function driveClone(fileId: string, bot: TelegramBot, cloneMsg: Tel
                             }
                             msg = `<a href="` + url + `">` + res.name + `</a> (` + dlUtils.formatSize(res.size) + `)`;
                             if (constants.INDEX_DOMAIN) {
-                                msg += `\n\n<a href="` + constants.INDEX_DOMAIN + `GdriveBot/` + encodeURIComponent(res.name) + `">Index URL</a>`
+                                msg += `\n\n<a href="` + constants.INDEX_DOMAIN + encodeURIComponent(res.name) + `">Index URL</a>`
                             }
                             res.url = url;
                             notifyExternal(true, cloneMsg.chat.id, res);
