@@ -89,6 +89,26 @@ setEventCallback(eventRegex.commandsRegex.disk, eventRegex.commandsRegexNoName.d
   }
 });
 
+setEventCallback(eventRegex.commandsRegex.mf, eventRegex.commandsRegexNoName.mf, (msg, match) => {
+  if (msgTools.isAuthorized(msg) < 0) {
+    msgTools.sendUnauthorizedMessage(bot, msg);
+  } else {
+    if (msg.hasOwnProperty("reply_to_message") && msg.reply_to_message.hasOwnProperty("document") && msg.reply_to_message.document.hasOwnProperty("file_id")) {
+      bot.getFileLink(msg.reply_to_message.document.file_id).then((res) => {
+        match.splice(2, 0, '69');// insert some fake values so that index matches in mirror fucntions
+        match.splice(3, 0, '69');
+        match.splice(4, 0, res);
+        mirror(msg, match);
+      }).catch(err => {
+        console.log("couldn't get file link: ", err.message);
+        msgTools.sendMessage(bot, msg, err.message, 60000);
+      });
+    } else {
+      msgTools.sendMessage(bot, msg, 'Failed to start download. Reply to a torrent file.', 60000);
+    }
+  }
+});
+
 /**
  * Start a new download operation. Make sure that this is triggered by an
  * authorized user, because this function itself does not check for that.
