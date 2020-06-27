@@ -11,6 +11,7 @@ export class RegExps {
   readonly getLink: RegExp;
   readonly clone: RegExp;
   readonly id: RegExp;
+  readonly mf: RegExp;
 
   constructor(commands: string[]) {
     this.start = new RegExp(commands[0], 'i');
@@ -25,5 +26,6 @@ export class RegExps {
     this.getLink = new RegExp(commands[9], 'i');
     this.clone = new RegExp(commands[10], 'i');
     this.id = new RegExp(commands[11], 'i');
+    this.mf = new RegExp(commands[12], 'i');
   }
 }
