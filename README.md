@@ -12,15 +12,21 @@ There is very little preventing users from using this to mirror pirated content.
 
 ## Bot commands
 
-* `/mirror <url>`: Download from the given URL and upload it to Google Drive. <url> can be HTTP(S), a BitTorrent magnet, or a HTTP(S) url to a BitTorrent .torrent file. A status message will be shown and updated while downloading.
-* `/mirrorTar <url>`: Same as `/mirror`, but archive multiple files into a tar before uploading it.
-* `/mirrorStatus`: Send a status message about all active and queued downloads.
-* `/cancelMirror`: Cancel a particular mirroring task. To use this, send it as a reply to the message that started the download that you want to cancel. Only the person who started the task, SUDO_USERS, and chat admins can use this command.
-* `/cancelAll`: Cancel all mirroring tasks in all chats if a [SUDO_USERS](#Constants-description) member uses it, or cancel all mirroring tasks for a particular chat if one of that chat's admins use it. No one else can use this command.
-* `/list <filename>` : Send links to downloads with the `filename` substring in the name. In case of too many downloads, only show the most recent few. 
-* `/getfolder` : Send link of drive mirror folder.
+* `/mirror <url>` or `/m <url>`: Download from the given URL and upload it to Google Drive. <url> can be HTTP(S), a BitTorrent magnet, or a HTTP(S) url to a BitTorrent .torrent file. A status message will be shown and updated while downloading.
+* `/mirrorTar <url>` or `/mt <url>`: Same as `/mirror`, but archive multiple files into a tar before uploading it.
+* `/mirrorStatus` or `/ms`: Send a status message about all active and queued downloads.
+* `/cancelMirror` or `/cm`: Cancel a particular mirroring task. To use this, send it as a reply to the message that started the download that you want to cancel. Only the person who started the task, SUDO_USERS, and chat admins can use this command.
+* `/cancelAll` or `/ca`: Cancel all mirroring tasks in all chats if a [SUDO_USERS](#Constants-description) member uses it, or cancel all mirroring tasks for a particular chat if one of that chat's admins use it. No one else can use this command.
+* `/list <filename>` or `/l <filename>`: Send links to downloads with the `filename` substring in the name. In case of too many downloads, only show the most recent few. 
+* `/getfolder` or `/gf`: Send link of drive mirror folder.
+* `/disk`: Send disk information of the machine.
+* `/getlink <driveUrl>` or `/gl <driveUrl>`: Send index link of the file.
+* `/clone <driveUrl>` or `/clone <diveUrl>`: Clone any shareable drive link. (TODO: Add service account in it so that if 750GB per account limit is over we can switch to service account.)
+* `/mirror file` or `/mf`: Forward any torrent file and reply to the forwared message with this command it will start mirroring the torrent.
 
 #### Notes
+
+* **All commands can also be called using dot(.) instead of slash(/). For e.x:** `.mirror <url>` or `.m <url>`
 
 * **All commands except** `list` **can have the bot's username appended to them. See** `COMMANDS_USE_BOT_NAME` **under [constants description](#Constants-description).** This is useful if you have multiple instances of this bot in the same group.
 
@@ -117,6 +123,7 @@ This is a description of the fields in src/.constants.js:
 * `ARIA_FILTERED_FILENAMES`: The bot will refuse to completely download (or if already downloaded, then upload) files with any of these substrings in the file/top level directory name. Can be an empty list or left undefined.
 * `ARIA_PORT`: The port for the Aria2c RPC server. If you change this, make sure to update your aria.sh as well. Safe to leave this at the default value unless something else on your system is using that port.
 * `GDRIVE_PARENT_DIR_ID`: This is the ID of the Google Drive folder that files will be uploaded into. You will get this from step 4 of Pre-installation.
+* `OTHER_GDRIVE_DIR_IDS`: This is needed if u want to look for files in multiple dirs on list command
 * `SUDO_USERS`: This is a list of Telegram user IDs. These users can use the bot in any chat. Can be an empty list, if AUTHORIZED_CHATS is not empty.
 * `AUTHORIZED_CHATS`: This is a list of Telegram Chat IDs. Anyone in these chats can use the bot in that particular chat. Anyone not in one of these chats and not in SUDO_USERS cannot use the bot. Someone in one of the chats in this list can use the bot only in that chat, not elsewhere. Can be an empty list, if SUDO_USERS is not empty.
 * `STATUS_UPDATE_INTERVAL_MS`: Set the time in milliseconds between status updates. A smaller number will update status messages faster, but Telegram will rate limit the bot if it sends/edits more than around 20 messages/minute/chat. As that quota includes messages other than status updates, do not decrease this number if you get rate limit messages in the logs.
@@ -132,6 +139,7 @@ This is a description of the fields in src/.constants.js:
   * `ENABLED`: If `true`, all bot commands have to have the bot's username (as below) appended to them. For example, `/mirror https://someweb.site/resource.tar` will become `/mirror@botName_bot https://someweb.site/resource.tar`. The only exception to this is the `/list` command, which will not have the bot's name appended. This allows having multiple non-conflicting mirror bots in the same group, and have them all reply to `/list`.
   * `NAME`: The username of the bot, as given in BotFather. Include the leading "@".
 * `IS_TEAM_DRIVE`: Set to `true` if you are mirroring to a Shared Drive.
+* `INDEX_DOMAIN`: Link for gdindex
 
 ## Starting after installation
 
