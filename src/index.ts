@@ -666,9 +666,12 @@ function driveUploadCompleteCallback(err: string, gid: string, url: string, file
     cleanupDownload(gid, finalMessage);
   } else {
     console.log(`${gid}: Uploaded `);
-    if (fileSize && gdIndexLink) {
+    if (fileSize) {
       var fileSizeStr = downloadUtils.formatSize(fileSize);
-      finalMessage = `<b>GDrive Link</b>: <a href="${url}">${fileName}</a> (${fileSizeStr}) \n\n<b>Do not share the GDrive Link. \n\nYou can share this link</b>: <a href="${gdIndexLink}">${fileName}</a>`;
+      finalMessage = `<b>GDrive Link</b>: <a href="${url}">${fileName}</a> (${fileSizeStr})`;
+if(gdIndexLink && constants.INDEX_DOMAIN){
+finalMessage += `\n\n<b>Do not share the GDrive Link. \n\nYou can share this link</b>: <a href="${gdIndexLink}">${fileName}</a>`;
+}
     } else {
       finalMessage = `<a href='${url}'>${fileName}</a>`;
     }
