@@ -207,24 +207,15 @@ function driveUploadFile(dlDetails: DlVars, filePath: string, fileName: string, 
     filePath,
     constants.GDRIVE_PARENT_DIR_ID,
     async (err: string, url: string, isFolder: boolean, fileId: string) => {
-        // Add direct link to the final message
-        // driveDirectLink.getLink(url, false , (err1: string, res: string) => {
-        //   console.log('called-->');
-        //   let directLink: string;
-        //     if (err1) {
-        //       directLink = `Direct Link: ${err}`;
-        //     } else {
-        //       directLink = res;
-        //     }
-        //     console.log('final directLink--->', directLink);
-        //     callback(err, dlDetails.gid, url, filePath, fileName, fileSize, isFolder, directLink);
-        // });
-
+      if (constants.INDEX_DOMAIN) {
         await driveDirectLink.getGDindexLink(fileId).then((gdIndexLink: string) => {
           callback(err, dlDetails.gid, url, filePath, fileName, fileSize, isFolder, gdIndexLink);
-        }).catch((err: string) => {
-          callback(err, dlDetails.gid, url, filePath, fileName, fileSize, isFolder);
+        }).catch((dlErr: string) => {
+          callback(dlErr, dlDetails.gid, url, filePath, fileName, fileSize, isFolder);
         });
+      } else {
+        callback(err, dlDetails.gid, url, filePath, fileName, fileSize, isFolder);
+      }
     });
 }
 
