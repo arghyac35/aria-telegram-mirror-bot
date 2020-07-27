@@ -78,7 +78,7 @@ export async function getGDindexLink(fileId: string, isUrl?: boolean) {
                 }
                 const drive = google.drive({ version: 'v3', auth });
 
-                drive.files.get({ fileId: fileId, fields: 'id, name, parents, mimeType' },
+                drive.files.get({ fileId: fileId, fields: 'id, name, parents, mimeType', supportsAllDrives: true },
                     async (err: Error, res: any) => {
                         if (err) {
                             reject(err.message);
@@ -107,7 +107,7 @@ async function getFilePathDrive(parents: any, drive: any) {
     let path: string = '';
     if (parent) {
         do {
-            const f = await drive.files.get({ fileId: parent[0], fields: 'id, name, parents' });
+            const f = await drive.files.get({ fileId: parent[0], fields: 'id, name, parents', supportsAllDrives: true });
             parent = f.data.parents;
             if (!parent) break;
             tree.push({ 'id': parent[0], 'name': f.data.name })
@@ -115,7 +115,7 @@ async function getFilePathDrive(parents: any, drive: any) {
     }
     tree.reverse();
     for (const folder of tree) {
-        if (folder.name !== 'Stuffs') {
+        if (folder.name !== 'Stuffs' && folder.name !== 'AnotherGdriveBot') {
             path += folder.name + '/';
         }
     }
