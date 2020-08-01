@@ -12,6 +12,7 @@ export class RegExps {
   readonly clone: RegExp;
   readonly id: RegExp;
   readonly mf: RegExp;
+  readonly tar: RegExp;
 
   constructor(commands: string[]) {
     this.start = new RegExp(commands[0], 'i');
@@ -27,5 +28,6 @@ export class RegExps {
     this.clone = new RegExp(commands[10], 'i');
     this.id = new RegExp(commands[11], 'i');
     this.mf = new RegExp(commands[12], 'i');
+    this.tar = new RegExp(commands[13], 'i');
   }
 }

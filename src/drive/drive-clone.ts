@@ -76,7 +76,7 @@ export async function driveClone(fileId: string, bot: TelegramBot, cloneMsg: Tel
     });
 }
 
-async function timeout(ms: number) {
+export async function timeout(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -121,7 +121,7 @@ async function copyFolder(file: drive_v3.Schema$File, dir_id: string, drive: dri
     return folderSize;
 }
 
-async function driveListFiles(searchQuery: string, drive: drive_v3.Drive) {
+export async function driveListFiles(searchQuery: string, drive: drive_v3.Drive) {
     const getList = (pageToken: string) => {
         return new Promise((resolve, reject) => {
             const qs = {

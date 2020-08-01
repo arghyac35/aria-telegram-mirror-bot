@@ -9,6 +9,7 @@ import driveList = require('./drive/drive-list.js');
 import driveUtils = require('./drive/drive-utils.js');
 import driveDirectLink = require('./drive/drive-directLink.js');
 import cloneFn = require('./drive/drive-clone.js');
+import driveDownload = require('./drive/download-file.js');
 import details = require('./dl_model/detail');
 import filenameUtils = require('./download_tools/filename-utils');
 import { EventRegex } from './bot_utils/event_regex';
@@ -231,6 +232,14 @@ setEventCallback(eventRegex.commandsRegex.clone, eventRegex.commandsRegexNoName.
   }
 });
 
+setEventCallback(eventRegex.commandsRegex.tar, eventRegex.commandsRegexNoName.tar, async (msg, match) => {
+  if (msgTools.isAuthorized(msg) < 0) {
+    msgTools.sendUnauthorizedMessage(bot, msg);
+  } else {
+    tar(msg, match);
+  }
+});
+
 /**
  * Start a clonning Google Drive files. Make sure that this is triggered by an
  * authorized user, because this function itself does not check for that.
@@ -253,6 +262,28 @@ async function clone(msg: TelegramBot.Message, match: RegExpExecArray) {
     }).catch((err: string) => {
       msgTools.deleteMsg(bot, cloneMsg);
       msgTools.sendMessage(bot, msg, err, 10000);
+    });
+  } else {
+    msgTools.sendMessage(bot, msg, `Google drive ID could not be found in the provided link`);
+  }
+}
+
+async function tar(msg: TelegramBot.Message, match: RegExpExecArray) {
+  // get the drive filed id from url
+  const driveId = match[4].match(/[-\w]{25,}/);
+  const fileId: string = Array.isArray(driveId) && driveId.length > 0 ? driveId[0] : '';
+  if (fileId) {
+    const tarMsg = await bot.sendMessage(msg.chat.id, `Creating Tar: <code>` + match[4] + `</code>`, {
+      reply_to_message_id: msg.message_id,
+      parse_mode: 'HTML'
+    });
+
+    driveDownload.driveDownloadAndTar(fileId, bot, tarMsg).then((res: string) => {
+      msgTools.deleteMsg(bot, tarMsg);
+      msgTools.sendMessage(bot, msg, res, -1);
+    }).catch(e =>{
+      msgTools.deleteMsg(bot, tarMsg);
+      msgTools.sendMessage(bot, msg, e, 10000);
     });
   } else {
     msgTools.sendMessage(bot, msg, `Google drive ID could not be found in the provided link`);
@@ -669,9 +700,9 @@ function driveUploadCompleteCallback(err: string, gid: string, url: string, file
     if (fileSize) {
       var fileSizeStr = downloadUtils.formatSize(fileSize);
       finalMessage = `<b>GDrive Link</b>: <a href="${url}">${fileName}</a> (${fileSizeStr})`;
-if(gdIndexLink && constants.INDEX_DOMAIN){
-finalMessage += `\n\n<b>Do not share the GDrive Link. \n\nYou can share this link</b>: <a href="${gdIndexLink}">${fileName}</a>`;
-}
+      if (gdIndexLink && constants.INDEX_DOMAIN) {
+        finalMessage += `\n\n<b>Do not share the GDrive Link. \n\nYou can share this link</b>: <a href="${gdIndexLink}">${fileName}</a>`;
+      }
     } else {
       finalMessage = `<a href='${url}'>${fileName}</a>`;
     }

@@ -180,7 +180,7 @@ export function uploadFile(dlDetails: DlVars, filePath: string, fileSize: number
           driveUploadFile(dlDetails, realFilePath, fileName, fileSize, callback);
           return;
         }
-        if (res['free'] > fileSize) {
+        if (Number(res['free']) > Number(fileSize)) {
           console.log('Starting archival');
           var destName = fileName + '.tar';
           tar.archive(realFilePath, destName, (err: string, size: number) => {
