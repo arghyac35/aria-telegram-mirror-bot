@@ -22,6 +22,7 @@
     "http-range-parse": "^1.0.0",
     "jsdom": "^15.1.1",
     "node-telegram-bot-api": "^0.30.0",
+    "progress-stream": "^2.0.0",
     "request": "^2.88.0",
     "tar": "^4.4.4",
     "typescript": "^3.5.3",
