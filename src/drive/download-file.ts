@@ -11,17 +11,19 @@ import { DlVars } from "../dl_model/detail.js";
 import driveDirectLink = require('./drive-directLink.js');
 import downloadUtils = require('../download_tools/utils');
 import uuid = require("uuid");
+var Progress = require('progress-stream');
 
-
-async function downloadFile(fileId: string, drive: drive_v3.Drive, filePath: string, dir: string) {
+var om = '';
+async function downloadFile(file: any, drive: drive_v3.Drive, filePath: string, dir: string, bot: TelegramBot, tarringMsg: TelegramBot.Message, message: string) {
     return new Promise(async (resolve, reject) => {
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir, { recursive: true });
         }
         var dest = fs.createWriteStream(filePath);
+        var progress = Progress({ time: constants.STATUS_UPDATE_INTERVAL_MS ? constants.STATUS_UPDATE_INTERVAL_MS : 12000, length: file.size });
 
         await drive.files.get({
-            fileId: fileId,
+            fileId: file.id,
             supportsAllDrives: true,
             alt: 'media'
         }, {
@@ -33,8 +35,21 @@ async function downloadFile(fileId: string, drive: drive_v3.Drive, filePath: str
                 })
                 .on('error', (dlErr: any) => {
                     console.log('error', dlErr);
+                    reject(dlErr);
                 })
-                .pipe(dest);
+                .pipe(progress).pipe(dest);
+            //checking progress of file
+            progress.on('progress', function (prog: any) {
+                let totalsize = downloadUtils.formatSize(file.size);
+                let speed = downloadUtils.formatSize(prog.speed.toFixed(2));
+
+                let tmessage = message + `\n<b>Downloading</b>: <code>${file.name}</code>\n<b>Size</b>: <code>${totalsize}</code>\n<b>Progress</b>: <code>${prog.percentage.toFixed(2)}%</code>\n<b>Speed</b>: <code>${speed}ps</code>\n<b>ETA</b>: <code>${prog.eta}</code>`;
+
+                if (om !== tmessage) {
+                    msgTools.editMessage(bot, tarringMsg, tmessage);
+                }
+                om = tmessage;
+            });
         }).catch((error: Error) => {
             reject(error.message + `\n\nEither it is not a Shareable Link or something went wrong while fetching files metadata`);
         });
@@ -75,7 +90,7 @@ export async function driveDownloadAndTar(fileId: string, bot: TelegramBot, tarr
                     let folderPath = `${constants.ARIA_DOWNLOAD_LOCATION}/${dlDir}/${meta.data.name}/`;
                     let originalFileName = meta.data.name;
 
-                    let res = await downloadAllFiles(meta.data, drive, folderPath);
+                    let res = await downloadAllFiles(meta.data, drive, folderPath, bot, tarringMsg, message);
                     if (res.message && res.message.includes('found')) {
                         reject(res.message);
                     } else {
@@ -143,7 +158,7 @@ export async function driveDownloadAndTar(fileId: string, bot: TelegramBot, tarr
 }
 
 
-async function downloadAllFiles(meta: drive_v3.Schema$File, drive: drive_v3.Drive, folderPath: string) {
+async function downloadAllFiles(meta: drive_v3.Schema$File, drive: drive_v3.Drive, folderPath: string, bot: TelegramBot, tarringMsg: TelegramBot.Message, message: string) {
     // list all files inside the folder
     const files = await driveListFiles("'" + meta.id + "' in parents and trashed = false", drive);
     let errMsg: boolean;
@@ -153,11 +168,11 @@ async function downloadAllFiles(meta: drive_v3.Schema$File, drive: drive_v3.Driv
         for (let index = 0; index < files.length; index++) {
             const file = files[index];
             if (file.mimeType === 'application/vnd.google-apps.folder') {
-                await downloadAllFiles(file, drive, folderPath + file.name + '/');
+                await downloadAllFiles(file, drive, folderPath + file.name + '/', bot, tarringMsg, message);
             } else {
                 let filePath = folderPath + file.name;
                 await timeout(1000);
-                await downloadFile(file.id, drive, filePath, folderPath).then(d => {
+                await downloadFile(file, drive, filePath, folderPath, bot, tarringMsg, message).then(d => {
                     console.log('Download complete for: ', file.name);
                 }).catch(e => {
                     console.log('Download error for: ', file.name);
@@ -196,11 +211,16 @@ function driveUploadFile(filePath: string, dlDetails: DlVars, callback: DriveUpl
             }
         });
 }
-
+var lastMessage = '';
 function updateStatus(dlDetails: DlVars, totalsize: number, message: string, bot: TelegramBot, tarringMsg: TelegramBot.Message): void {
     let sm = getStatus(dlDetails, totalsize);
     message += `\n\n` + sm.message;
-    msgTools.editMessage(bot, tarringMsg, message);
+    if (lastMessage !== message) {
+        msgTools.editMessage(bot, tarringMsg, message).catch(e => {
+            console.error('UpdateStatus error: ', e.message);
+        });
+    }
+    lastMessage = message;
 }
 
 function getStatus(dlDetails: DlVars, totalSize: number) {
