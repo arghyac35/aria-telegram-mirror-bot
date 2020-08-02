@@ -12,6 +12,7 @@ import driveDirectLink = require('./drive-directLink.js');
 import downloadUtils = require('../download_tools/utils');
 import uuid = require("uuid");
 
+
 async function downloadFile(fileId: string, drive: drive_v3.Drive, filePath: string, dir: string) {
     return new Promise(async (resolve, reject) => {
         if (!fs.existsSync(dir)) {
@@ -41,14 +42,30 @@ async function downloadFile(fileId: string, drive: drive_v3.Drive, filePath: str
 }
 
 export async function driveDownloadAndTar(fileId: string, bot: TelegramBot, tarringMsg: TelegramBot.Message) {
-    console.log(fileId);
+    const dlDetails: DlVars = {
+        isTar: true,
+        tgUsername: '',
+        gid: '',
+        downloadDir: '',
+        tgChatId: 0,
+        tgFromId: 0,
+        tgMessageId: 0,
+        tgRepliedUsername: '',
+        isDownloadAllowed: 1,
+        isDownloading: true,
+        isUploading: true,
+        uploadedBytes: 0,
+        uploadedBytesLast: 0,
+        startTime: 0,
+        lastUploadCheckTimestamp: 0
+    };
     return new Promise(async (resolve, reject) => {
         driveAuth.call(async (err, auth) => {
             if (err) {
                 reject(err);
             }
             const drive = google.drive({ version: 'v3', auth });
-            let message = `Tarring: <code>`;
+            let message = `Creating Tar: <code>`;
             await drive.files.get({ fileId: fileId, fields: 'id, name, mimeType, size', supportsAllDrives: true }).then(async meta => {
                 // check if its folder or not
                 if (meta.data.mimeType === 'application/vnd.google-apps.folder') {
@@ -77,8 +94,13 @@ export async function driveDownloadAndTar(fileId: string, bot: TelegramBot, tarr
                                 console.log('Archive complete');
                                 message += `\n\n✔Making tar complete, starting file upload...`;
                                 msgTools.editMessage(bot, tarringMsg, message);
-
-                                driveUploadFile(realFilePath + '.tar', (uperr, url, isFolder, indexLink) => {
+                                updateStatus(dlDetails, size, message, bot, tarringMsg);
+                                let statusInterval = setInterval(() => {
+                                    updateStatus(dlDetails, size, message, bot, tarringMsg);
+                                },
+                                    constants.STATUS_UPDATE_INTERVAL_MS ? constants.STATUS_UPDATE_INTERVAL_MS : 12000);
+                                driveUploadFile(realFilePath + '.tar', dlDetails, (uperr, url, isFolder, indexLink) => {
+                                    clearInterval(statusInterval);
                                     var finalMessage;
                                     if (uperr) {
                                         console.error(`Failed to upload - ${realFilePath}: ${uperr}`);
@@ -154,24 +176,7 @@ interface DriveUploadCompleteCallback {
     (err: string, url: string, isFolder: boolean, indexLink?: string): void;
 }
 
-function driveUploadFile(filePath: string, callback: DriveUploadCompleteCallback): void {
-    const dlDetails: DlVars = {
-        isTar: true,
-        tgUsername: '',
-        gid: '',
-        downloadDir: '',
-        tgChatId: 0,
-        tgFromId: 0,
-        tgMessageId: 0,
-        tgRepliedUsername: '',
-        isDownloadAllowed: 1,
-        isDownloading: true,
-        isUploading: true,
-        uploadedBytes: 0,
-        uploadedBytesLast: 0,
-        startTime: 0,
-        lastUploadCheckTimestamp: 0
-    }
+function driveUploadFile(filePath: string, dlDetails: DlVars, callback: DriveUploadCompleteCallback): void {
     fsWalk.uploadRecursive(dlDetails,
         filePath,
         constants.GDRIVE_PARENT_DIR_ID,
@@ -190,4 +195,27 @@ function driveUploadFile(filePath: string, callback: DriveUploadCompleteCallback
                 }
             }
         });
+}
+
+function updateStatus(dlDetails: DlVars, totalsize: number, message: string, bot: TelegramBot, tarringMsg: TelegramBot.Message): void {
+    let sm = getStatus(dlDetails, totalsize);
+    message += `\n\n` + sm.message;
+    msgTools.editMessage(bot, tarringMsg, message);
+}
+
+function getStatus(dlDetails: DlVars, totalSize: number) {
+    var downloadSpeed: number;
+    var time = new Date().getTime();
+    if (!dlDetails.lastUploadCheckTimestamp) {
+        downloadSpeed = 0;
+    } else {
+        downloadSpeed = (dlDetails.uploadedBytes - dlDetails.uploadedBytesLast)
+            / ((time - dlDetails.lastUploadCheckTimestamp) / 1000);
+    }
+    dlDetails.uploadedBytesLast = dlDetails.uploadedBytes;
+    dlDetails.lastUploadCheckTimestamp = time;
+
+    var statusMessage = downloadUtils.generateStatusMessage2(totalSize,
+        dlDetails.uploadedBytes, downloadSpeed);
+    return statusMessage;
 }
