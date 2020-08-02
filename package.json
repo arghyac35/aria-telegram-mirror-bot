@@ -17,6 +17,7 @@
     "@types/uuid": "^3.4.4",
     "aria2": "^3.0.1",
     "diskspace": "^2.0.0",
+    "execution-time": "^1.4.1",
     "fs-extra": "^7.0.0",
     "googleapis": "^41.0.1",
     "http-range-parse": "^1.0.0",

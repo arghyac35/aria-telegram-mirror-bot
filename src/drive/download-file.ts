@@ -12,6 +12,7 @@ import driveDirectLink = require('./drive-directLink.js');
 import downloadUtils = require('../download_tools/utils');
 import uuid = require("uuid");
 var Progress = require('progress-stream');
+const perf = require('execution-time')();
 
 var om = '';
 async function downloadFile(file: any, drive: drive_v3.Drive, filePath: string, dir: string, bot: TelegramBot, tarringMsg: TelegramBot.Message, message: string) {
@@ -42,8 +43,10 @@ async function downloadFile(file: any, drive: drive_v3.Drive, filePath: string, 
             progress.on('progress', function (prog: any) {
                 let totalsize = downloadUtils.formatSize(file.size);
                 let speed = downloadUtils.formatSize(prog.speed.toFixed(2));
+                let dLeft = downloadUtils.formatSize(prog.remaining);
+                let dComp = downloadUtils.formatSize(prog.transferred);
 
-                let tmessage = message + `\n<b>Downloading</b>: <code>${file.name}</code>\n<b>Size</b>: <code>${totalsize}</code>\n<b>Progress</b>: <code>${prog.percentage.toFixed(2)}%</code>\n<b>Speed</b>: <code>${speed}ps</code>\n<b>ETA</b>: <code>${prog.eta}</code>`;
+                let tmessage = message + `\n<b>Downloading</b>: <code>${file.name}</code>\n<b>Size</b>: <code>${totalsize}</code>\n<b>Progress</b>: <code>${prog.percentage.toFixed(2)}%</code>\n<b>Remaining</b>: <code>${dLeft}</code>\n<b>Transfered</b>: <code>${dComp}</code>\n<b>Speed</b>: <code>${speed}ps</code>\n<b>ETA</b>: <code>${prog.eta}</code>`;
 
                 if (om !== tmessage) {
                     msgTools.editMessage(bot, tarringMsg, tmessage);
@@ -81,6 +84,7 @@ export async function driveDownloadAndTar(fileId: string, bot: TelegramBot, tarr
             }
             const drive = google.drive({ version: 'v3', auth });
             let message = `Creating Tar: <code>`;
+            perf.start();
             await drive.files.get({ fileId: fileId, fields: 'id, name, mimeType, size', supportsAllDrives: true }).then(async meta => {
                 // check if its folder or not
                 if (meta.data.mimeType === 'application/vnd.google-apps.folder') {
@@ -96,7 +100,7 @@ export async function driveDownloadAndTar(fileId: string, bot: TelegramBot, tarr
                     } else {
                         // make tar of the downloaded files
                         // start tarring
-                        message += `\n\n🤐All files download complete now making tar...`;
+                        message = `Creating Tar: <code>${meta.data.name}</code>\n\n🤐All files download complete now making tar...`;
                         msgTools.editMessage(bot, tarringMsg, message);
 
                         console.log('Starting archival');
@@ -141,6 +145,8 @@ export async function driveDownloadAndTar(fileId: string, bot: TelegramBot, tarr
                                         }
                                     }
                                     downloadUtils.deleteDownloadedFile(dlDir);
+                                    const results = perf.stop();
+                                    finalMessage += `\n\nExecution time: ${millisToMinutesAndSeconds(results.time)}`;
                                     resolve(finalMessage);
                                 });
                             }
@@ -157,6 +163,11 @@ export async function driveDownloadAndTar(fileId: string, bot: TelegramBot, tarr
     });
 }
 
+function millisToMinutesAndSeconds(millis: number) {
+    var minutes = Math.floor(millis / 60000);
+    var seconds = Math.floor((millis % 60000) / 1000);
+    return (seconds == 60 ? (minutes + 1) + ":00" : minutes + ":" + (seconds < 10 ? "0" : "") + seconds);
+}
 
 async function downloadAllFiles(meta: drive_v3.Schema$File, drive: drive_v3.Drive, folderPath: string, bot: TelegramBot, tarringMsg: TelegramBot.Message, message: string) {
     // list all files inside the folder
