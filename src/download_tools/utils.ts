@@ -155,6 +155,25 @@ export function generateStatusMessage(totalLength: number, completedLength: numb
   return status;
 }
 
+export function generateStatusMessage2(totalLength: number, completedLength: number, speed: number): {message: string, filesize: string} {
+  var progress;
+  if (totalLength === 0) {
+    progress = 0;
+  } else {
+    progress = Math.round(completedLength * 100 / totalLength);
+  }
+  var totalLengthStr = formatSize(totalLength);
+  var progressString = generateProgress(progress);
+  var speedStr = formatSize(speed);
+  var eta = downloadETA(totalLength, completedLength, speed);
+  var message = `<b>Size</b>: <code>${totalLengthStr}</code>\n<b>Progress</b>: <code>${progressString}</code>\n<b>Speed</b>: <code>${speedStr}ps</code>\n<b>ETA</b>: <code>${eta}</code>`;
+  var status = {
+    message: message,
+    filesize: totalLengthStr
+  };
+  return status;
+}
+
 export interface StatusMessage {
   message: string;
   filename: string;
