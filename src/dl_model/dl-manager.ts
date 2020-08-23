@@ -29,8 +29,8 @@ export class DlManager {
     return DlManager.instance;
   }
 
-  addDownload(gid: string, dlDir: string, msg: TelegramBot.Message, isTar: boolean): void {
-    var detail = new dlDetails.DlVars(gid, msg, isTar, dlDir);
+  addDownload(gid: string, dlDir: string, msg: TelegramBot.Message, isTar: boolean, isUnZip: boolean): void {
+    var detail = new dlDetails.DlVars(gid, msg, isTar, isUnZip, dlDir);
     this.allDls[gid] = detail;
   }
 

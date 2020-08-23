@@ -110,17 +110,26 @@ setEventCallback(eventRegex.commandsRegex.mf, eventRegex.commandsRegexNoName.mf,
   }
 });
 
+setEventCallback(eventRegex.commandsRegex.unzipMirror, eventRegex.commandsRegexNoName.unzipMirror, (msg, match) => {
+  if (msgTools.isAuthorized(msg) < 0) {
+    msgTools.sendUnauthorizedMessage(bot, msg);
+  } else {
+    mirror(msg, match, false, true);
+  }
+});
+
 /**
  * Start a new download operation. Make sure that this is triggered by an
  * authorized user, because this function itself does not check for that.
  * @param {Object} msg The Message that triggered the download
  * @param {Array} match Message matches
  * @param {boolean} isTar Decides if this download should be archived before upload
+ * @param {boolean} isUnZip Decides if this download should be extracted before upload
  */
-function mirror(msg: TelegramBot.Message, match: RegExpExecArray, isTar?: boolean): void {
+function mirror(msg: TelegramBot.Message, match: RegExpExecArray, isTar?: boolean, isUnZip?: boolean): void {
   if (websocketOpened) {
     if (downloadUtils.isDownloadAllowed(match[4])) {
-      prepDownload(msg, match[4], isTar);
+      prepDownload(msg, match[4], isTar, isUnZip);
     } else {
       msgTools.sendMessage(bot, msg, `Download failed. Blacklisted URL.`);
     }
@@ -281,7 +290,7 @@ async function tar(msg: TelegramBot.Message, match: RegExpExecArray) {
     driveDownload.driveDownloadAndTar(fileId, bot, tarMsg).then((res: string) => {
       msgTools.deleteMsg(bot, tarMsg);
       msgTools.sendMessage(bot, msg, res, -1);
-    }).catch(e =>{
+    }).catch(e => {
       msgTools.deleteMsg(bot, tarMsg);
       msgTools.sendMessage(bot, msg, e, 10000);
     });
@@ -402,10 +411,10 @@ function handleDisallowedFilename(dlDetails: details.DlVars, filename: string): 
   return true;
 }
 
-function prepDownload(msg: TelegramBot.Message, match: string, isTar: boolean): void {
+function prepDownload(msg: TelegramBot.Message, match: string, isTar: boolean, isUnZip: boolean): void {
   var dlDir = uuid();
   ariaTools.addUri(match, dlDir, (err, gid) => {
-    dlManager.addDownload(gid, dlDir, msg, isTar);
+    dlManager.addDownload(gid, dlDir, msg, isTar, isUnZip);
     if (err) {
       var message = `Failed to start the download. ${err.message}`;
       console.error(message);

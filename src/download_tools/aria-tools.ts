@@ -7,6 +7,7 @@ import tar = require('../drive/tar');
 const diskspace = require('diskspace');
 import filenameUtils = require('./filename-utils');
 import { DlVars } from '../dl_model/detail';
+import unzip = require('../drive/extract');
 
 const ariaOptions = {
   host: 'localhost',
@@ -164,6 +165,7 @@ interface DriveUploadCompleteCallback {
  * @param {function} callback The function to call with the link to the uploaded file
  */
 export function uploadFile(dlDetails: DlVars, filePath: string, fileSize: number, callback: DriveUploadCompleteCallback): void {
+  const supportedArchive = ['zip', 'tar', 'gz', 'bz2', 'tgz', 'tbz2'];
 
   dlDetails.isUploading = true;
   var fileName = filenameUtils.getFileNameFromPath(filePath, null);
@@ -183,9 +185,9 @@ export function uploadFile(dlDetails: DlVars, filePath: string, fileSize: number
         if (Number(res['free']) > Number(fileSize)) {
           console.log('Starting archival');
           var destName = fileName + '.tar';
-          tar.archive(realFilePath, destName, (err: string, size: number) => {
-            if (err) {
-              callback(err, dlDetails.gid, null, null, null, null, false);
+          tar.archive(realFilePath, destName, (tarerr: string, size: number) => {
+            if (tarerr) {
+              callback(tarerr, dlDetails.gid, null, null, null, null, false);
             } else {
               console.log('Archive complete');
               driveUploadFile(dlDetails, realFilePath + '.tar', destName, size, callback);
@@ -196,6 +198,39 @@ export function uploadFile(dlDetails: DlVars, filePath: string, fileSize: number
           driveUploadFile(dlDetails, realFilePath, fileName, fileSize, callback);
         }
       });
+    }
+  } else if (dlDetails.isUnzip) {
+    var period = fileName.lastIndexOf('.');
+    var fileExtension = fileName.substring(period + 1);
+    let realFileNameWithoutExt = fileName.substring(0, period);
+    console.log('fileExtension: ', fileExtension);
+    // check if it is a supported archive
+    if (supportedArchive.includes(fileExtension)) {
+      diskspace.check(constants.ARIA_DOWNLOAD_LOCATION_ROOT, (err: string, res: any) => {
+        if (err) {
+          console.log('uploadFile: diskspace: ' + err);
+          // Could not unzip, so upload normally
+          driveUploadFile(dlDetails, realFilePath, fileName, fileSize, callback);
+          return;
+        }
+        if (Number(res['free']) > Number(fileSize)) {
+          console.log('Starting unzipping');
+          unzip.extract(realFilePath, realFileNameWithoutExt, (unziperr: string, size: number, rfp: string) => {
+            if (unziperr && !rfp) {
+              callback(unziperr, dlDetails.gid, null, null, null, null, false);
+            } else {
+              console.log('Unzip complete');
+              driveUploadFile(dlDetails, rfp, realFileNameWithoutExt, size, callback);
+            }
+          });
+        } else {
+          console.log('uploadFile: Not enough space, uploading without archiving');
+          driveUploadFile(dlDetails, realFilePath, fileName, fileSize, callback);
+        }
+      });
+    } else {
+      console.log('Extension is not supported for unzipping, uploading without archive');
+      driveUploadFile(dlDetails, realFilePath, fileName, fileSize, callback);
     }
   } else {
     driveUploadFile(dlDetails, realFilePath, fileName, fileSize, callback);

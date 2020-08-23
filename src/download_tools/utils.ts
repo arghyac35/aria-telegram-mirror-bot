@@ -155,7 +155,7 @@ export function generateStatusMessage(totalLength: number, completedLength: numb
   return status;
 }
 
-export function generateStatusMessage2(totalLength: number, completedLength: number, speed: number): {message: string, filesize: string} {
+export function generateStatusMessage2(totalLength: number, completedLength: number, speed: number): { message: string, filesize: string } {
   var progress;
   if (totalLength === 0) {
     progress = 0;

@@ -62,6 +62,7 @@ async function downloadFile(file: any, drive: drive_v3.Drive, filePath: string, 
 export async function driveDownloadAndTar(fileId: string, bot: TelegramBot, tarringMsg: TelegramBot.Message) {
     const dlDetails: DlVars = {
         isTar: true,
+        isUnzip: false,
         tgUsername: '',
         gid: '',
         downloadDir: '',
