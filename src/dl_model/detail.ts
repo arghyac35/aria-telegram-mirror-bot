@@ -19,7 +19,7 @@ export class DlVars {
    */
   readonly downloadDir: string;
 
-  constructor(gid: string, msg: TelegramBot.Message, readonly isTar: boolean, downloadDir: string) {
+  constructor(gid: string, msg: TelegramBot.Message, readonly isTar: boolean, readonly isUnzip: boolean, downloadDir: string) {
     this.tgUsername = getUsername(msg);
     if (msg.reply_to_message) {
       this.tgRepliedUsername = getUsername(msg.reply_to_message);

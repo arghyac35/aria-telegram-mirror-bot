@@ -13,6 +13,7 @@ export class RegExps {
   readonly id: RegExp;
   readonly mf: RegExp;
   readonly tar: RegExp;
+  readonly unzipMirror: RegExp;
 
   constructor(commands: string[]) {
     this.start = new RegExp(commands[0], 'i');
@@ -29,5 +30,6 @@ export class RegExps {
     this.id = new RegExp(commands[11], 'i');
     this.mf = new RegExp(commands[12], 'i');
     this.tar = new RegExp(commands[13], 'i');
+    this.unzipMirror = new RegExp(commands[14], 'i');
   }
 }
