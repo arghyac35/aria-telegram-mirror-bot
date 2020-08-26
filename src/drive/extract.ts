@@ -1,10 +1,13 @@
 const inly = require('inly');
 import fs = require('fs');
-import path = require('path');
-import async = require('async');
+import getSize = require('get-folder-size');
 
 export function extract(srcPath: string, fileName: string, callback: (err: string, size: number, realFilePath: string) => void): void {
-    var dlDirPath = srcPath.substring(0, srcPath.lastIndexOf('/'));
+    var dlDirPath = srcPath.substring(0, srcPath.lastIndexOf('.'));
+
+    if (!fs.existsSync(dlDirPath)) {
+        fs.mkdirSync(dlDirPath, { recursive: true });
+    }
 
     const extractProcess = inly(srcPath, dlDirPath);
 
@@ -18,45 +21,17 @@ export function extract(srcPath: string, fileName: string, callback: (err: strin
     });
 
     extractProcess.on('end', () => {
-        readSizeRecursive(dlDirPath + '/' + fileName, (err, size) => {
+        getSize(dlDirPath, (err, size) => {
+            if (fs.existsSync(dlDirPath + '/' + fileName)) {
+                dlDirPath = dlDirPath + '/' + fileName;
+            }
             if (err) {
                 console.log('Couldn\'t determine file size: ', err.message);
-                callback(err.message, null, dlDirPath + '/' + fileName);
+                callback(err.message, null, dlDirPath);
             } else {
-                callback(null, size, dlDirPath + '/' + fileName);
+                callback(null, size, dlDirPath);
             }
         });
-    });
-
-
-}
-
-
-function readSizeRecursive(item: string, cb: (err: Error, size: number) => void) {
-    fs.lstat(item, function (err, stats) {
-        if (!err && stats.isDirectory()) {
-            var total = stats.size;
-
-            fs.readdir(item, function (err, list) {
-                if (err) return cb(err, null);
-
-                async.forEach(
-                    list,
-                    function (diritem, callback) {
-                        readSizeRecursive(path.join(item, diritem), function (err1, size) {
-                            total += size;
-                            callback(err1);
-                        });
-                    },
-                    function (err) {
-                        cb(err, total);
-                    }
-                );
-            });
-        }
-        else {
-            cb(err, null);
-        }
     });
 }
 
