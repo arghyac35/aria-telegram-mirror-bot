@@ -1603,10 +1603,10 @@ node-forge@^0.9.0:
   resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.9.1.tgz#775368e6846558ab6676858a4d8c6e8d16c677b5"
   integrity sha512-G6RlQt5Sb4GMBzXvhfkeFmbqR6MzhtnT7VTHuLadjkii3rdYHNdw0m8zA4BTxVIh68FicCQ2NSUANpsqkr9jvQ==
 
-node-telegram-bot-api@^0.30.0:
-  version "0.30.0"
-  resolved "https://registry.yarnpkg.com/node-telegram-bot-api/-/node-telegram-bot-api-0.30.0.tgz#17541935f2a56382d8ef7f91d9e544b530be717c"
-  integrity sha512-+EeM+fe3Xt81KIPqN3L6s6eK+FK4QaqyDcwCwkY/jqsleERXwwjGlVbf4lJCOZ0uJuF5PfqTmvVNtua7AZfBXg==
+node-telegram-bot-api@^0.50.0:
+  version "0.50.0"
+  resolved "https://registry.yarnpkg.com/node-telegram-bot-api/-/node-telegram-bot-api-0.50.0.tgz#c8cf99bc379c824b38bff803722e5cf58cb9fd84"
+  integrity sha512-wPGJYb8RDsy2jOaWk51NWjJq+kcFLjJ3xMTYcfjkdK4b81i7d/ptjzsnmVsA31XeO1ZDDm8TwtqSr7CQkVfDVw==
   dependencies:
     array.prototype.findindex "^2.0.2"
     bl "^1.2.1"

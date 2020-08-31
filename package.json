@@ -27,7 +27,7 @@
     "http-range-parse": "^1.0.0",
     "inly": "^4.0.7",
     "jsdom": "^15.1.1",
-    "node-telegram-bot-api": "^0.30.0",
+    "node-telegram-bot-api": "^0.50.0",
     "progress-stream": "^2.0.0",
     "request": "^2.88.2",
     "tar": "^4.4.4",
