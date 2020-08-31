@@ -29,41 +29,39 @@ export function openWebsocket(callback: (err: string) => void): void {
 }
 
 export function setOnDownloadStart(callback: (gid: string, retry: number) => void): void {
-  aria2.onDownloadStart = (keys: any) => {
+  aria2.on("onDownloadStart", ([keys]: any) => {
     callback(keys.gid, 1);
-  };
+  });
 }
 
 export function setOnDownloadStop(callback: (gid: string, retry: number) => void): void {
-  aria2.onDownloadStop = (keys: any) => {
+  aria2.on("onDownloadStop", ([keys]: any) => {
     callback(keys.gid, 1);
-  };
+  });
 }
 
 export function setOnDownloadComplete(callback: (gid: string, retry: number) => void): void {
-  aria2.onDownloadComplete = (keys: any) => {
+  aria2.on("onDownloadComplete", ([keys]: any) => {
     callback(keys.gid, 1);
-  };
+  });
 }
 
 export function setOnDownloadError(callback: (gid: string, retry: number) => void): void {
-  aria2.onDownloadError = (keys: any) => {
+  aria2.on("onDownloadError", ([keys]: any) => {
     callback(keys.gid, 1);
-  };
+  });
 }
 
 export function getAriaFilePath(gid: string, callback: (err: string, file: string) => void): void {
-  aria2.getFiles(gid, (err: any, files: any[]) => {
-    if (err) {
-      callback(err.message, null);
+  aria2.call('getFiles', gid).then((files: any[]) => {
+    var filePath = filenameUtils.findAriaFilePath(files);
+    if (filePath) {
+      callback(null, filePath.path);
     } else {
-      var filePath = filenameUtils.findAriaFilePath(files);
-      if (filePath) {
-        callback(null, filePath.path);
-      } else {
-        callback(null, null);
-      }
+      callback(null, null);
     }
+  }).catch((err: any) => {
+    callback(err.message, null);
   });
 }
 
@@ -76,78 +74,70 @@ export function getAriaFilePath(gid: string, callback: (err: string, file: strin
  */
 export function getStatus(dlDetails: DlVars,
   callback: (err: string, message: string, filename: string, filesizeStr: string) => void): void {
-  aria2.tellStatus(dlDetails.gid,
-    ['status', 'totalLength', 'completedLength', 'downloadSpeed', 'files'],
-    (err: any, res: any) => {
-      if (err) {
-        callback(err.message, null, null, null);
-      } else if (res.status === 'active') {
-        var statusMessage = downloadUtils.generateStatusMessage(parseFloat(res.totalLength),
-          parseFloat(res.completedLength), parseFloat(res.downloadSpeed), res.files, false);
-        callback(null, statusMessage.message, statusMessage.filename, statusMessage.filesize);
-      } else if (dlDetails.isUploading) {
-        var downloadSpeed: number;
-        var time = new Date().getTime();
-        if (!dlDetails.lastUploadCheckTimestamp) {
-          downloadSpeed = 0;
-        } else {
-          downloadSpeed = (dlDetails.uploadedBytes - dlDetails.uploadedBytesLast)
-            / ((time - dlDetails.lastUploadCheckTimestamp) / 1000);
-        }
-        dlDetails.uploadedBytesLast = dlDetails.uploadedBytes;
-        dlDetails.lastUploadCheckTimestamp = time;
-
-        var statusMessage = downloadUtils.generateStatusMessage(parseFloat(res.totalLength),
-          dlDetails.uploadedBytes, downloadSpeed, res.files, true);
-        callback(null, statusMessage.message, statusMessage.filename, statusMessage.filesize);
+  aria2.call('tellStatus', dlDetails.gid, ['status', 'totalLength', 'completedLength', 'downloadSpeed', 'files']).then((res: any) => {
+    if (res.status === 'active') {
+      var statusMessage = downloadUtils.generateStatusMessage(parseFloat(res.totalLength),
+        parseFloat(res.completedLength), parseFloat(res.downloadSpeed), res.files, false);
+      callback(null, statusMessage.message, statusMessage.filename, statusMessage.filesize);
+    } else if (dlDetails.isUploading) {
+      var downloadSpeed: number;
+      var time = new Date().getTime();
+      if (!dlDetails.lastUploadCheckTimestamp) {
+        downloadSpeed = 0;
       } else {
-        var filePath = filenameUtils.findAriaFilePath(res['files']);
-        var filename = filenameUtils.getFileNameFromPath(filePath.path, filePath.inputPath, filePath.downloadUri);
-        var message;
-        if (res.status === 'waiting') {
-          message = `<i>${filename}</i> - Queued`;
-        } else {
-          message = `<i>${filename}</i> - ${res.status}`;
-        }
-        callback(null, message, filename, '0B');
+        downloadSpeed = (dlDetails.uploadedBytes - dlDetails.uploadedBytesLast)
+          / ((time - dlDetails.lastUploadCheckTimestamp) / 1000);
       }
-    });
+      dlDetails.uploadedBytesLast = dlDetails.uploadedBytes;
+      dlDetails.lastUploadCheckTimestamp = time;
+
+      var statusMessage = downloadUtils.generateStatusMessage(parseFloat(res.totalLength),
+        dlDetails.uploadedBytes, downloadSpeed, res.files, true);
+      callback(null, statusMessage.message, statusMessage.filename, statusMessage.filesize);
+    } else {
+      var filePath = filenameUtils.findAriaFilePath(res['files']);
+      var filename = filenameUtils.getFileNameFromPath(filePath.path, filePath.inputPath, filePath.downloadUri);
+      var message;
+      if (res.status === 'waiting') {
+        message = `<i>${filename}</i> - Queued`;
+      } else {
+        message = `<i>${filename}</i> - ${res.status}`;
+      }
+      callback(null, message, filename, '0B');
+    }
+  }).catch((err: any) => {
+    callback(err.message, null, null, null);
+  });
 }
 
 export function getError(gid: string, callback: (err: string, message: string) => void): void {
-  aria2.tellStatus(gid, ['errorMessage'], (err: any, res: any) => {
-    if (err) {
-      callback(err.message, null);
-    } else {
-      callback(null, res.errorMessage);
-    }
+  aria2.call('tellStatus', gid, ['errorMessage']).then((res: any) => {
+    callback(null, res.errorMessage);
+  }).catch((err: any) => {
+    callback(err.message, null);
   });
 }
 
 export function isDownloadMetadata(gid: string, callback: (err: string, isMetadata: boolean, newGid: string) => void): void {
-  aria2.tellStatus(gid, ['followedBy'], (err: any, res: any) => {
-    if (err) {
-      callback(err.message, null, null);
+  aria2.call('tellStatus', gid, ['followedBy']).then((res: any) => {
+    if (res.followedBy) {
+      callback(null, true, res.followedBy[0]);
     } else {
-      if (res.followedBy) {
-        callback(null, true, res.followedBy[0]);
-      } else {
-        callback(null, false, null);
-      }
+      callback(null, false, null);
     }
+  }).catch((err: any) => {
+    callback(err.message, null, null);
   });
 }
 
 export function getFileSize(gid: string, callback: (err: string, fileSize: number) => void): void {
-  aria2.tellStatus(gid,
-    ['totalLength'],
-    (err: any, res: any) => {
-      if (err) {
-        callback(err.message, res);
-      } else {
+  aria2.call('tellStatus', gid,
+    ['totalLength']).then(
+      (res: any) => {
         callback(null, res['totalLength']);
-      }
-    });
+      }).catch((err: any) => {
+        callback(err.message, 0);
+      });
 }
 
 interface DriveUploadCompleteCallback {
@@ -255,11 +245,11 @@ function driveUploadFile(dlDetails: DlVars, filePath: string, fileName: string, 
 }
 
 export function stopDownload(gid: string, callback: () => void): void {
-  aria2.remove(gid, callback);
+  aria2.call('remove', gid).then(callback);
 }
 
 export function addUri(uri: string, dlDir: string, callback: (err: any, gid: string) => void): void {
-  aria2.addUri([uri], { dir: `${constants.ARIA_DOWNLOAD_LOCATION}/${dlDir}` })
+  aria2.call('addUri', [uri], { dir: `${constants.ARIA_DOWNLOAD_LOCATION}/${dlDir}` })
     .then((gid: string) => {
       callback(null, gid);
     })
