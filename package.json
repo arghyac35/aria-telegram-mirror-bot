@@ -16,7 +16,7 @@
     "@types/mime-types": "^2.1.0",
     "@types/node-telegram-bot-api": "^0.50.2",
     "@types/tar": "^4.0.0",
-    "@types/uuid": "^3.4.4",
+    "@types/uuid": "^8.3.0",
     "aria2": "^4.1.0",
     "async": "^3.2.0",
     "diskspace": "^2.0.0",
