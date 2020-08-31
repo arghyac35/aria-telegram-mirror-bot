@@ -2,7 +2,7 @@ import driveAuth = require('./drive-auth');
 import driveFile = require('./upload-file');
 import utils = require('./drive-utils');
 import { google, drive_v3 } from 'googleapis';
-import constants = require('../.constants.js');
+import constants = require('../.constants');
 import { GaxiosResponse } from 'gaxios';
 import { DlVars } from '../dl_model/detail';
 

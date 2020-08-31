@@ -1,9 +1,9 @@
-import constants = require('../.constants.js');
-import driveAuth = require('./drive-auth.js');
+import constants = require('../.constants');
+import driveAuth = require('./drive-auth');
 import { google, drive_v3 } from 'googleapis';
 import gdrive = require('./drive-upload');
 import TelegramBot = require('node-telegram-bot-api');
-import msgTools = require('../bot_utils/msg-tools.js');
+import msgTools = require('../bot_utils/msg-tools');
 import http = require('http');
 import dlUtils = require('../download_tools/utils');
 
