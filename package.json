@@ -32,7 +32,7 @@
     "request": "^2.88.2",
     "tar": "^4.4.4",
     "typescript": "^4.0.2",
-    "uuid": "^3.3.2"
+    "uuid": "^8.3.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^1.12.0",
