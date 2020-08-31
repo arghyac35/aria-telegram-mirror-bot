@@ -1,5 +1,5 @@
-import constants = require('../.constants.js');
-import driveAuth = require('./drive-auth.js');
+import constants = require('../.constants');
+import driveAuth = require('./drive-auth');
 import { google } from 'googleapis';
 import utils = require('./drive-utils');
 import dlUtils = require('../download_tools/utils');

@@ -1,6 +1,6 @@
 import downloadUtils = require('./utils');
 import drive = require('../fs-walk');
-import driveDirectLink = require('../drive/drive-directLink.js');
+import driveDirectLink = require('../drive/drive-directLink');
 const Aria2 = require('aria2');
 import constants = require('../.constants');
 import tar = require('../drive/tar');
