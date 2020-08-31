@@ -10,7 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "@types/async": "^3.2.3",
-    "@types/fs-extra": "^7.0.0",
+    "@types/fs-extra": "^9.0.1",
     "@types/get-folder-size": "^2.0.0",
     "@types/jsdom": "^12.2.4",
     "@types/mime-types": "^2.1.0",
