@@ -1,5 +1,5 @@
 import TelegramBot = require('node-telegram-bot-api');
-import uuid = require('uuid/v4');
+import { v4 as uuidv4 } from 'uuid';
 import downloadUtils = require('./download_tools/utils');
 import ariaTools = require('./download_tools/aria-tools.js');
 import constants = require('./.constants.js');
@@ -412,7 +412,7 @@ function handleDisallowedFilename(dlDetails: details.DlVars, filename: string): 
 }
 
 function prepDownload(msg: TelegramBot.Message, match: string, isTar: boolean, isUnZip: boolean): void {
-  var dlDir = uuid();
+  var dlDir = uuidv4();
   ariaTools.addUri(match, dlDir, (err, gid) => {
     dlManager.addDownload(gid, dlDir, msg, isTar, isUnZip);
     if (err) {
