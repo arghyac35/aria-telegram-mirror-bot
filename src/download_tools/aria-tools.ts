@@ -205,7 +205,7 @@ export function uploadFile(dlDetails: DlVars, filePath: string, fileSize: number
         }
         if (Number(res['free']) > Number(fileSize)) {
           console.log('Starting unzipping');
-          unzip.extract(realFilePath, realFileNameWithoutExt, (unziperr: string, size: number, rfp: string) => {
+          unzip.extract(realFilePath, realFileNameWithoutExt, fileExtension, (unziperr: string, size: number, rfp: string) => {
             if (unziperr && !rfp) {
               callback(unziperr, dlDetails.gid, null, null, null, null, false);
             } else {
