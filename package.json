@@ -12,7 +12,7 @@
     "@types/async": "^3.2.3",
     "@types/fs-extra": "^9.0.1",
     "@types/get-folder-size": "^2.0.0",
-    "@types/jsdom": "^12.2.4",
+    "@types/jsdom": "^16.2.3",
     "@types/mime-types": "^2.1.0",
     "@types/node-telegram-bot-api": "^0.31.0",
     "@types/tar": "^4.0.0",
