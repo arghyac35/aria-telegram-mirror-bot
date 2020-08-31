@@ -10,7 +10,7 @@ import fsWalk = require('../fs-walk');
 import { DlVars } from "../dl_model/detail.js";
 import driveDirectLink = require('./drive-directLink.js');
 import downloadUtils = require('../download_tools/utils');
-import uuid = require("uuid");
+import { v4 as uuidv4 } from 'uuid';
 var Progress = require('progress-stream');
 const perf = require('execution-time')();
 
@@ -91,7 +91,7 @@ export async function driveDownloadAndTar(fileId: string, bot: TelegramBot, tarr
                 if (meta.data.mimeType === 'application/vnd.google-apps.folder') {
                     message += meta.data.name + `</code>`;
                     msgTools.editMessage(bot, tarringMsg, message);
-                    var dlDir = uuid();
+                    var dlDir = uuidv4();
                     let folderPath = `${constants.ARIA_DOWNLOAD_LOCATION}/${dlDir}/${meta.data.name}/`;
                     let originalFileName = meta.data.name;
 
