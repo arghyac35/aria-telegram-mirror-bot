@@ -547,7 +547,7 @@ function cleanupDownload(gid: string, message: string, url?: string, dlDetails?:
     dlManager.removeCancelledDls(gid);
     dlManager.deleteDownload(gid);
     updateAllStatus();
-    // downloadUtils.deleteDownloadedFile(dlDetails.downloadDir);
+    downloadUtils.deleteDownloadedFile(dlDetails.downloadDir);
   } else {
     // Why is this message so calm? We should be SCREAMING at this point!
     console.error(`cleanupDownload: Could not get dlDetails for ${gid}`);
