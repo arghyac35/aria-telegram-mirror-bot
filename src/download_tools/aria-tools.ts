@@ -155,7 +155,7 @@ interface DriveUploadCompleteCallback {
  * @param {function} callback The function to call with the link to the uploaded file
  */
 export function uploadFile(dlDetails: DlVars, filePath: string, fileSize: number, callback: DriveUploadCompleteCallback): void {
-  const supportedArchive = ['zip', 'tar', 'gz', 'bz2', 'tgz', 'tbz2'];
+  const supportedArchive = ['zip', 'tar', 'gz', 'bz2', 'tgz', 'tbz2', 'rar'];
 
   dlDetails.isUploading = true;
   var fileName = filenameUtils.getFileNameFromPath(filePath, null);
@@ -232,6 +232,7 @@ function driveUploadFile(dlDetails: DlVars, filePath: string, fileName: string, 
     filePath,
     constants.GDRIVE_PARENT_DIR_ID,
     async (err: string, url: string, isFolder: boolean, fileId: string) => {
+      console.log('File id after upload: ', fileId);
       if (constants.INDEX_DOMAIN) {
         await driveDirectLink.getGDindexLink(fileId).then((gdIndexLink: string) => {
           callback(err, dlDetails.gid, url, filePath, fileName, fileSize, isFolder, gdIndexLink);
