@@ -29,7 +29,6 @@
     "http-range-parse": "^1.0.0",
     "inly": "^4.0.7",
     "node-telegram-bot-api": "^0.50.0",
-    "node-unrar-js": "^0.8.1",
     "nodemon": "^2.0.4",
     "progress-stream": "^2.0.0",
     "request": "^2.88.2",
