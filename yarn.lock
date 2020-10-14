@@ -100,10 +100,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/node-telegram-bot-api@^0.50.3":
-  version "0.50.3"
-  resolved "https://registry.yarnpkg.com/@types/node-telegram-bot-api/-/node-telegram-bot-api-0.50.3.tgz#1bb190137399e26af874b4015191d946dd698f85"
-  integrity sha512-ANBR2YEtGOTDIhrSqyLTcwXCapM8yx+giBec1pKsPpj9BJ4WFYIcJcRf3njVSuMjGk18XV6DKic1W+74Jt9evA==
+"@types/node-telegram-bot-api@^0.50.4":
+  version "0.50.4"
+  resolved "https://registry.yarnpkg.com/@types/node-telegram-bot-api/-/node-telegram-bot-api-0.50.4.tgz#3131e0c368f904ae8a97765ce2e3b653eae9f9f6"
+  integrity sha512-3wS5AOsMvIUCY1UU8l0zB0yERNOm2qEQNknPaxrDsN/ISSbLfa0blSsdfxoO63L/acdffF+Udn9XfXaJnGDF5g==
   dependencies:
     "@types/node" "*"
     "@types/request" "*"
@@ -677,13 +677,6 @@ debug@^3.1.0, debug@^3.2.6:
   integrity sha512-mel+jf7nrtEl5Pn1Qx46zARXKDpBbvzezse7p7LqINmdoIk8PYP5SySaxEmYv6TZ0JyEKA1hsCId6DIhgITtWQ==
   dependencies:
     ms "^2.1.1"
-
-debug@^4.1.1:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/debug/-/debug-4.2.0.tgz#7f150f93920e94c58f5574c2fd01a3110effe7f1"
-  integrity sha512-IX2ncY78vDTjZMFUdmsvIRFY2Cf4FnD0wRs+nQwJU8Lu99/tPFdb0VybiiMTPe3I6rQmwsqQqRBvxU+bZ/I8sg==
-  dependencies:
-    ms "2.1.2"
 
 decompress-response@^3.3.0:
   version "3.3.0"
@@ -1854,11 +1847,6 @@ node-telegram-bot-api@^0.50.0:
     pump "^2.0.0"
     request "^2.83.0"
     request-promise "^4.2.2"
-
-node-unrar-js@^0.8.1:
-  version "0.8.1"
-  resolved "https://registry.yarnpkg.com/node-unrar-js/-/node-unrar-js-0.8.1.tgz#35188ef7aaebab8542fddd237d4040f1f3fee6ee"
-  integrity sha1-NRiO96rrq4VC/d0jfUBA8fP+5u4=
 
 nodemon@^2.0.4:
   version "2.0.4"
