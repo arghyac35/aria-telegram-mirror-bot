@@ -14,6 +14,7 @@ import details = require('./dl_model/detail');
 import filenameUtils = require('./download_tools/filename-utils');
 import { EventRegex } from './bot_utils/event_regex';
 import { exec } from 'child_process';
+import removeFn = require('./bot_utils/remove_text');
 
 const eventRegex = new EventRegex();
 const bot = new TelegramBot(constants.TOKEN, { polling: true });
@@ -246,6 +247,33 @@ setEventCallback(eventRegex.commandsRegex.tar, eventRegex.commandsRegexNoName.ta
     msgTools.sendUnauthorizedMessage(bot, msg);
   } else {
     tar(msg, match);
+  }
+});
+
+setEventCallback(eventRegex.commandsRegex.removeText, eventRegex.commandsRegexNoName.removeText, async (msg, match) => {
+  if (msgTools.isAuthorized(msg) < 0) {
+    msgTools.sendUnauthorizedMessage(bot, msg);
+  } else {
+    let matchTxt = match[4].split(/ (.+)/);
+    // get the drive filed id from url
+    const driveId = matchTxt[0].match(/[-\w]{25,}/);
+    const fileId: string = Array.isArray(driveId) && driveId.length > 0 ? driveId[0] : '';
+    if (fileId) {
+      let cloneMsg = await bot.sendMessage(msg.chat.id, `Removing text from: <code>` + match[4] + `</code>`, {
+        reply_to_message_id: msg.message_id,
+        parse_mode: 'HTML'
+      });
+      // call the removeTxt function
+      await removeFn.removeText(fileId, matchTxt[1], bot, cloneMsg).then((res: string) => {
+        msgTools.deleteMsg(bot, cloneMsg);
+        msgTools.sendMessage(bot, msg, res, -1);
+      }).catch((err: string) => {
+        msgTools.deleteMsg(bot, cloneMsg);
+        msgTools.sendMessage(bot, msg, err, 10000);
+      });
+    } else {
+      msgTools.sendMessage(bot, msg, `Google drive ID could not be found in the provided link`);
+    }
   }
 });
 
