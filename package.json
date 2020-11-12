@@ -12,7 +12,7 @@
   "dependencies": {
     "@types/async": "^3.2.3",
     "@types/extract-zip": "^1.6.2",
-    "@types/fs-extra": "^9.0.1",
+    "@types/fs-extra": "^8.1.0",
     "@types/get-folder-size": "^2.0.0",
     "@types/mime-types": "^2.1.0",
     "@types/node-telegram-bot-api": "^0.50.3",
