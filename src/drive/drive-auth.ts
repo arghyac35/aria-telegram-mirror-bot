@@ -1,7 +1,7 @@
 import fs = require('fs');
 import readline = require('readline');
 import { google } from 'googleapis';
-import { OAuth2Client } from 'google-auth-library';
+import { OAuth2Client, JWT } from 'google-auth-library';
 
 const SCOPE = 'https://www.googleapis.com/auth/drive';
 const TOKEN_PATH = './credentials.json';
@@ -18,6 +18,39 @@ export function call(callback: (err: string, client: OAuth2Client) => void): voi
       callback(err.message, null);
     } else {
       authorize(JSON.parse(content), callback);
+    }
+  });
+}
+
+export function callAsync(useSa = false, saNumber = 0): Promise<OAuth2Client | JWT> {
+  return new Promise((res, rej) => {
+    if (!useSa) {
+      // Load client secrets from a local file.
+      fs.readFile('./client_secret.json', 'utf8', (err, content) => {
+        if (err) {
+          console.log('Error loading client secret file:', err.message);
+          rej(err.message);
+        } else {
+          authorize(JSON.parse(content), (authErr, auth) => {
+            if (authErr) {
+              rej(authErr);
+            }
+            res(auth)
+          });
+        }
+      });
+    } else {
+      console.log(`Authorizing with ${saNumber}.json service account`);
+      const key = require(`../../accounts/${saNumber}.json`);
+      res(new google.auth.JWT(
+        key.client_email,
+        undefined,
+        key.private_key,
+        [SCOPE],
+        undefined,
+        key.private_key_id
+      ));
+
     }
   });
 }
