@@ -29,7 +29,7 @@
     "http-range-parse": "^1.0.0",
     "inly": "^4.0.8",
     "node-telegram-bot-api": "^0.50.0",
-    "nodemon": "^2.0.4",
+    "nodemon": "^2.0.6",
     "progress-stream": "^2.0.0",
     "request": "^2.88.2",
     "tar": "^6.0.5",
