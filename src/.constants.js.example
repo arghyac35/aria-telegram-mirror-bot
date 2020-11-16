@@ -26,5 +26,6 @@ module.exports = Object.freeze({
     NAME: "@nameOf_bot"
   },
   IS_TEAM_DRIVE: false,
+  USE_SERVICE_ACCOUNT_FOR_CLONE: false,
   INDEX_DOMAIN: "" // add an extra / at the end, for example https://www.gdindex.url/
 });

@@ -24,6 +24,11 @@ var dlManager = dlm.DlManager.getInstance();
 
 initAria2();
 
+if (constants.USE_SERVICE_ACCOUNT_FOR_CLONE && !constants.IS_TEAM_DRIVE) {
+  console.log('In order to use Service account for clone the drive should be Team drive. Please set IS_TEAM_DRIVE to true in .constants.js');
+  process.exit();
+}
+
 bot.on("polling_error", msg => console.error(msg.message));
 
 function setEventCallback(regexp: RegExp, regexpNoName: RegExp,
@@ -285,8 +290,8 @@ setEventCallback(eventRegex.commandsRegex.removeText, eventRegex.commandsRegexNo
  */
 async function clone(msg: TelegramBot.Message, match: RegExpExecArray) {
   // get the drive filed id from url
-  const driveId = match[4].match(/[-\w]{25,}/);
-  const fileId: string = Array.isArray(driveId) && driveId.length > 0 ? driveId[0] : '';
+  const fileId = getIdFrom(match[4]);
+  // const fileId: string = Array.isArray(driveId) && driveId.length > 0 ? driveId[0] : '';
   if (fileId) {
     let cloneMsg = await bot.sendMessage(msg.chat.id, `Cloning: <code>` + match[4] + `</code>`, {
       reply_to_message_id: msg.message_id,
@@ -302,6 +307,21 @@ async function clone(msg: TelegramBot.Message, match: RegExpExecArray) {
     });
   } else {
     msgTools.sendMessage(bot, msg, `Google drive ID could not be found in the provided link`);
+  }
+}
+
+function getIdFrom(url: any) {
+  var id: any = '';
+  var parts = url.split(/^(([^:\/?#]+):)?(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?/);
+  if (url.indexOf('?id=') >= 0) {
+    id = (parts[6].split("=")[1]).replace("&usp", "");
+    return id;
+  } else {
+    id = parts[5].split("/");
+    //Using sort to get the id as it is the longest element. 
+    var sortArr = id.sort((a: any, b: any) => { return b.length - a.length });
+    id = sortArr[0];
+    return id;
   }
 }
 

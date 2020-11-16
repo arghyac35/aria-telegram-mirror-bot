@@ -24,7 +24,7 @@
     "esModuleInterop": true
   },
   "include": [
-    "./src/**/*", "src/.constants.js"
+    "./src/**/*", "./src/.constants.js"
   ],
   "exclude": [
     "node_modules"
