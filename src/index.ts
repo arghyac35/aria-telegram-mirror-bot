@@ -262,8 +262,7 @@ setEventCallback(eventRegex.commandsRegex.tar, eventRegex.commandsRegexNoName.ta
  */
 async function clone(msg: TelegramBot.Message, match: RegExpExecArray) {
   // get the drive filed id from url
-  const fileId = getIdFrom(match[4]);
-  // const fileId: string = Array.isArray(driveId) && driveId.length > 0 ? driveId[0] : '';
+  const fileId = getIdFromUrl(match[4]);
   if (fileId) {
     let cloneMsg = await bot.sendMessage(msg.chat.id, `Cloning: <code>` + match[4] + `</code>`, {
       reply_to_message_id: msg.message_id,
@@ -282,8 +281,15 @@ async function clone(msg: TelegramBot.Message, match: RegExpExecArray) {
   }
 }
 
-function getIdFrom(url: any) {
+function getIdFromUrl(url: string) {
   var id: any = '';
+  if (url.includes('uc?id=')) {
+    const driveId = url.match(/[-\w]{25,}/);
+    const fileId: string = Array.isArray(driveId) && driveId.length > 0 ? driveId[0] : '';
+    if (fileId) {
+      return fileId;
+    }
+  }
   var parts = url.split(/^(([^:\/?#]+):)?(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?/);
   if (url.indexOf('?id=') >= 0) {
     id = (parts[6].split("=")[1]).replace("&usp", "");
