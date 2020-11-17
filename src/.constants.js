@@ -27,5 +27,5 @@ module.exports = Object.freeze({
   },
   IS_TEAM_DRIVE: true,
   USE_SERVICE_ACCOUNT_FOR_CLONE: false,
-  INDEX_DOMAIN: "" // add an extra / at the end, for example https://www.gdindex.url/
+  INDEX_DOMAIN: "https://join.telegram--premiumcoursesdrive.tk/0:/" // add an extra / at the end, for example https://www.gdindex.url/
 });
