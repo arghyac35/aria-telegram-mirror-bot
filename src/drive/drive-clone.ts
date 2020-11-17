@@ -101,10 +101,13 @@ async function copyFile(file: any, parent: string): Promise<any> {
 
         return await driveService.files.copy({ fileId: file.id, fields: 'id, name, mimeType, size', supportsAllDrives: true, supportsTeamDrives: true, requestBody: body }).then((res: any) => res.data);
     } catch (err) {
-        if (err.errors && err.errors.length > 0 && (err.errors[0].reason === 'userRateLimitExceeded' || err.errors[0].reason === 'dailyLimitExceeded') && constants.USE_SERVICE_ACCOUNT_FOR_CLONE && SERVICE_ACCOUNT_INDEX !== service_account_count - 1) {
+        if (err.errors && err.errors.length > 0 && (err.errors[0].reason === 'userRateLimitExceeded' || err.errors[0].reason === 'dailyLimitExceeded') && constants.USE_SERVICE_ACCOUNT_FOR_CLONE && SERVICE_ACCOUNT_INDEX !== service_account_count - 2) {
             console.log('Got error: ', err.errors[0].reason, ' trying again..');
             await switchServiceAccount().catch(error => { throw new Error(error) });
             return await copyFile(file, parent);
+        }
+        if (SERVICE_ACCOUNT_INDEX === service_account_count - 2) {
+            SERVICE_ACCOUNT_INDEX = 0;
         }
         throw new Error(err);
     }
