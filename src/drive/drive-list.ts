@@ -37,7 +37,7 @@ export function listFiles(fileName: string, callback: (err: string, message: str
       includeItemsFromAllDrives: true
     },
       (listErr: Error, res: any) => {
-        if (err) {
+        if (listErr) {
           callback(listErr.message, null);
         } else {
           res = res['data']['files'];
