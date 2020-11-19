@@ -89,7 +89,7 @@ async function copyFile(file: any, parent: string, drive: drive_v3.Drive): Promi
             const newdrive = google.drive({ version: 'v3', auth });
             return await copyFile(file, parent, newdrive);
         }
-        if (driveAuth.SERVICE_ACCOUNT_INDEX === driveAuth.service_account_count - 2) {
+        if (driveAuth.SERVICE_ACCOUNT_INDEX === driveAuth.service_account_count - 1) {
             driveAuth.SERVICE_ACCOUNT_INDEX = 0;
         }
         throw new Error(err);

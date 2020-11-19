@@ -7,3 +7,4 @@ credentials.json
 npm-debug.log
 out/
 package-lock.json
+accounts/
