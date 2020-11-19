@@ -6,17 +6,12 @@ import TelegramBot = require('node-telegram-bot-api');
 import msgTools = require('../bot_utils/msg-tools');
 import http = require('http');
 import dlUtils = require('../download_tools/utils');
-import { readdirSync } from 'fs-extra';
-let SERVICE_ACCOUNT_INDEX = 0;
-let service_account_count = readdirSync('./accounts').length;
-let driveService: drive_v3.Drive;
 
 export async function driveClone(fileId: string, bot: TelegramBot, cloneMsg: TelegramBot.Message) {
     return new Promise((resolve, reject) => {
-        driveAuth.callAsync(constants.USE_SERVICE_ACCOUNT_FOR_CLONE, SERVICE_ACCOUNT_INDEX).then(async (auth) => {
+        driveAuth.callAsync().then(async (auth) => {
             let message = `Cloning: <code>`;
             const drive = google.drive({ version: 'v3', auth });
-            driveService = drive;
             await drive.files.get({ fileId: fileId, fields: 'id, name, mimeType, size', supportsAllDrives: true }).then(async (meta) => {
                 message += meta.data.name + `</code>`;
                 msgTools.editMessage(bot, cloneMsg, message);
@@ -46,20 +41,20 @@ export async function driveClone(fileId: string, bot: TelegramBot, cloneMsg: Tel
                     message += `\n\nRuko zara sabar karo...`;
                     msgTools.editMessage(bot, cloneMsg, message);
                     //copy file
-                    await copyFile(meta.data, constants.GDRIVE_PARENT_DIR_ID).then((res: any) => {
+                    await copyFile(meta.data, constants.GDRIVE_PARENT_DIR_ID, drive).then((res: any) => {
                         let msg: string;
                         message += `\n\nYo boi copy is done getting shareable link...`;
                         msgTools.editMessage(bot, cloneMsg, message);
-                        gdrive.getSharableLink(res.id, false, (err, url) => {
+                        gdrive.getSharableLink(res.data.id, false, (err, url) => {
                             if (err) {
                                 reject(err);
                             }
-                            msg = `<a href="` + url + `">` + res.name + `</a> (` + dlUtils.formatSize(res.size) + `)`;
+                            msg = `<a href="` + url + `">` + res.data.name + `</a> (` + dlUtils.formatSize(res.data.size) + `)`;
                             if (constants.INDEX_DOMAIN) {
                                 msg += `\n\n<a href="` + constants.INDEX_DOMAIN + encodeURIComponent(res.name) + `">Index URL</a>`
                             }
-                            res.url = url;
-                            notifyExternal(true, cloneMsg.chat.id, res);
+                            res.data.url = url;
+                            notifyExternal(true, cloneMsg.chat.id, res.data);
                             resolve(msg);
                         });
                     }).catch(err => {
@@ -78,36 +73,24 @@ export async function timeout(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function copyFile(file: any, parent: string): Promise<any> {
+async function copyFile(file: any, parent: string, drive: drive_v3.Drive): Promise<any> {
     try {
         console.log('Copying file: ', file.name);
         let body = {
             'parents': [parent],
             'name': file.name
         };
-        // return new Promise(async (resolve, reject) => {
-        //     drive.files.copy({ fileId: file.id, fields: 'id, name, mimeType, size', supportsAllDrives: true, requestBody: body }, async (err: any, res: any) => {
-        //         if (err) {
-        //             if (err.errors && err.errors.length > 0 && (err.errors[0].reason === 'userRateLimitExceeded' || err.errors[0].reason === 'dailyLimitExceeded') && constants.USE_SERVICE_ACCOUNT_FOR_CLONE) {
-        //                 console.log('Got error: ', err.errors[0].reason, ' trying again..');
-        //                 await copyFile(file, parent, await switchServiceAccount()).then((r: any) => resolve(r.data)).catch(reject);
-        //             }
-        //             reject(err);
-        //         } else {
-        //             resolve(res.data);
-        //         }
-        //     });
-        // });
-
-        return await driveService.files.copy({ fileId: file.id, fields: 'id, name, mimeType, size', supportsAllDrives: true, supportsTeamDrives: true, requestBody: body }).then((res: any) => res.data);
+        return await drive.files.copy({ fileId: file.id, fields: 'id, name, mimeType, size', supportsAllDrives: true, supportsTeamDrives: true, requestBody: body }).then((res: any) => ({ data: res.data, drive }));
     } catch (err) {
-        if (err.errors && err.errors.length > 0 && (err.errors[0].reason === 'userRateLimitExceeded' || err.errors[0].reason === 'dailyLimitExceeded') && constants.USE_SERVICE_ACCOUNT_FOR_CLONE && SERVICE_ACCOUNT_INDEX !== service_account_count - 2) {
+        if (err.errors && err.errors.length > 0 && (err.errors[0].reason === 'userRateLimitExceeded' || err.errors[0].reason === 'dailyLimitExceeded') && constants.USE_SERVICE_ACCOUNT && driveAuth.SERVICE_ACCOUNT_INDEX !== driveAuth.service_account_count - 2) {
             console.log('Got error: ', err.errors[0].reason, ' trying again..');
-            await switchServiceAccount().catch(error => { throw new Error(error) });
-            return await copyFile(file, parent);
+            driveAuth.switchServiceAccount();
+            const auth = await driveAuth.callAsync().catch(error => { throw new Error(error); });
+            const newdrive = google.drive({ version: 'v3', auth });
+            return await copyFile(file, parent, newdrive);
         }
-        if (SERVICE_ACCOUNT_INDEX === service_account_count - 2) {
-            SERVICE_ACCOUNT_INDEX = 0;
+        if (driveAuth.SERVICE_ACCOUNT_INDEX === driveAuth.service_account_count - 2) {
+            driveAuth.SERVICE_ACCOUNT_INDEX = 0;
         }
         throw new Error(err);
     }
@@ -126,8 +109,9 @@ async function copyFolder(file: drive_v3.Schema$File, dir_id: string, drive: dri
             folderSize += await copyFolder(element, id, drive);
         } else {
             await timeout(1000); // 1 sec
-            await copyFile(element, dir_id).then(d => {
+            await copyFile(element, dir_id, drive).then(d => {
                 folderSize += parseInt(element.size);
+                drive = d.drive;
             }).catch(err => {
                 console.error('Error copying file: ' + element.name + ' Error for: ' + err.message)
             });
@@ -135,14 +119,6 @@ async function copyFolder(file: drive_v3.Schema$File, dir_id: string, drive: dri
         }
     }
     return folderSize;
-}
-
-async function switchServiceAccount() {
-    if (SERVICE_ACCOUNT_INDEX === service_account_count - 1) SERVICE_ACCOUNT_INDEX = 0;
-
-    SERVICE_ACCOUNT_INDEX++;
-    console.log(`Switching to ${SERVICE_ACCOUNT_INDEX}.json service account`);
-    await driveAuth.callAsync(true, SERVICE_ACCOUNT_INDEX).then(auth => driveService = google.drive({ version: 'v3', auth }));
 }
 
 export async function driveListFiles(searchQuery: string, drive: drive_v3.Drive) {

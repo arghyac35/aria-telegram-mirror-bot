@@ -149,7 +149,7 @@ This is a description of the fields in src/.constants.js:
   * `ENABLED`: If `true`, all bot commands have to have the bot's username (as below) appended to them. For example, `/mirror https://someweb.site/resource.tar` will become `/mirror@botName_bot https://someweb.site/resource.tar`. The only exception to this is the `/list` command, which will not have the bot's name appended. This allows having multiple non-conflicting mirror bots in the same group, and have them all reply to `/list`.
   * `NAME`: The username of the bot, as given in BotFather. Include the leading "@".
 * `IS_TEAM_DRIVE`: Set to `true` if you are mirroring to a Shared Drive.
-* `USE_SERVICE_ACCOUNT_FOR_CLONE`: Set to `true` if you want to use Service Accounts to clone, this only works when IS_TEAM_DRIVE is true. Keep all the SAs in accounts folder.
+* `USE_SERVICE_ACCOUNT`: Set to `true` if you want to use Service Accounts to clone, this only works when IS_TEAM_DRIVE is true. Keep all the SAs in accounts folder.
    * TODO: Add script and instructions to generate SAs, for now follow: https://github.com/lzzy12/python-aria-mirror-bot#generating-service-accounts
 * `INDEX_DOMAIN`: Link for gdindex
 
