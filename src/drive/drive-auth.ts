@@ -123,7 +123,7 @@ function getAccessToken(oAuth2Client: OAuth2Client, callback: (err: string, clie
 }
 
 export function switchServiceAccount() {
-  if (SERVICE_ACCOUNT_INDEX === service_account_count - 2) SERVICE_ACCOUNT_INDEX = 0;
+  if (SERVICE_ACCOUNT_INDEX === service_account_count - 1) SERVICE_ACCOUNT_INDEX = 0;
 
   SERVICE_ACCOUNT_INDEX++;
   console.log(`Switching to ${SERVICE_ACCOUNT_INDEX}.json service account`);
