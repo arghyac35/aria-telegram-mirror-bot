@@ -24,7 +24,7 @@ var dlManager = dlm.DlManager.getInstance();
 
 initAria2();
 
-if (constants.USE_SERVICE_ACCOUNT_FOR_CLONE && !constants.IS_TEAM_DRIVE) {
+if (constants.USE_SERVICE_ACCOUNT && !constants.IS_TEAM_DRIVE) {
   console.log('In order to use Service account for clone the drive should be Team drive. Please set IS_TEAM_DRIVE to true in .constants.js');
   process.exit();
 }

@@ -2,29 +2,45 @@ import fs = require('fs');
 import readline = require('readline');
 import { google } from 'googleapis';
 import { OAuth2Client, JWT } from 'google-auth-library';
+import constants = require('../.constants');
+import { readdirSync } from 'fs-extra';
 
 const SCOPE = 'https://www.googleapis.com/auth/drive';
 const TOKEN_PATH = './credentials.json';
+export var SERVICE_ACCOUNT_INDEX: number = 0;
+export const service_account_count = readdirSync('./accounts').length;
 
 /**
  * Authorize a client with credentials, then call the Google Drive API.
  * @param {function} callback The callback to call with the authorized client.
  */
-export function call(callback: (err: string, client: OAuth2Client) => void): void {
-  // Load client secrets from a local file.
-  fs.readFile('./client_secret.json', 'utf8', (err, content) => {
-    if (err) {
-      console.log('Error loading client secret file:', err.message);
-      callback(err.message, null);
-    } else {
-      authorize(JSON.parse(content), callback);
-    }
-  });
+export function call(callback: (err: string, client: OAuth2Client | JWT) => void): void {
+  if (constants.USE_SERVICE_ACCOUNT) {
+    const key = require(`../../accounts/${SERVICE_ACCOUNT_INDEX}.json`);
+    callback(null, new google.auth.JWT(
+      key.client_email,
+      undefined,
+      key.private_key,
+      [SCOPE],
+      undefined,
+      key.private_key_id
+    ));
+  } else {
+    // Load client secrets from a local file.
+    fs.readFile('./client_secret.json', 'utf8', (err, content) => {
+      if (err) {
+        console.log('Error loading client secret file:', err.message);
+        callback(err.message, null);
+      } else {
+        authorize(JSON.parse(content), callback);
+      }
+    });
+  }
 }
 
-export function callAsync(useSa = false, saNumber = 0): Promise<OAuth2Client | JWT> {
+export function callAsync(): Promise<OAuth2Client | JWT> {
   return new Promise((res, rej) => {
-    if (!useSa) {
+    if (!constants.USE_SERVICE_ACCOUNT) {
       // Load client secrets from a local file.
       fs.readFile('./client_secret.json', 'utf8', (err, content) => {
         if (err) {
@@ -40,8 +56,8 @@ export function callAsync(useSa = false, saNumber = 0): Promise<OAuth2Client | J
         }
       });
     } else {
-      console.log(`Authorizing with ${saNumber}.json service account`);
-      const key = require(`../../accounts/${saNumber}.json`);
+      console.log(`Authorizing with ${SERVICE_ACCOUNT_INDEX}.json service account`);
+      const key = require(`../../accounts/${SERVICE_ACCOUNT_INDEX}.json`);
       res(new google.auth.JWT(
         key.client_email,
         undefined,
@@ -50,7 +66,6 @@ export function callAsync(useSa = false, saNumber = 0): Promise<OAuth2Client | J
         undefined,
         key.private_key_id
       ));
-
     }
   });
 }
@@ -105,4 +120,11 @@ function getAccessToken(oAuth2Client: OAuth2Client, callback: (err: string, clie
       callback(null, oAuth2Client);
     });
   });
+}
+
+export function switchServiceAccount() {
+  if (SERVICE_ACCOUNT_INDEX === service_account_count - 2) SERVICE_ACCOUNT_INDEX = 0;
+
+  SERVICE_ACCOUNT_INDEX++;
+  console.log(`Switching to ${SERVICE_ACCOUNT_INDEX}.json service account`);
 }
