@@ -123,10 +123,10 @@
     "@types/tough-cookie" "*"
     form-data "^2.5.0"
 
-"@types/tar@^4.0.0":
-  version "4.0.3"
-  resolved "https://registry.yarnpkg.com/@types/tar/-/tar-4.0.3.tgz#e2cce0b8ff4f285293243f5971bd7199176ac489"
-  integrity sha512-Z7AVMMlkI8NTWF0qGhC4QIX0zkV/+y0J8x7b/RsHrN0310+YNjoJd8UrApCiGBCWtKjxS9QhNqLi2UJNToh5hA==
+"@types/tar@^4.0.4":
+  version "4.0.4"
+  resolved "https://registry.yarnpkg.com/@types/tar/-/tar-4.0.4.tgz#d680de60855e7778a51c672b755869a3b8d2889f"
+  integrity sha512-0Xv+xcmkTsOZdIF4yCnd7RkOOyfyqPaqJ7RZFKnwdxfDbkN3eAAE9sHl8zJFqBz4VhxolW9EErbjR1oyH7jK2A==
   dependencies:
     "@types/minipass" "*"
     "@types/node" "*"
@@ -282,14 +282,13 @@ argparse@^1.0.7:
   dependencies:
     sprintf-js "~1.0.2"
 
-aria2@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/aria2/-/aria2-4.1.0.tgz#d9511e2e944e40549b0996ec6b345c4ce0ecd284"
-  integrity sha512-8BFq3xtK/uLEji4p+7nzMcaK1jrmu8ykAXrRcsxGv8U6gg48gc5+jJ5zzg2eN2p3GEr1rznHNNQ5YIGGvZHvIg==
+aria2@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/aria2/-/aria2-4.1.1.tgz#6b9cda9f99f2680188a582fbcef9a17a125a34a2"
+  integrity sha512-X6KwHm6Vf3RqHN3xU7AWK6u3DJZLFu9/9clQ8cw6sfVQNzh6ik35+D6Vsd3IE/EiTNTvsTk1/aZchT81nuHnrw==
   dependencies:
-    commander "^3.0.1"
-    node-fetch "^2.6.0"
-    ws "^7.1.2"
+    node-fetch "^2.6.1"
+    ws "^7.4.0"
 
 array.prototype.findindex@^2.0.2:
   version "2.0.2"
@@ -603,11 +602,6 @@ combined-stream@^1.0.6, combined-stream@~1.0.6:
   integrity sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==
   dependencies:
     delayed-stream "~1.0.0"
-
-commander@^3.0.1:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/commander/-/commander-3.0.2.tgz#6837c3fb677ad9933d1cfba42dd14d5117d6b39e"
-  integrity sha512-Gar0ASD4BDyKC4hl4DwHqDrmvjoxWKZigVnAbn5H1owvm4CxCPdb0HQDehwNYMJpla5+M2tPmPARzhtYuwpHow==
 
 concat-map@0.0.1:
   version "0.0.1"
@@ -1267,10 +1261,10 @@ googleapis-common@^4.4.1:
     url-template "^2.0.8"
     uuid "^8.0.0"
 
-googleapis@^64.0.0:
-  version "64.0.0"
-  resolved "https://registry.yarnpkg.com/googleapis/-/googleapis-64.0.0.tgz#af40364d27f2245049aaa2506847148d1815c61c"
-  integrity sha512-o8m4aRVv/LdvTVMgH4tLNeQvJZrXaa+62L9wPaKg6nHlCN3dBCKWWQKOklCwtg18xpWY4/vdNuTPHb/9Lnd00A==
+googleapis@^65.0.0:
+  version "65.0.0"
+  resolved "https://registry.yarnpkg.com/googleapis/-/googleapis-65.0.0.tgz#de261460548bd4bb63b9ea3765415577d17f8c8c"
+  integrity sha512-dcfZVkML8H6mPAsph0hgfyRQYKJpw2XjKchAXx5YEfDYWU7021Mpzaf+ejNSipa3QmcfOLOcWg6sUr0I7M4jjQ==
   dependencies:
     google-auth-library "^6.0.0"
     googleapis-common "^4.4.1"
@@ -1837,7 +1831,7 @@ natural-compare@^1.4.0:
   resolved "https://registry.yarnpkg.com/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
   integrity sha1-Sr6/7tdUHywnrPspvbvRXI1bpPc=
 
-node-fetch@^2.3.0, node-fetch@^2.6.0:
+node-fetch@^2.3.0, node-fetch@^2.6.1:
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.1.tgz#045bd323631f76ed2e2b55573394416b639a0052"
   integrity sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==
@@ -2733,10 +2727,10 @@ write@1.0.3:
   dependencies:
     mkdirp "^0.5.1"
 
-ws@^7.1.2:
-  version "7.3.1"
-  resolved "https://registry.yarnpkg.com/ws/-/ws-7.3.1.tgz#d0547bf67f7ce4f12a72dfe31262c68d7dc551c8"
-  integrity sha512-D3RuNkynyHmEJIpD2qrgVkc9DQ23OrN/moAwZX4L8DfvszsJxpjQuUq3LMx6HoYji9fbIOBY18XWBsAux1ZZUA==
+ws@^7.4.0:
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-7.4.0.tgz#a5dd76a24197940d4a8bb9e0e152bb4503764da7"
+  integrity sha512-kyFwXuV/5ymf+IXhS6f0+eAFvydbaBW3zjpT6hUdAh/hbVjTIB5EHBGi0bPoCLSK2wcuz3BrEkB9LrYv1Nm4NQ==
 
 xdg-basedir@^4.0.0:
   version "4.0.0"
