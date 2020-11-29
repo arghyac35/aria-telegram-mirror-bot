@@ -40,26 +40,71 @@ export async function driveClone(fileId: string, bot: TelegramBot, cloneMsg: Tel
                 } else {
                     message += `\n\nRuko zara sabar karo...`;
                     msgTools.editMessage(bot, cloneMsg, message);
+                    let parentDirs = [constants.GDRIVE_PARENT_DIR_ID, '0ABgYqj4LyiHVUk9PVA'];
                     //copy file
-                    await copyFile(meta.data, constants.GDRIVE_PARENT_DIR_ID, drive).then((res: any) => {
-                        let msg: string;
-                        message += `\n\nYo boi copy is done getting shareable link...`;
-                        msgTools.editMessage(bot, cloneMsg, message);
-                        gdrive.getSharableLink(res.data.id, false, (err, url) => {
-                            if (err) {
-                                reject(err);
-                            }
-                            msg = `<a href="` + url + `">` + res.data.name + `</a> (` + dlUtils.formatSize(res.data.size) + `)`;
-                            if (constants.INDEX_DOMAIN) {
-                                msg += `\n\n<a href="` + constants.INDEX_DOMAIN + `GdriveBot/` + encodeURIComponent(res.name) + `">Index URL</a>`
-                            }
-                            res.data.url = url;
-                            notifyExternal(true, cloneMsg.chat.id, res.data);
-                            resolve(msg);
+                    let parallelCopyCalls = parentDirs.map(parentDirId => {
+                        return new Promise((Cresolve, Creject) => {
+                            copyFile(meta.data, parentDirId, drive).then((res: any) => {
+                                Cresolve({
+                                    res,
+                                    parentDirId
+                                });
+                            }).catch((copyErr) => {
+                                Creject({
+                                    copyErr,
+                                    parentDirId
+                                });
+                            });
                         });
-                    }).catch(err => {
-                        reject(err.message);
                     });
+                    Promise.allSettled(parallelCopyCalls).then((copyResults: any) => {
+                        // filter failed copy
+                        let failedCopy = copyResults.filter((cr: any) => cr.status === 'rejected');
+                        let successfullCopy = copyResults.filter((cr: any) => cr.status === 'fulfilled' && cr.value.parentDirId === constants.GDRIVE_PARENT_DIR_ID);
+                        let message = '';
+                        if (failedCopy.length > 0) {
+                            failedCopy.forEach((element: any) => {
+                                message += `Failed to copy to: ${element.reason.parentDirId}, reason: ${element.reason.copyErr.message}\n\n`;
+                            });
+                        }
+
+                        if (successfullCopy.length > 0) {
+                            let res = successfullCopy[0].value.res;
+                            gdrive.getSharableLink(res.data.id, false, (err, url) => {
+                                if (err) {
+                                    reject(err);
+                                }
+                                message = `<a href="` + url + `">` + res.data.name + `</a> (` + dlUtils.formatSize(res.data.size) + `)`;
+                                if (constants.INDEX_DOMAIN) {
+                                    message += `\n\n<a href="` + constants.INDEX_DOMAIN + `GdriveBot/` + encodeURIComponent(res.name) + `">Index URL</a>`
+                                }
+                                res.data.url = url;
+                                notifyExternal(true, cloneMsg.chat.id, res.data);
+                                resolve(message);
+                            });
+                        } else {
+                            reject(message)
+                        }
+                    });
+                    // await copyFile(meta.data, constants.GDRIVE_PARENT_DIR_ID, drive).then((res: any) => {
+                    //     let msg: string;
+                    //     message += `\n\nYo boi copy is done getting shareable link...`;
+                    //     msgTools.editMessage(bot, cloneMsg, message);
+                    //     gdrive.getSharableLink(res.data.id, false, (err, url) => {
+                    //         if (err) {
+                    //             reject(err);
+                    //         }
+                    //         msg = `<a href="` + url + `">` + res.data.name + `</a> (` + dlUtils.formatSize(res.data.size) + `)`;
+                    //         if (constants.INDEX_DOMAIN) {
+                    //             msg += `\n\n<a href="` + constants.INDEX_DOMAIN + `GdriveBot/` + encodeURIComponent(res.name) + `">Index URL</a>`
+                    //         }
+                    //         res.data.url = url;
+                    //         notifyExternal(true, cloneMsg.chat.id, res.data);
+                    //         resolve(msg);
+                    //     });
+                    // }).catch(err => {
+                    //     reject(err.message);
+                    // });
                 }
             }).catch((error: Error) => {
                 reject(error.message + `\n\nEither it is not a Shareable Link or something went wrong while fetching files metadata`);
