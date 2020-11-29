@@ -8,7 +8,7 @@ import { readdirSync } from 'fs-extra';
 const SCOPE = 'https://www.googleapis.com/auth/drive';
 const TOKEN_PATH = './credentials.json';
 export var SERVICE_ACCOUNT_INDEX: number = 0;
-export const service_account_count = readdirSync('./accounts').length;
+export const service_account_count = constants.USE_SERVICE_ACCOUNT ? readdirSync('./accounts').length : 0;
 
 /**
  * Authorize a client with credentials, then call the Google Drive API.
