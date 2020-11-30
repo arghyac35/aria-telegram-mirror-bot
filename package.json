@@ -10,7 +10,7 @@
   "author": "Ritayan Chakraborty",
   "license": "MIT",
   "dependencies": {
-    "@types/async": "^3.2.4",
+    "@types/async": "^3.2.5",
     "@types/extract-zip": "^1.6.2",
     "@types/fs-extra": "^8.1.0",
     "@types/get-folder-size": "^2.0.0",
