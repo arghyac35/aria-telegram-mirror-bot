@@ -33,7 +33,7 @@
     "progress-stream": "^2.0.0",
     "request": "^2.88.2",
     "tar": "^6.0.5",
-    "ts-node": "^9.0.0",
+    "ts-node": "^9.1.0",
     "typescript": "^4.0.5",
     "uuid": "^8.3.1"
   },
