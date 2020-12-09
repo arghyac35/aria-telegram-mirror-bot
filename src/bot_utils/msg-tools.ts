@@ -31,7 +31,7 @@ export function editMessage(bot: TelegramBot, msg: TelegramBot.Message, text: st
           reject(err);
         });
     } else {
-      resolve();
+      resolve('');
     }
   });
 }
