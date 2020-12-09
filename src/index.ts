@@ -495,7 +495,7 @@ function sendStatusMessage(msg: TelegramBot.Message, keepForever?: boolean): Pro
     dlManager.deleteStatus(msg.chat.id);
   }
 
-  return new Promise(resolve => {
+  return new Promise<void>(resolve => {
     downloadUtils.getStatusMessage()
       .then(res => {
         if (keepForever) {
