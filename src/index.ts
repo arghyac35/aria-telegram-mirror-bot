@@ -13,7 +13,8 @@ import driveDownload = require('./drive/download-file');
 import details = require('./dl_model/detail');
 import filenameUtils = require('./download_tools/filename-utils');
 import { EventRegex } from './bot_utils/event_regex';
-import { exec } from 'child_process';
+// import { exec } from 'child_process';
+import checkDiskSpace = require('check-disk-space');
 import removeFn = require('./bot_utils/remove_text');
 
 const eventRegex = new EventRegex();
@@ -87,12 +88,19 @@ setEventCallback(eventRegex.commandsRegex.disk, eventRegex.commandsRegexNoName.d
   if (msgTools.isAuthorized(msg) < 0) {
     msgTools.sendUnauthorizedMessage(bot, msg);
   } else {
-    exec(`df --output="size,used,avail" -h "${constants.ARIA_DOWNLOAD_LOCATION_ROOT}" | tail -n1`,
-      (err, res) => {
-        var disk = res.trim().split(/\s+/);
-        msgTools.sendMessage(bot, msg, `Total space: ${disk[0]}B\nUsed: ${disk[1]}B\nAvailable: ${disk[2]}B`);
-      }
-    );
+    // exec(`df --output="size,used,avail" -h "${constants.ARIA_DOWNLOAD_LOCATION_ROOT}" | tail -n1`,
+    //   (err, res) => {
+    //     var disk = res.trim().split(/\s+/);
+    //     msgTools.sendMessage(bot, msg, `Total space: ${disk[0]}B\nUsed: ${disk[1]}B\nAvailable: ${disk[2]}B`);
+    //   }
+    // );
+    checkDiskSpace(constants.ARIA_DOWNLOAD_LOCATION_ROOT).then(res => {
+      let used = res.size - res.free;
+      msgTools.sendMessage(bot, msg, `Total space: ${downloadUtils.formatSize(res.size)}\nUsed: ${downloadUtils.formatSize(used)}\nAvailable: ${downloadUtils.formatSize(res.free)}`);
+    }).catch(error => {
+      console.log('checkDiskSpace: ', error.message);
+      msgTools.sendMessage(bot, msg, `Error checking disk space: ${error.message}`);
+    });
   }
 });
 
@@ -410,7 +418,7 @@ function sendCancelledMessages(): void {
 }
 
 function cancelMirror(dlDetails: details.DlVars, cancelMsg?: TelegramBot.Message): boolean {
-  if (dlDetails.isUploading) {
+  if (dlDetails.isUploading || dlDetails.isExtracting) {
     if (cancelMsg) {
       msgTools.sendMessage(bot, cancelMsg, 'Upload in progress. Cannot cancel.');
     }
@@ -454,7 +462,7 @@ function handleDisallowedFilename(dlDetails: details.DlVars, filename: string): 
     var isAllowed = filenameUtils.isFilenameAllowed(filename);
     if (isAllowed === 0) {
       dlDetails.isDownloadAllowed = 0;
-      if (!dlDetails.isUploading) {
+      if (!dlDetails.isUploading || !dlDetails.isExtracting) {
         cancelMirror(dlDetails);
       }
       return false;
@@ -663,7 +671,7 @@ function ariaOnDownloadComplete(gid: string, retry: number): void {
       }
 
       if (file) {
-        ariaTools.getFileSize(gid, (err, size) => {
+        ariaTools.getFileSize(gid, async (err, size) => {
           if (err) {
             console.error(`onDownloadComplete: Error getting file size for ${gid}. ${err}`);
             var message = 'Upload failed. Could not get file size.';
@@ -672,8 +680,20 @@ function ariaOnDownloadComplete(gid: string, retry: number): void {
           }
 
           var filename = filenameUtils.getFileNameFromPath(file, null);
-          dlDetails.isUploading = true;
           if (handleDisallowedFilename(dlDetails, filename)) {
+            if (dlDetails.isUnzip) {
+              try {
+                const extractDetails = await ariaTools.extractFile(dlDetails, file, size);
+                file = extractDetails.filePath;
+                filename = extractDetails.filename;
+                size = extractDetails.size; //TODO: To check if size is null
+              } catch (error) {
+                console.error(error);
+                cleanupDownload(gid, error);
+                return;
+              }
+            }
+            dlDetails.isUploading = true;
             console.log(`${gid}: Completed. Filename: ${filename}. Starting upload.`);
             ariaTools.uploadFile(dlDetails, file, size, driveUploadCompleteCallback);
           } else {
