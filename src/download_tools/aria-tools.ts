@@ -8,6 +8,7 @@ const diskspace = require('diskspace');
 import filenameUtils = require('./filename-utils');
 import { DlVars } from '../dl_model/detail';
 import unzip = require('../drive/extract');
+var chmodr = require('chmodr');
 
 const ariaOptions = {
   host: 'localhost',
@@ -210,6 +211,13 @@ export function uploadFile(dlDetails: DlVars, filePath: string, fileSize: number
               callback(unziperr, dlDetails.gid, null, null, null, null, false);
             } else {
               console.log('Unzip complete');
+              chmodr(rfp, 0o777, (err: any) => {
+                if (err) {
+                  console.log('Failed to execute chmod', err);
+                } else {
+                  console.log('Chmod Success');
+                }
+              });
               driveUploadFile(dlDetails, rfp, realFileNameWithoutExt, size, callback);
             }
           });

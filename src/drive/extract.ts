@@ -11,7 +11,7 @@ export function extract(srcPath: string, fileName: string, ext: string, callback
     }
 
     if (ext === 'zip') {
-        extractZip(srcPath, { dir: dlDirPath }).then(() => {
+        extractZip(srcPath, { dir: dlDirPath, defaultFileMode: 0o777, defaultDirMode: 0o777 }).then(() => {
             getSize(dlDirPath, (err, size) => {
                 if (fs.existsSync(dlDirPath + '/' + fileName)) {
                     dlDirPath = dlDirPath + '/' + fileName;
