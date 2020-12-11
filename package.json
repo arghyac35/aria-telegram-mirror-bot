@@ -20,6 +20,7 @@
     "@types/uuid": "^8.3.0",
     "aria2": "^4.1.1",
     "async": "^3.2.0",
+    "chmodr": "^1.2.0",
     "diskspace": "^2.0.0",
     "execution-time": "^1.4.1",
     "extract-zip": "^2.0.1",
