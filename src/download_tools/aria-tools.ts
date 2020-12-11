@@ -4,11 +4,13 @@ import driveDirectLink = require('../drive/drive-directLink');
 const Aria2 = require('aria2');
 import constants = require('../.constants');
 import tar = require('../drive/tar');
-const diskspace = require('diskspace');
 import filenameUtils = require('./filename-utils');
 import { DlVars } from '../dl_model/detail';
 import unzip = require('../drive/extract');
-var chmodr = require('chmodr');
+const chmodr = require('chmodr');
+import checkDiskSpace from 'check-disk-space';
+
+const supportedArchive = ['zip', 'tar', 'gz', 'bz2', 'tgz', 'tbz2'];
 
 const ariaOptions = {
   host: 'localhost',
@@ -78,7 +80,7 @@ export function getStatus(dlDetails: DlVars,
   aria2.call('tellStatus', dlDetails.gid, ['status', 'totalLength', 'completedLength', 'downloadSpeed', 'files']).then((res: any) => {
     if (res.status === 'active') {
       var statusMessage = downloadUtils.generateStatusMessage(parseFloat(res.totalLength),
-        parseFloat(res.completedLength), parseFloat(res.downloadSpeed), res.files, false);
+        parseFloat(res.completedLength), parseFloat(res.downloadSpeed), res.files, false, '');
       callback(null, statusMessage.message, statusMessage.filename, statusMessage.filesize);
     } else if (dlDetails.isUploading) {
       var downloadSpeed: number;
@@ -93,8 +95,11 @@ export function getStatus(dlDetails: DlVars,
       dlDetails.lastUploadCheckTimestamp = time;
 
       var statusMessage = downloadUtils.generateStatusMessage(parseFloat(res.totalLength),
-        dlDetails.uploadedBytes, downloadSpeed, res.files, true);
+        dlDetails.uploadedBytes, downloadSpeed, res.files, true, dlDetails);
       callback(null, statusMessage.message, statusMessage.filename, statusMessage.filesize);
+    } else if (dlDetails.isExtracting) {
+      let message = `<b>Extracting</b>: <code>${dlDetails.extractedFileName}</code>\n<b>Size</b>: <code>${dlDetails.extractedFileSize}</code>`;
+      callback(null, message, dlDetails.extractedFileName, dlDetails.extractedFileSize);
     } else {
       var filePath = filenameUtils.findAriaFilePath(res['files']);
       var filename = filenameUtils.getFileNameFromPath(filePath.path, filePath.inputPath, filePath.downloadUri);
@@ -156,8 +161,6 @@ interface DriveUploadCompleteCallback {
  * @param {function} callback The function to call with the link to the uploaded file
  */
 export function uploadFile(dlDetails: DlVars, filePath: string, fileSize: number, callback: DriveUploadCompleteCallback): void {
-  const supportedArchive = ['zip', 'tar', 'gz', 'bz2', 'tgz', 'tbz2', 'rar'];
-
   dlDetails.isUploading = true;
   var fileName = filenameUtils.getFileNameFromPath(filePath, null);
   var realFilePath = filenameUtils.getActualDownloadPath(filePath);
@@ -166,14 +169,8 @@ export function uploadFile(dlDetails: DlVars, filePath: string, fileSize: number
       // If there is only one file, do not archive
       driveUploadFile(dlDetails, realFilePath, fileName, fileSize, callback);
     } else {
-      diskspace.check(constants.ARIA_DOWNLOAD_LOCATION_ROOT, (err: string, res: any) => {
-        if (err) {
-          console.log('uploadFile: diskspace: ' + err);
-          // Could not archive, so upload normally
-          driveUploadFile(dlDetails, realFilePath, fileName, fileSize, callback);
-          return;
-        }
-        if (Number(res['free']) > Number(fileSize)) {
+      checkDiskSpace(constants.ARIA_DOWNLOAD_LOCATION_ROOT).then(res => {
+        if (res.free > Number(fileSize)) {
           console.log('Starting archival');
           var destName = fileName + '.tar';
           tar.archive(realFilePath, destName, (tarerr: string, size: number) => {
@@ -188,47 +185,11 @@ export function uploadFile(dlDetails: DlVars, filePath: string, fileSize: number
           console.log('uploadFile: Not enough space, uploading without archiving');
           driveUploadFile(dlDetails, realFilePath, fileName, fileSize, callback);
         }
+      }).catch(err => {
+        console.log('uploadFile: checkDiskSpace: ' + err);
+        // Could not archive, so upload normally
+        driveUploadFile(dlDetails, realFilePath, fileName, fileSize, callback);
       });
-    }
-  } else if (dlDetails.isUnzip) {
-    var period = fileName.lastIndexOf('.');
-    var fileExtension = fileName.substring(period + 1);
-    let realFileNameWithoutExt = fileName.substring(0, period);
-    console.log('fileExtension: ', fileExtension);
-    // check if it is a supported archive
-    if (supportedArchive.includes(fileExtension)) {
-      diskspace.check(constants.ARIA_DOWNLOAD_LOCATION_ROOT, (err: string, res: any) => {
-        if (err) {
-          console.log('uploadFile: diskspace: ' + err);
-          // Could not unzip, so upload normally
-          driveUploadFile(dlDetails, realFilePath, fileName, fileSize, callback);
-          return;
-        }
-        if (Number(res['free']) > Number(fileSize)) {
-          console.log('Starting unzipping');
-          unzip.extract(realFilePath, realFileNameWithoutExt, fileExtension, (unziperr: string, size: number, rfp: string) => {
-            if (unziperr && !rfp) {
-              callback(unziperr, dlDetails.gid, null, null, null, null, false);
-            } else {
-              console.log('Unzip complete');
-              chmodr(rfp, 0o777, (err: any) => {
-                if (err) {
-                  console.log('Failed to execute chmod', err);
-                } else {
-                  console.log('Chmod Success');
-                }
-              });
-              driveUploadFile(dlDetails, rfp, realFileNameWithoutExt, size, callback);
-            }
-          });
-        } else {
-          console.log('uploadFile: Not enough space, uploading without archiving');
-          driveUploadFile(dlDetails, realFilePath, fileName, fileSize, callback);
-        }
-      });
-    } else {
-      console.log('Extension is not supported for unzipping, uploading without archive');
-      driveUploadFile(dlDetails, realFilePath, fileName, fileSize, callback);
     }
   } else {
     driveUploadFile(dlDetails, realFilePath, fileName, fileSize, callback);
@@ -265,4 +226,60 @@ export function addUri(uri: string, dlDir: string, callback: (err: any, gid: str
     .catch((err: any) => {
       callback(err, null);
     });
+}
+
+export async function extractFile(dlDetails: DlVars, filePath: string, fileSize: number) {
+  try {
+    dlDetails.isExtracting = true;
+    const fileName = filenameUtils.getFileNameFromPath(filePath, null);
+    const realFilePath = filenameUtils.getActualDownloadPath(filePath);
+
+    const period = fileName.lastIndexOf('.');
+    const fileExtension = fileName.substring(period + 1);
+    let fileNameWithoutExt = fileName.substring(0, period);
+    console.log('fileExtension: ', fileExtension);
+
+    // check if it is a supported archive
+    if (supportedArchive.includes(fileExtension)) {
+      const diskspace = await checkDiskSpace(constants.ARIA_DOWNLOAD_LOCATION_ROOT).catch(error => {
+        console.log('extract: checkDiskSpace: ', error.message);
+        throw new Error('Error checkDiskSpace: ' + error.message);
+      });
+      if (diskspace.free > Number(fileSize)) {
+        console.log('Starting unzipping');
+        return new Promise<{ filePath: string, filename: string, size: number }>((resolve, reject) => {
+          dlDetails.extractedFileName = fileNameWithoutExt;
+          dlDetails.extractedFileSize = downloadUtils.formatSize(fileSize);
+          unzip.extract(realFilePath, fileNameWithoutExt, fileExtension, (unziperr: string, size: number, rfp: string) => {
+            if (unziperr && !rfp) {
+              reject(unziperr);
+            } else {
+              console.log('Unzip complete');
+              dlDetails.isExtracting = false;
+              chmodr(rfp, 0o777, (err: any) => {
+                if (err) {
+                  console.log('Failed to execute chmod', err);
+                } else {
+                  console.log('Chmod Success');
+                }
+              });
+              if (size) {
+                dlDetails.extractedFileSize = downloadUtils.formatSize(size);
+              }
+              resolve({ filePath: rfp, filename: fileNameWithoutExt, size });
+            }
+          });
+        });
+      } else {
+        console.error('extract: Not enough space, for extracting');
+        throw new Error('Not enough disk space is there to extract.');
+      }
+    } else {
+      console.log('Extension is not supported for unzipping');
+      throw new Error('Extension is not supported for unzipping\nSupported extensions are: ' + supportedArchive.toString());
+    }
+  } catch (error) {
+    console.log('In catch');
+    throw new Error(error);
+  }
 }

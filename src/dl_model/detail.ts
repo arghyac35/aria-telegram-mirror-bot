@@ -1,12 +1,15 @@
 import TelegramBot = require('node-telegram-bot-api');
 export class DlVars {
   isUploading: boolean;
+  isExtracting: boolean;
   uploadedBytes: number;
   uploadedBytesLast: number;
   lastUploadCheckTimestamp: number;
   isDownloadAllowed: number;
   isDownloading: boolean;
   gid: string;
+  extractedFileName: string;
+  extractedFileSize: string;
   readonly tgFromId: number;
   readonly tgUsername: string;
   readonly tgRepliedUsername: string;
@@ -33,6 +36,9 @@ export class DlVars {
     this.startTime = new Date().getTime();
     this.uploadedBytes = 0;
     this.uploadedBytesLast = 0;
+    this.extractedFileName = '';
+    this.extractedFileSize = '';
+    this.isExtracting = false;
   }
 }
 

@@ -76,7 +76,10 @@ export async function driveDownloadAndTar(fileId: string, bot: TelegramBot, tarr
         uploadedBytes: 0,
         uploadedBytesLast: 0,
         startTime: 0,
-        lastUploadCheckTimestamp: 0
+        lastUploadCheckTimestamp: 0,
+        isExtracting: false,
+        extractedFileName: '',
+        extractedFileSize: ''
     };
     return new Promise(async (resolve, reject) => {
         driveAuth.call(async (err, auth) => {

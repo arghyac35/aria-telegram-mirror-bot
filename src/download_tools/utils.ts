@@ -132,7 +132,7 @@ export function getStatusMessage(): Promise<StatusAll> {
  * @returns {StatusMessage} An object containing a printable status message and the file name
  */
 export function generateStatusMessage(totalLength: number, completedLength: number, speed: number,
-  files: any[], isUploading: boolean): StatusMessage {
+  files: any[], isUploading: boolean, dlDetails: any): StatusMessage {
   var filePath = filenameUtils.findAriaFilePath(files);
   var fileName = filenameUtils.getFileNameFromPath(filePath.path, filePath.inputPath, filePath.downloadUri);
   var progress;
@@ -140,6 +140,9 @@ export function generateStatusMessage(totalLength: number, completedLength: numb
     progress = 0;
   } else {
     progress = Math.round(completedLength * 100 / totalLength);
+  }
+  if (dlDetails && dlDetails.extractedFileName) {
+    fileName = dlDetails.extractedFileName;
   }
   var totalLengthStr = formatSize(totalLength);
   var progressString = generateProgress(progress);

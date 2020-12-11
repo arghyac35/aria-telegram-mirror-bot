@@ -530,6 +530,16 @@ chalk@^4.0.0:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
 
+check-disk-space@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/check-disk-space/-/check-disk-space-2.1.0.tgz#2e77fe62f30d9676dc37a524ea2008f40c780295"
+  integrity sha512-f0nx9oJF/AVF8nhSYlF1EBvMNnO+CXyLwKhPvN1943iOMI9TWhQigLZm80jAf0wzQhwKkzA8XXjyvuVUeGGcVQ==
+
+chmodr@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/chmodr/-/chmodr-1.2.0.tgz#720e96caa09b7f1cdbb01529b7d0ab6bc5e118b9"
+  integrity sha512-Y5uI7Iq/Az6HgJEL6pdw7THVd7jbVOTPwsmcPOBjQL8e3N+pz872kzK5QxYGEy21iRys+iHWV0UZQXDFJo1hyA==
+
 chokidar@^3.2.2:
   version "3.4.2"
   resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-3.4.2.tgz#38dc8e658dec3809741eb3ef7bb0a47fe424232d"
