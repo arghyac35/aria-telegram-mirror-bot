@@ -158,12 +158,20 @@ interface DriveUploadCompleteCallback {
  * @param {dlVars.DlVars} dlDetails The dlownload details for the current download
  * @param {string} filePath The path of the file or directory to upload
  * @param {number} fileSize The size of the file
+ * * @param {number} isUnzip Is the file to be upload was unzipped
  * @param {function} callback The function to call with the link to the uploaded file
  */
-export function uploadFile(dlDetails: DlVars, filePath: string, fileSize: number, callback: DriveUploadCompleteCallback): void {
+export function uploadFile(dlDetails: DlVars, filePath: string, fileSize: number, isUnzip: boolean, callback: DriveUploadCompleteCallback): void {
   dlDetails.isUploading = true;
-  var fileName = filenameUtils.getFileNameFromPath(filePath, null);
-  var realFilePath = filenameUtils.getActualDownloadPath(filePath);
+  var fileName = '';
+  var realFilePath = '';
+  if (isUnzip) {
+    fileName = dlDetails.extractedFileName;
+    realFilePath = filePath;
+  } else {
+    fileName = filenameUtils.getFileNameFromPath(filePath, null);
+    realFilePath = filenameUtils.getActualDownloadPath(filePath);
+  }
   if (dlDetails.isTar) {
     if (filePath === realFilePath) {
       // If there is only one file, do not archive
@@ -262,11 +270,11 @@ export async function extractFile(dlDetails: DlVars, filePath: string, fileSize:
                 } else {
                   console.log('Chmod Success');
                 }
+                if (size) {
+                  dlDetails.extractedFileSize = downloadUtils.formatSize(size);
+                }
+                resolve({ filePath: rfp, filename: fileNameWithoutExt, size });
               });
-              if (size) {
-                dlDetails.extractedFileSize = downloadUtils.formatSize(size);
-              }
-              resolve({ filePath: rfp, filename: fileNameWithoutExt, size });
             }
           });
         });

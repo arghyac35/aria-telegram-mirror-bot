@@ -681,8 +681,10 @@ function ariaOnDownloadComplete(gid: string, retry: number): void {
 
           var filename = filenameUtils.getFileNameFromPath(file, null);
           if (handleDisallowedFilename(dlDetails, filename)) {
+            let isUnzip = false;
             if (dlDetails.isUnzip) {
               try {
+                isUnzip = true;
                 const extractDetails = await ariaTools.extractFile(dlDetails, file, size);
                 file = extractDetails.filePath;
                 filename = extractDetails.filename;
@@ -695,7 +697,7 @@ function ariaOnDownloadComplete(gid: string, retry: number): void {
             }
             dlDetails.isUploading = true;
             console.log(`${gid}: Completed. Filename: ${filename}. Starting upload.`);
-            ariaTools.uploadFile(dlDetails, file, size, driveUploadCompleteCallback);
+            ariaTools.uploadFile(dlDetails, file, size, isUnzip, driveUploadCompleteCallback);
           } else {
             var reason = 'Upload failed. Blacklisted file name.';
             console.log(`${gid}: Blacklisted. Filename: ${filename}.`);
