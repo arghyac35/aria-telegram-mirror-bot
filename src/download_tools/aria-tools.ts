@@ -209,8 +209,7 @@ function driveUploadFile(dlDetails: DlVars, filePath: string, fileName: string, 
     filePath,
     constants.GDRIVE_PARENT_DIR_ID,
     async (err: string, url: string, isFolder: boolean, fileId: string) => {
-      console.log('File id after upload: ', fileId);
-      if (constants.INDEX_DOMAIN) {
+      if (fileId && constants.INDEX_DOMAIN) {
         await driveDirectLink.getGDindexLink(fileId).then((gdIndexLink: string) => {
           callback(err, dlDetails.gid, url, filePath, fileName, fileSize, isFolder, gdIndexLink);
         }).catch((dlErr: string) => {
