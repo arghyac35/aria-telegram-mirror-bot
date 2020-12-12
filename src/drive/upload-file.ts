@@ -119,7 +119,11 @@ export function uploadGoogleDriveFile(dlDetails: DlVars, parent: string, file: {
           }
 
           if (!response.headers || !response.headers.location || response.headers.location.length <= 0) {
-            return reject(new Error(`Get drive resumable url return invalid headers: ${JSON.stringify(response.headers, null, 2)}`));
+            let message = `Get drive resumable url return invalid headers: ${JSON.stringify(response.headers, null, 2)}`;
+            if (response.body && response.body.error) {
+              message = `\nGet drive resumable url return invalid headers.\nErrorcode: ${response.body.error.code}\nErrorMessage: ${response.body.error.message}`
+            }
+            return reject(new Error(message));
           }
 
           let chunks = getChunks(file.filePath, 0);
