@@ -51,7 +51,7 @@ export async function driveClone(fileId: string, bot: TelegramBot, cloneMsg: Tel
                             }
                             msg = `<a href="` + url + `">` + res.data.name + `</a> (` + dlUtils.formatSize(res.data.size) + `)`;
                             if (constants.INDEX_DOMAIN) {
-                                msg += `\n\n<a href="` + constants.INDEX_DOMAIN + encodeURIComponent(res.name) + `">Index URL</a>`
+                                msg += `\n\n<a href="` + constants.INDEX_DOMAIN + encodeURIComponent(res.data.name) + `">Index URL</a>`
                             }
                             res.data.url = url;
                             notifyExternal(true, cloneMsg.chat.id, res.data);
