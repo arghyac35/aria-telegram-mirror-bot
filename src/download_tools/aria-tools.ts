@@ -10,7 +10,7 @@ import unzip = require('../drive/extract');
 const chmodr = require('chmodr');
 import checkDiskSpace from 'check-disk-space';
 
-const supportedArchive = ['zip', 'tar', 'gz', 'bz2', 'tgz', 'tbz2'];
+const supportedArchive = ['zip', 'tar', 'gz', 'bz2', 'tgz', 'tbz2', 'rar'];
 
 const ariaOptions = {
   host: 'localhost',

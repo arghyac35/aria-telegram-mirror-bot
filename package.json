@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "NTBA_FIX_319=1 node --max_old_space_size=128 ./out/index.js",
-    "start:dev": "nodemon"
+    "start:dev": "nodemon",
+    "postinstall": "node ./src/unpackAll/postinstall.mjs"
   },
   "author": "Ritayan Chakraborty",
   "license": "MIT",
@@ -16,6 +17,7 @@
     "@types/get-folder-size": "^2.0.0",
     "@types/mime-types": "^2.1.0",
     "@types/node-telegram-bot-api": "^0.50.4",
+    "@types/shell-quote": "^1.7.0",
     "@types/tar": "^4.0.4",
     "@types/uuid": "^8.3.0",
     "aria2": "^4.1.1",
@@ -31,14 +33,20 @@
     "inly": "^4.0.8",
     "node-telegram-bot-api": "^0.50.0",
     "nodemon": "^2.0.6",
+    "npmlog": "^4.1.2",
     "progress-stream": "^2.0.0",
     "request": "^2.88.2",
+    "shell-quote": "^1.7.2",
+    "system-install": "^1.0.4",
     "tar": "^6.0.5",
     "ts-node": "^9.1.1",
     "typescript": "^4.1.2",
-    "uuid": "^8.3.2"
+    "unzipper": "^0.10.10",
+    "uuid": "^8.3.2",
+    "wget-improved": "^3.2.0"
   },
   "devDependencies": {
+    "@types/npmlog": "^4.1.2",
     "@typescript-eslint/eslint-plugin": "^1.12.0",
     "@typescript-eslint/parser": "^1.12.0",
     "eslint": "^7.15.0"
