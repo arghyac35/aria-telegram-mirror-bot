@@ -691,7 +691,7 @@ function ariaOnDownloadComplete(gid: string, retry: number): void {
                 size = extractDetails.size; //TODO: To check if size is null
               } catch (error) {
                 console.error(error);
-                cleanupDownload(gid, error);
+                cleanupDownload(gid, error.message);
                 return;
               }
             }
