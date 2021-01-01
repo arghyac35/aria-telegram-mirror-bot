@@ -21,7 +21,7 @@ export function unpackAll(archiveFile: any, options: any, callback: any) {
 
     // Unar command:
     let unar = options.unar;
-    if (!unar) unar = !isLinux ? '../../unar' : 'unar';
+    if (!unar) unar = !isLinux ? `${process.cwd()}/unar` : `${process.cwd()}/unarLinux`;
     let ar = [unar];
 
     // Archive file (source):
