@@ -11,6 +11,7 @@ import child_process from 'child_process';
 
 const exec = child_process.exec;
 var isLinux = process.platform === "linux";
+var projectRoot = path.resolve('./');
 
 export function unpackAll(archiveFile: any, options: any, callback: any) {
     if (!archiveFile) archiveFile = options.archiveFile;
@@ -21,7 +22,7 @@ export function unpackAll(archiveFile: any, options: any, callback: any) {
 
     // Unar command:
     let unar = options.unar;
-    if (!unar) unar = !isLinux ? `${process.cwd()}/unar` : `${process.cwd()}/unarLinux`;
+    if (!unar) unar = !isLinux ? `${projectRoot}/unar` : `${projectRoot}/unarLinux`;
     let ar = [unar];
 
     // Archive file (source):
