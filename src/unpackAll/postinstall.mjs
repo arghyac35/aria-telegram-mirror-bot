@@ -12,10 +12,10 @@ import getInstallCmd from 'system-install';
 import child_process from 'child_process';
 
 const exec = child_process.exec;
-const unarAppfile = (process.platform === "darwin") ? 'unar1.8.1.zip' : 'unar1.8.1_win.zip';
-const unarAppurl = 'https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/theunarchiver/';
+const unarAppfile = (process.platform === "darwin") ? 'unarMac.zip' : 'unarWindows.zip';
+const unarAppurl = 'https://cdn.theunarchiver.com/downloads/';
 
-const cwd = process.cwd();
+const cwd = path.resolve('./');
 const url = unarAppurl + unarAppfile;
 const source = path.join(cwd, unarAppfile);
 const windows = (process.platform === "win32") || (process.platform === "darwin");
@@ -62,7 +62,7 @@ export function postinstall() {
     const cmd = getInstallCmd('unar');
     exec(cmd, (err, stdout, stderr) => {
       if (err) {
-        console.error(err);
+        console.error(err.message);
       } else {
         console.info('Unar installed successful');
       }
