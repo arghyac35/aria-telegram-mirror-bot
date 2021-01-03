@@ -80,7 +80,7 @@ export function getStatus(dlDetails: DlVars,
   aria2.call('tellStatus', dlDetails.gid, ['status', 'totalLength', 'completedLength', 'downloadSpeed', 'files']).then((res: any) => {
     if (res.status === 'active') {
       var statusMessage = downloadUtils.generateStatusMessage(parseFloat(res.totalLength),
-        parseFloat(res.completedLength), parseFloat(res.downloadSpeed), res.files, false, '');
+        parseFloat(res.completedLength), parseFloat(res.downloadSpeed), res.files, dlDetails);
       callback(null, statusMessage.message, statusMessage.filename, statusMessage.filesize);
     } else if (dlDetails.isUploading) {
       var downloadSpeed: number;
@@ -95,10 +95,10 @@ export function getStatus(dlDetails: DlVars,
       dlDetails.lastUploadCheckTimestamp = time;
 
       var statusMessage = downloadUtils.generateStatusMessage(parseFloat(res.totalLength),
-        dlDetails.uploadedBytes, downloadSpeed, res.files, true, dlDetails);
+        dlDetails.uploadedBytes, downloadSpeed, res.files, dlDetails);
       callback(null, statusMessage.message, statusMessage.filename, statusMessage.filesize);
     } else if (dlDetails.isExtracting) {
-      let message = `<b>Extracting</b>: <code>${dlDetails.extractedFileName}</code>\n<b>Size</b>: <code>${dlDetails.extractedFileSize}</code>`;
+      let message = `<b>Extracting</b>: <code>${dlDetails.extractedFileName}</code>\n<b>Size</b>: <code>${dlDetails.extractedFileSize}</code>\n<b>GID</b>: <code>${dlDetails.gid}</code>`;
       callback(null, message, dlDetails.extractedFileName, dlDetails.extractedFileSize);
     } else {
       var filePath = filenameUtils.findAriaFilePath(res['files']);
@@ -109,6 +109,7 @@ export function getStatus(dlDetails: DlVars,
       } else {
         message = `<i>${filename}</i> - ${res.status}`;
       }
+      message += `\n<b>GID</b>: <code>${dlDetails.gid}</code>`;
       callback(null, message, filename, '0B');
     }
   }).catch((err: any) => {
