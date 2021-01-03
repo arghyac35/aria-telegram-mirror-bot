@@ -15,7 +15,10 @@ There is very little preventing users from using this to mirror pirated content.
 * `/mirror <url>` or `/m <url>`: Download from the given URL and upload it to Google Drive. <url> can be HTTP(S), a BitTorrent magnet, or a HTTP(S) url to a BitTorrent .torrent file. A status message will be shown and updated while downloading.
 * `/mirrorTar <url>` or `/mt <url>`: Same as `/mirror`, but archive multiple files into a tar before uploading it.
 * `/mirrorStatus` or `/ms`: Send a status message about all active and queued downloads.
-* `/cancelMirror` or `/cm`: Cancel a particular mirroring task. To use this, send it as a reply to the message that started the download that you want to cancel. Only the person who started the task, SUDO_USERS, and chat admins can use this command.
+* `/cancelMirror` or `/cm`: Cancel a particular mirroring task. Only the person who started the task, SUDO_USERS, and chat admins can use this command. It can be used in below two ways:
+
+      1. Send it as a reply to the message that started the download that you want to cancel.
+      2. Use the gid for each download, like `/cancelMirror <gid>` or `/cm <gid>`.
 * `/cancelAll` or `/ca`: Cancel all mirroring tasks in all chats if a [SUDO_USERS](#Constants-description) member uses it, or cancel all mirroring tasks for a particular chat if one of that chat's admins use it. No one else can use this command.
 * `/list <filename>` or `/l <filename>`: Send links to downloads with the `filename` substring in the name. In case of too many downloads, only show the most recent few. 
 * `/getfolder` or `/gf`: Send link of drive mirror folder.

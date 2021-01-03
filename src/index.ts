@@ -184,30 +184,37 @@ setEventCallback(eventRegex.commandsRegex.getFolder, eventRegex.commandsRegexNoN
   }
 });
 
-setEventCallback(eventRegex.commandsRegex.cancelMirror, eventRegex.commandsRegexNoName.cancelMirror, (msg) => {
+setEventCallback(eventRegex.commandsRegex.cancelMirror, eventRegex.commandsRegexNoName.cancelMirror, (msg, match) => {
   var authorizedCode = msgTools.isAuthorized(msg);
+  var dlDetails: details.DlVars;
+  let gidFromMessage = '';
+
   if (msg.reply_to_message) {
-    var dlDetails = dlManager.getDownloadByMsgId(msg.reply_to_message);
-    if (dlDetails) {
-      if (authorizedCode > -1 && authorizedCode < 3) {
-        cancelMirror(dlDetails, msg);
-      } else if (authorizedCode === 3) {
-        msgTools.isAdmin(bot, msg, (e, res) => {
-          if (res) {
-            cancelMirror(dlDetails, msg);
-          } else {
-            msgTools.sendMessage(bot, msg, 'You do not have permission to do that.');
-          }
-        });
-      } else {
-        msgTools.sendUnauthorizedMessage(bot, msg);
-      }
+    dlDetails = dlManager.getDownloadByMsgId(msg.reply_to_message);
+  } else if (match && match.length > 5) {
+    gidFromMessage = match[4];
+    dlDetails = dlManager.getDownloadByGid(gidFromMessage.trim());
+  } else {
+    msgTools.sendMessage(bot, msg, `Reply to the command message for the download that you want to cancel or enter valid gid.`);
+  }
+
+  if (dlDetails) {
+    if (authorizedCode > -1 && authorizedCode < 3) {
+      cancelMirror(dlDetails, msg);
+    } else if (authorizedCode === 3) {
+      msgTools.isAdmin(bot, msg, (e, res) => {
+        if (res) {
+          cancelMirror(dlDetails, msg);
+        } else {
+          msgTools.sendMessage(bot, msg, 'You do not have permission to do that.');
+        }
+      });
     } else {
-      msgTools.sendMessage(bot, msg, `Reply to the command message for the download that you want to cancel.` +
-        ` Also make sure that the download is even active.`);
+      msgTools.sendUnauthorizedMessage(bot, msg);
     }
   } else {
-    msgTools.sendMessage(bot, msg, `Reply to the command message for the download that you want to cancel.`);
+    const message = gidFromMessage ? `Invalid GID, no download found with gid: <code>${gidFromMessage}</code>.` : `Reply to the command message for the download that you want to cancel. Also make sure that the download is even active.`;
+    msgTools.sendMessage(bot, msg, message);
   }
 });
 
