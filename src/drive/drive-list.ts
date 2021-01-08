@@ -34,7 +34,9 @@ export function listFiles(fileName: string, callback: (err: string, message: str
       orderBy: 'modifiedTime desc',
       pageSize: 20,
       supportsAllDrives: true,
-      includeItemsFromAllDrives: true
+      includeItemsFromAllDrives: true,
+      corpora: 'drive',
+      driveId: constants.SHARED_DRIVE_ID
     },
       (listErr: Error, res: any) => {
         if (listErr) {
