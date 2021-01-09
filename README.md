@@ -36,6 +36,7 @@ There is very little preventing users from using this to mirror pirated content.
 
       Supported filetypes:
       .zip, .gz, .bz2, .tar, tar.gz, tar.bz2, .tgz, .tbz2
+* `/count <driveUrl>` or `/cnt <driveUrl>`: Obtain informations about a drive folder and send it as a table. Idea taken from: https://github.com/iwestlin/gd-utils/blob/master/count
 
 #### Notes
 
