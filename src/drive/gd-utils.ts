@@ -219,7 +219,7 @@ async function walk_and_save(fid: string, tg?: any) {
 
     async function recur(parent: string) {
         let files = await limit(() => ls_folder(parent))
-        if (!files) return
+        if (!files) return null;
         if (files.unfinished) unfinished_folders.push(parent)
         const folders = files.filter((v: any) => v.mimeType === FOLDER_TYPE)
         files.forEach((v: any) => v.parent = parent)
@@ -284,6 +284,7 @@ function summary(info: any[], sort_by?: string) {
         } else {
             sizes[ext] = size
         }
+        return v;
     })
     const details: any = Object.keys(exts).map(ext => {
         const count = exts[ext]
