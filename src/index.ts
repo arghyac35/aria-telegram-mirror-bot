@@ -16,6 +16,7 @@ import { EventRegex } from './bot_utils/event_regex';
 // import { exec } from 'child_process';
 import checkDiskSpace = require('check-disk-space');
 import removeFn = require('./bot_utils/remove_text');
+import gdUtils = require('./drive/gd-utils');
 
 const eventRegex = new EventRegex();
 const bot = new TelegramBot(constants.TOKEN, { polling: true });
@@ -291,6 +292,48 @@ setEventCallback(eventRegex.commandsRegex.removeText, eventRegex.commandsRegexNo
         msgTools.deleteMsg(bot, cloneMsg);
         msgTools.sendMessage(bot, msg, err, 10000);
       });
+    } else {
+      msgTools.sendMessage(bot, msg, `Google drive ID could not be found in the provided link`);
+    }
+  }
+});
+
+setEventCallback(eventRegex.commandsRegex.count, eventRegex.commandsRegexNoName.count, async (msg, match) => {
+  if (msgTools.isAuthorized(msg) < 0) {
+    msgTools.sendUnauthorizedMessage(bot, msg);
+  } else {
+    // get the drive filed id from url
+    const fileId = getIdFromUrl(match[4]);
+    if (fileId) {
+      let countMsg = await bot.sendMessage(msg.chat.id, `Collecting info about ${fileId}，Please wait...`, {
+        reply_to_message_id: msg.message_id,
+        parse_mode: 'HTML'
+      });
+      const name = await gdUtils.get_folder_name(fileId);
+
+      const gen_text = (payload: any) => {
+        const { obj_count, processing_count, pending_count } = payload || {}
+        return `<b>Name:</b> ${name}\n<b>Number of Files:</b> ${obj_count || ''}\n${pending_count ? ('<b>Pending:</b> ' + pending_count) : ''}\n${processing_count ? ('<b>Ongoing:</b> ' + processing_count) : ''}`
+      }
+
+      const message_updater = async (payload: any) => await msgTools.editMessage(bot, countMsg, gen_text(payload));
+
+      const table = await gdUtils.gen_count_body({ fid: fileId, tg: message_updater });
+      if (!table) {
+        msgTools.deleteMsg(bot, countMsg);
+        msgTools.sendMessage(bot, msg, `Failed to obtain info for: ${name}`, 10000);
+        return;
+      }
+
+      msgTools.deleteMsg(bot, countMsg);
+      msgTools.sendMessageAsync(bot, msg, `<b>Source Folder Name:</b> <code>${name}</code>\n<b>Source Folder Link:</b> <code>${match[4]}</code>\n<pre>${table}</pre>`, -1).catch(async err => {
+        if (err && err.body && err.body.error_code == 413 && err.body.description.includes('Entity Too Large')) {
+          const limit = 20
+          const table = await gdUtils.gen_count_body({ fid: fileId, limit });
+          msgTools.sendMessage(bot, msg, `<b>Source Folder Name:</b> <code>${name}</code>\n<b>Source Folder Link:</b> <code>${match[4]}</code>\nThe table is too long and exceeds the telegram message limit, only the first ${limit} will be displayed:\n<pre>${table}</pre>`, -1)
+        }
+      });
+
     } else {
       msgTools.sendMessage(bot, msg, `Google drive ID could not be found in the provided link`);
     }

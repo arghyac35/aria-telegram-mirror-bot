@@ -15,6 +15,7 @@ export class RegExps {
   readonly tar: RegExp;
   readonly unzipMirror: RegExp;
   readonly removeText: RegExp;
+  readonly count: RegExp;
 
   constructor(commands: string[]) {
     this.start = new RegExp(commands[0], 'i');
@@ -33,5 +34,6 @@ export class RegExps {
     this.tar = new RegExp(commands[13], 'i');
     this.unzipMirror = new RegExp(commands[14], 'i');
     this.removeText = new RegExp(commands[15], 'i');
+    this.count = new RegExp(commands[16], 'i');
   }
 }

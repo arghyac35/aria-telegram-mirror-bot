@@ -26,6 +26,17 @@ There is very little preventing users from using this to mirror pirated content.
 * `/getlink <driveUrl>` or `/gl <driveUrl>`: Send index link of the file.
 * `/clone <driveUrl>` or `/clone <diveUrl>`: Clone any shareable drive link. ~~(TODO: Add service account in it so that if 750GB per account limit is over we can switch to service account.)~~
 * `/mirror file` or `/mf`: Forward any torrent file and reply to the forwared message with this command it will start mirroring the torrent.
+* `/tar <driveUrl>` or `/t <driveUrl>`: Create a tar of drive folder and upload. This is not yet 100% perfect but does the work. 
+
+      Workflow:
+      1. It downlaods each and every files(inside the drive folder) one by one using drive download api. As, it downloads one by one so the overall process is slow.
+      2. Creates a tar of the downloaded files.
+      3. Uploads the tar.
+* `/unzipMirror <url>` or `/um <url>`: Unzip the archive and uploads the unzipped folder. Todo: Show extracted percentage & add support to extract from drive url. Idea taken from: https://github.com/magneto261290/magneto-python-aria
+
+      Supported filetypes:
+      .zip, .gz, .bz2, .tar, tar.gz, tar.bz2, .tgz, .tbz2
+* `/count <driveUrl>` or `/cnt <driveUrl>`: Obtain informations about a drive folder and send it as a table. Idea taken from: https://github.com/iwestlin/gd-utils/blob/master/count
 
 #### Notes
 

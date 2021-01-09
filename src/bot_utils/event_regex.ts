@@ -7,9 +7,9 @@ export class EventRegex {
   readonly commandsRegexNoName: regexps.RegExps;
 
   constructor() {
-    var commands = ['^[/|.]start', '^[/|.](mirrorTar|mt)', '^[/|.](mirror|m)', '^[/|.](mirrorStatus|ms)', '^[/|.](list|l)', '^[/|.](getFolder|gf)', '^[/|.](cancelMirror|cm)', '^[/|.](cancelAll|ca)', '^[/|.]disk', '^[/|.](getLink|gl)', '^[/|.](clone|c)', '^[/|.]id', '^[/|.]mf', '^[/|.](tar|t)', '^[/|.](unzipMirror|um)', '^[/|.](removeText|rt)'];
+    var commands = ['^[/|.]start', '^[/|.](mirrorTar|mt)', '^[/|.](mirror|m)', '^[/|.](mirrorStatus|ms)', '^[/|.](list|l)', '^[/|.](getFolder|gf)', '^[/|.](cancelMirror|cm)', '^[/|.](cancelAll|ca)', '^[/|.]disk', '^[/|.](getLink|gl)', '^[/|.](clone|c)', '^[/|.]id', '^[/|.]mf', '^[/|.](tar|t)', '^[/|.](unzipMirror|um)', '^[/|.](removeText|rt)', '^[/|.](count|cnt)'];
     var commandsNoName: string[] = [];
-    var commandAfter = ['$', ' (.+)', ' (.+)', '$', ' (.+)', '$', '($| (.+))', '$', '$', ' (.+)', ' (.+)', '$', '$', ' (.+)', ' (.+)', ' (.+)'];
+    var commandAfter = ['$', ' (.+)', ' (.+)', '$', ' (.+)', '$', '($| (.+))', '$', '$', ' (.+)', ' (.+)', '$', '$', ' (.+)', ' (.+)', ' (.+)', ' (.+)'];
 
     if (constants.COMMANDS_USE_BOT_NAME && constants.COMMANDS_USE_BOT_NAME.ENABLED) {
       commands.forEach((command, i) => {

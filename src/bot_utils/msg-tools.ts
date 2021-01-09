@@ -59,6 +59,31 @@ export function sendMessage(bot: TelegramBot, msg: TelegramBot.Message, text: st
     });
 }
 
+export async function sendMessageAsync(bot: TelegramBot, msg: TelegramBot.Message, text: string, delay?: number, quickDeleteOriginal?: boolean) {
+  if (!delay) delay = 10000;
+  return new Promise((resolve, reject) => {
+    bot.sendMessage(msg.chat.id, text, {
+      reply_to_message_id: msg.message_id,
+      parse_mode: 'HTML'
+    })
+      .then((res) => {
+        if (delay > -1) {
+          deleteMsg(bot, res, delay);
+          if (quickDeleteOriginal) {
+            deleteMsg(bot, msg);
+          } else {
+            deleteMsg(bot, msg, delay);
+          }
+        }
+        resolve(res);
+      })
+      .catch((err) => {
+        console.error(`sendMessage error: ${err.message}`);
+        reject(err);
+      });
+  });
+}
+
 export function sendUnauthorizedMessage(bot: TelegramBot, msg: TelegramBot.Message): void {
   sendMessage(bot, msg, `You aren't authorized to use this bot here.`);
 }
