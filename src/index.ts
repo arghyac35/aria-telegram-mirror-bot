@@ -318,21 +318,26 @@ setEventCallback(eventRegex.commandsRegex.count, eventRegex.commandsRegexNoName.
 
       const message_updater = async (payload: any) => await msgTools.editMessage(bot, countMsg, gen_text(payload));
 
-      const table = await gdUtils.gen_count_body({ fid: fileId, tg: message_updater });
-      if (!table) {
-        msgTools.deleteMsg(bot, countMsg);
-        msgTools.sendMessage(bot, msg, `Failed to obtain info for: ${name}`, 10000);
-        return;
-      }
-
-      msgTools.deleteMsg(bot, countMsg);
-      msgTools.sendMessageAsync(bot, msg, `<b>Source Folder Name:</b> <code>${name}</code>\n<b>Source Folder Link:</b> <code>${match[4]}</code>\n<pre>${table}</pre>`, -1).catch(async err => {
-        if (err && err.body && err.body.error_code == 413 && err.body.description.includes('Entity Too Large')) {
-          const limit = 20
-          const table = await gdUtils.gen_count_body({ fid: fileId, limit });
-          msgTools.sendMessage(bot, msg, `<b>Source Folder Name:</b> <code>${name}</code>\n<b>Source Folder Link:</b> <code>${match[4]}</code>\nThe table is too long and exceeds the telegram message limit, only the first ${limit} will be displayed:\n<pre>${table}</pre>`, -1)
+      try {
+        const table = await gdUtils.gen_count_body({ fid: fileId, tg: message_updater });
+        if (!table) {
+          msgTools.deleteMsg(bot, countMsg);
+          msgTools.sendMessage(bot, msg, `Failed to obtain info for: ${name}`, 10000);
+          return;
         }
-      });
+
+        msgTools.deleteMsg(bot, countMsg);
+        msgTools.sendMessageAsync(bot, msg, `<b>Source Folder Name:</b> <code>${name}</code>\n<b>Source Folder Link:</b> <code>${match[4]}</code>\n<pre>${table}</pre>`, -1).catch(async err => {
+          if (err && err.body && err.body.error_code == 413 && err.body.description.includes('Entity Too Large')) {
+            const limit = 20
+            const table = await gdUtils.gen_count_body({ fid: fileId, limit });
+            msgTools.sendMessage(bot, msg, `<b>Source Folder Name:</b> <code>${name}</code>\n<b>Source Folder Link:</b> <code>${match[4]}</code>\nThe table is too long and exceeds the telegram message limit, only the first ${limit} will be displayed:\n<pre>${table}</pre>`, -1)
+          }
+        });
+      } catch (error) {
+        msgTools.deleteMsg(bot, countMsg);
+        msgTools.sendMessage(bot, msg, error.message, 10000);
+      }
 
     } else {
       msgTools.sendMessage(bot, msg, `Google drive ID could not be found in the provided link`);
