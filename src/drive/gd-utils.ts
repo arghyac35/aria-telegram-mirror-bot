@@ -8,9 +8,8 @@ import pLimit from 'p-limit';
 import dayjs from 'dayjs';
 import Table from 'cli-table3';
 import constants = require('../.constants');
-import { map } from 'async';
 
-var accessToken = '';
+var AUTH: any;
 
 const FOLDER_TYPE = 'application/vnd.google-apps.folder'
 let axins = axios.create({});
@@ -172,13 +171,29 @@ async function real_get_sa_token(el: any) {
 }
 
 async function get_access_token() {
-    if (!accessToken) {
-        const cred = fs.readFileSync('./credentials.json').toString();
-        if (cred) {
-            accessToken = JSON.parse(cred).access_token;
-        }
+    if (AUTH && AUTH.expires > Date.now()) {
+        return AUTH.access_token;
     }
-    return accessToken;
+
+    let cred: any = fs.readFileSync('./credentials.json').toString();
+    let client_sec: any = fs.readFileSync('./client_secret.json').toString();
+    if (cred) {
+        cred = JSON.parse(cred);
+        client_sec = JSON.parse(client_sec)
+        cred = { ...cred, ...client_sec.installed }
+    }
+
+    const { client_id, client_secret, refresh_token } = cred
+
+    const url = 'https://www.googleapis.com/oauth2/v4/token'
+    const headers = { 'Content-Type': 'application/x-www-form-urlencoded' }
+    const config = { headers }
+    const params = { client_id, client_secret, refresh_token, grant_type: 'refresh_token' }
+    const { data } = await axins.post(url, params_to_query(params), config)
+    AUTH = cred;
+    AUTH.access_token = data.access_token
+    AUTH.expires = Date.now() + 1000 * data.expires_in
+    return data.access_token
 }
 
 function get_sa_batch() {
@@ -402,6 +417,7 @@ async function create_folders(source: string, folders: any[], root: string, smy?
             } catch (e) {
                 if (e.message === FILE_EXCEED_MSG) {
                     clearInterval(loop)
+                    if (tg_loop) clearInterval(tg_loop)
                     throw new Error(FILE_EXCEED_MSG)
                 }
                 console.error('Error creating Folder:', e.message)
@@ -411,7 +427,7 @@ async function create_folders(source: string, folders: any[], root: string, smy?
     }
 
     clearInterval(loop)
-    if(tg_loop) clearInterval(tg_loop);
+    if (tg_loop) clearInterval(tg_loop);
     return mapping
 }
 
@@ -439,6 +455,7 @@ async function copy_files(files: any[], mapping: any[], root: string, smy?: any,
     do {
         if (err) {
             clearInterval(loop)
+            if (tg_loop) clearInterval(tg_loop)
             files = null
             throw err
         }
@@ -457,7 +474,6 @@ async function copy_files(files: any[], mapping: any[], root: string, smy?: any,
         copy_file(id, target).then((new_file: any) => {
             if (new_file) {
                 count++
-                // TODO: Now push the copied files some where for checking status
             }
         }).catch(e => {
             err = e
