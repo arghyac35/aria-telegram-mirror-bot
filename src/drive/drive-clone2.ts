@@ -98,7 +98,7 @@ function notifyExternal(successful: boolean, originGroup: number, values: any) {
         file: {
             name: 'Cloning: ' + values.name,
             driveURL: values.url,
-            size: dlUtils.formatSize(values.size)
+            size: !isNaN(values.size) ? dlUtils.formatSize(values.size) : values.size
         },
         originGroup: originGroup
     });
