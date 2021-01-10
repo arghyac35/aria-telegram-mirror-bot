@@ -18,7 +18,7 @@ const FILE_EXCEED_MSG = 'The number of files on your team drive has exceeded the
 
 const SA_LOCATION = 'accounts';
 const SA_BATCH_SIZE = 1000
-const SA_FILES: any = fs.readdirSync(path.join(__dirname, '../..', SA_LOCATION)).filter(v => v.endsWith('.json'))
+const SA_FILES: any = constants.USE_SERVICE_ACCOUNT ? fs.readdirSync(path.join(__dirname, '../..', SA_LOCATION)).filter(v => v.endsWith('.json')) : [];
 SA_FILES.flag = 0
 let SA_TOKENS = get_sa_batch()
 
