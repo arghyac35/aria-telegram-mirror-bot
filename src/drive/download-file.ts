@@ -3,7 +3,7 @@ import fs = require('fs');
 import constants = require('../.constants');
 import driveAuth = require('./drive-auth');
 import { google, drive_v3 } from 'googleapis';
-import { driveListFiles, timeout } from './drive-clone';
+import { timeout } from './drive-clone';
 import msgTools = require('../bot_utils/msg-tools');
 import tar = require('./tar');
 import fsWalk = require('../fs-walk');
@@ -11,53 +11,12 @@ import { DlVars } from "../dl_model/detail";
 import driveDirectLink = require('./drive-directLink');
 import downloadUtils = require('../download_tools/utils');
 import { v4 as uuidv4 } from 'uuid';
-var Progress = require('progress-stream');
 const perf = require('execution-time')();
+import path from 'path';
+import gdUtils = require('./gd-utils');
 
-var om = '';
-async function downloadFile(file: any, drive: drive_v3.Drive, filePath: string, dir: string, bot: TelegramBot, tarringMsg: TelegramBot.Message, message: string) {
-    return new Promise(async (resolve, reject) => {
-        if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir, { recursive: true });
-        }
-        var dest = fs.createWriteStream(filePath);
-        var progress = Progress({ time: constants.STATUS_UPDATE_INTERVAL_MS ? constants.STATUS_UPDATE_INTERVAL_MS : 12000, length: file.size });
-
-        await drive.files.get({
-            fileId: file.id,
-            supportsAllDrives: true,
-            alt: 'media'
-        }, {
-            responseType: 'stream'
-        }).then((res: any) => {
-            res.data
-                .on('end', () => {
-                    resolve('Done');
-                })
-                .on('error', (dlErr: any) => {
-                    console.log('error', dlErr);
-                    reject(dlErr);
-                })
-                .pipe(progress).pipe(dest);
-            //checking progress of file
-            progress.on('progress', function (prog: any) {
-                let totalsize = downloadUtils.formatSize(file.size);
-                let speed = downloadUtils.formatSize(prog.speed.toFixed(2));
-                let dLeft = downloadUtils.formatSize(prog.remaining);
-                let dComp = downloadUtils.formatSize(prog.transferred);
-
-                let tmessage = message + `\n<b>Downloading</b>: <code>${file.name}</code>\n<b>Size</b>: <code>${totalsize}</code>\n<b>Progress</b>: <code>${prog.percentage.toFixed(2)}%</code>\n<b>Remaining</b>: <code>${dLeft}</code>\n<b>Transfered</b>: <code>${dComp}</code>\n<b>Speed</b>: <code>${speed}ps</code>\n<b>ETA</b>: <code>${prog.eta}</code>`;
-
-                if (om !== tmessage) {
-                    msgTools.editMessage(bot, tarringMsg, tmessage);
-                }
-                om = tmessage;
-            });
-        }).catch((error: Error) => {
-            reject(error.message + `\n\nEither it is not a Shareable Link or something went wrong while fetching files metadata`);
-        });
-    });
-}
+const FOLDER_TYPE = 'application/vnd.google-apps.folder'
+const PARALLEL_LIMIT = 10 // The number of parallel network requests can be adjusted according to the network environment
 
 export async function driveDownloadAndTar(fileId: string, bot: TelegramBot, tarringMsg: TelegramBot.Message) {
     const dlDetails: DlVars = {
@@ -91,7 +50,7 @@ export async function driveDownloadAndTar(fileId: string, bot: TelegramBot, tarr
             perf.start();
             await drive.files.get({ fileId: fileId, fields: 'id, name, mimeType, size', supportsAllDrives: true }).then(async meta => {
                 // check if its folder or not
-                if (meta.data.mimeType === 'application/vnd.google-apps.folder') {
+                if (meta.data.mimeType === FOLDER_TYPE) {
                     message += meta.data.name + `</code>`;
                     msgTools.editMessage(bot, tarringMsg, message);
                     var dlDir = uuidv4();
@@ -173,35 +132,6 @@ function millisToMinutesAndSeconds(millis: number) {
     return (seconds == 60 ? (minutes + 1) + ":00" : minutes + ":" + (seconds < 10 ? "0" : "") + seconds);
 }
 
-async function downloadAllFiles(meta: drive_v3.Schema$File, drive: drive_v3.Drive, folderPath: string, bot: TelegramBot, tarringMsg: TelegramBot.Message, message: string) {
-    // list all files inside the folder
-    const files = await driveListFiles("'" + meta.id + "' in parents and trashed = false", drive);
-    let errMsg: boolean;
-    let rmessage: string;
-    if (files.length > 0) {
-        // download the file one by one
-        for (let index = 0; index < files.length; index++) {
-            const file = files[index];
-            if (file.mimeType === 'application/vnd.google-apps.folder') {
-                await downloadAllFiles(file, drive, folderPath + file.name + '/', bot, tarringMsg, message);
-            } else {
-                let filePath = folderPath + file.name;
-                await timeout(1000);
-                await downloadFile(file, drive, filePath, folderPath, bot, tarringMsg, message).then(d => {
-                    console.log('Download complete for: ', file.name);
-                }).catch(e => {
-                    console.log('Download error for: ', file.name);
-                    console.error('Error: ', e);
-                    errMsg = true;
-                });
-            }
-        }
-    } else {
-        rmessage = 'No files found inside folder';
-    }
-    return { message: rmessage, status: errMsg };
-}
-
 interface DriveUploadCompleteCallback {
     (err: string, url: string, isFolder: boolean, indexLink?: string): void;
 }
@@ -253,4 +183,155 @@ function getStatus(dlDetails: DlVars, totalSize: number) {
     var statusMessage = downloadUtils.generateStatusMessage2(totalSize,
         dlDetails.uploadedBytes, downloadSpeed);
     return statusMessage;
+}
+
+async function downloadAllFiles(meta: drive_v3.Schema$File, drive: drive_v3.Drive, folderPath: string, bot: TelegramBot, tarringMsg: TelegramBot.Message, message: string) {
+    let errMsg: boolean;
+    let rmessage: string;
+
+    const arr = await gdUtils.walk_and_save(meta.id)
+    const smy = gdUtils.summary(arr);
+    const folders: any[] = [];
+    let totalFilesSize = 0;
+    let files = arr.filter((v: any) => {
+        if (v.mimeType !== FOLDER_TYPE) {
+            totalFilesSize += v.size;
+            return true;
+        }
+        else {
+            if (v.mimeType === FOLDER_TYPE) folders.push(v);
+            return false;
+        }
+    });
+    const totalFiles = files.length;
+    console.log('Number of folders to be downloaded: ', folders.length)
+    console.log('Number of files to be downloaded: ', totalFiles)
+
+    if (totalFiles === 0) {
+        console.log('No files found inside folder');
+        rmessage = 'No files found inside folder';
+    } else {
+
+        const mapping = await create_folders(meta.id, folders, folderPath);
+        let tmpTgMessage = ''
+
+        const tg_loop = setInterval(() => {
+            let tgMessage = message + `\n=====Downloading files=====\n\nFile Progress: ${count}/${totalFiles}\nTotal Percentage: ${(count * 100 / totalFiles).toFixed(2)}%\nTotal Size: ${smy.total_size || 'Unknown'}`;
+            if (tgMessage !== tmpTgMessage) {
+                msgTools.editMessage(bot, tarringMsg, tgMessage).catch(console.error);
+            }
+            tmpTgMessage = tgMessage;
+        }, constants.STATUS_UPDATE_INTERVAL_MS ? constants.STATUS_UPDATE_INTERVAL_MS : 12000);
+
+        let count = 0
+        let concurrency = 0
+        let err
+        do {
+            if (err) {
+                files = null
+                console.log('Err while downloadFile-->', err);
+                errMsg = true;
+                clearInterval(tg_loop)
+                break;
+            }
+            if (concurrency >= PARALLEL_LIMIT) {
+                await timeout(100)
+                continue
+            }
+            const file = files.shift()
+            if (!file) {
+                await timeout(1000)
+                continue
+            }
+            concurrency++
+            const { parent, name } = file
+            const targetFolderPath = mapping[parent] || folderPath;
+            const filePath = path.join(targetFolderPath, name);
+            downloadFile(file, drive, filePath).then((downloadedFile: any) => {
+                if (downloadedFile) {
+                    count++
+                }
+            }).catch(e => {
+                err = e
+            }).finally(() => {
+                concurrency--
+            })
+        } while (concurrency || files.length)
+        clearInterval(tg_loop)
+        if (err) errMsg = true;
+    }
+
+    return { message: rmessage, status: errMsg };
+}
+
+async function create_folders(source: string, folders: any[], root: string) {
+    if (!Array.isArray(folders)) throw new Error('folders must be Array:' + folders)
+    const mapping: any = {};
+    mapping[source] = root
+    if (!folders.length) {
+        await create_local_folder(root);
+        return mapping;
+    }
+
+    const missed_folders = folders.filter(v => !mapping[v.id])
+    console.log('Start creating folders, total：', missed_folders.length)
+    let count = 0
+    let same_levels = folders.filter(v => v.parent === folders[0].parent)
+
+    while (same_levels.length) {
+        const same_levels_missed = same_levels.filter(v => !mapping[v.id])
+        await Promise.all(same_levels_missed.map(async v => {
+            try {
+                const { name, id, parent } = v
+                const target = mapping[parent] || root
+                const new_folder = path.join(target, name);
+                await create_local_folder(new_folder);
+                count++
+                mapping[id] = new_folder;
+            } catch (e) {
+                console.error('Error creating Folder:', e.message)
+            }
+        }))
+        same_levels = [].concat(...same_levels.map(v => folders.filter(vv => vv.parent === v.id)))
+    }
+
+    return mapping
+}
+
+async function create_local_folder(folderPath: string) {
+    return new Promise((res, rej) => {
+        if (!fs.existsSync(folderPath)) {
+            fs.mkdir(folderPath, { recursive: true }, (err) => {
+                if (err) rej(err);
+                else res('');
+            });
+        } else res('');
+
+    });
+}
+
+async function downloadFile(file: any, drive: drive_v3.Drive, filePath: string) {
+    return new Promise(async (resolve, reject) => {
+        var dest = fs.createWriteStream(filePath);
+
+        await drive.files.get({
+            fileId: file.id,
+            supportsAllDrives: true,
+            alt: 'media'
+        }, {
+            responseType: 'stream'
+        }).then((res: any) => {
+            res.data
+                .on('end', () => {
+                    resolve(file);
+                })
+                .on('error', (dlErr: any) => {
+                    console.log('error', dlErr);
+                    reject(dlErr);
+                }).pipe(dest);
+
+        }).catch((error: Error) => {
+            reject(error.message + `\n\nEither it is not a Shareable Link or something went wrong while fetching files metadata`);
+        });
+    });
 }

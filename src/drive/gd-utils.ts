@@ -213,7 +213,7 @@ function get_random_element(arr: any[]) {
     return arr[~~(arr.length * Math.random())]
 }
 
-async function walk_and_save(fid: string, tg?: any) {
+export async function walk_and_save(fid: string, tg?: any) {
     let result: any = [];
     const unfinished_folders: any[] = []
     const limit = pLimit(PARALLEL_LIMIT)
@@ -272,7 +272,7 @@ function print_progress(msg: string) {
     }
 }
 
-function summary(info: any[], sort_by?: string) {
+export function summary(info: any[], sort_by?: string) {
     const files = info.filter(v => v.mimeType !== FOLDER_TYPE);
     const file_count = files.length;
     const folder_count = info.filter(v => v.mimeType === FOLDER_TYPE).length
