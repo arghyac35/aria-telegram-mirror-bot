@@ -106,18 +106,16 @@ function generateFilesListMessage(files: any[], fileName: string): string {
       message += '<a href = \'' + files[i]['url'] + '\'>' + files[i]['name'] + '</a>';
       if (files[i]['size']) {
         message += ' (' + dlUtils.formatSize(files[i]['size']) + ')';
-        //comment this if and 'GdriveBot/' if u want gdindex link in all searches
-        //Even if u dont comment then remove the 'GdriveBot/' from below message
-        if (fileName === '*' && constants.INDEX_DOMAIN) {
-          message += ` | <a href="` + constants.INDEX_DOMAIN + `GdriveBot/` + encodeURIComponent(files[i]['name']) + `">Index URL</a>`;
+        //uncomment the below filename === '*' if u want gdindex link ony in 'list *'
+        if (/*fileName === '*'  && */ constants.INDEX_DOMAIN) {
+          message += ` | <a href="` + dlUtils.checkTrailingSlash(constants.INDEX_DOMAIN) + `GdriveBot/` + encodeURIComponent(files[i]['name']) + `">Index URL</a>`;
         }
         message += '\n';
       } else if (files[i]['mimeType'] === 'application/vnd.google-apps.folder') {
         message += ' (folder)';
-        //comment this if and 'GdriveBot/' if u want gdindex link in all searches
-        //Even if u dont comment then remove the 'GdriveBot/' from below message
-        if (fileName === '*' && constants.INDEX_DOMAIN) {
-          message += ` | <a href="` + constants.INDEX_DOMAIN + `GdriveBot/` + encodeURIComponent(files[i]['name']) + `/">Index URL</a>`;
+        //uncomment the below filename === '*' if u want gdindex link ony in 'list *'
+        if (/* fileName === '*' && */ constants.INDEX_DOMAIN) {
+          message += ` | <a href="` + dlUtils.checkTrailingSlash(constants.INDEX_DOMAIN) + `GdriveBot/` + encodeURIComponent(files[i]['name']) + `/">Index URL</a>`;
         }
         message += '\n';
       } else {

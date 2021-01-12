@@ -1,12 +1,9 @@
 import constants = require('../.constants');
 import driveAuth = require('./drive-auth');
 import { google } from 'googleapis';
+import dlUtils = require('../download_tools/utils');
 
-export async function getGDindexLink(fileId: string, isUrl?: boolean) {
-    if (isUrl) {
-        let url = fileId.match(/[-\w]{25,}/);
-        fileId = Array.isArray(url) && url.length > 0 ? url[0] : ''
-    }
+export async function getGDindexLink(fileId: string, isGetLink?: boolean) {
     return new Promise(async (resolve, reject) => {
         if (fileId) {
             driveAuth.call((authErr, auth) => {
@@ -21,19 +18,19 @@ export async function getGDindexLink(fileId: string, isUrl?: boolean) {
                             reject(err.message);
                         } else {
                             if (res.data) {
-                                let url = constants.INDEX_DOMAIN + encodeURIComponent(await getFilePathDrive(res.data.parents, drive) + res.data.name);
+                                let url = dlUtils.checkTrailingSlash(constants.INDEX_DOMAIN) + encodeURIComponent(await getFilePathDrive(res.data.parents, drive) + res.data.name);
                                 if (res.data.mimeType === 'application/vnd.google-apps.folder') {
                                     url += '/'
                                 }
-                                resolve(isUrl ? { url: url, name: res.data.name } : url);
+                                resolve(isGetLink ? { url: url, name: res.data.name } : url);
                             } else {
-                                reject('🔥 error: %o : File not found');
+                                reject('🔥 Error: File not found: No metadata for the file returned.');
                             }
                         }
                     });
             });
         } else {
-            reject('🔥 error: %o : File id not found');
+            reject('🔥 Error: Couldn\'t decode fileId from url');
         }
     });
 }
@@ -52,9 +49,7 @@ async function getFilePathDrive(parents: any, drive: any) {
     }
     tree.reverse();
     for (const folder of tree) {
-        if (folder.name !== 'Stuffs' && folder.name !== 'AnotherGdriveBot') {
-            path += folder.name + '/';
-        }
+        path += folder.name + '/';
     }
     return path;
 }

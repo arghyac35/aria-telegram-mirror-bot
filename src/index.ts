@@ -303,7 +303,7 @@ setEventCallback(eventRegex.commandsRegex.count, eventRegex.commandsRegexNoName.
     msgTools.sendUnauthorizedMessage(bot, msg);
   } else {
     // get the drive filed id from url
-    const fileId = getIdFromUrl(match[4]);
+    const fileId = downloadUtils.getIdFromUrl(match[4]);
     if (fileId) {
       let countMsg = await bot.sendMessage(msg.chat.id, `Collecting info about ${fileId}，Please wait...`, {
         reply_to_message_id: msg.message_id,
@@ -353,7 +353,7 @@ setEventCallback(eventRegex.commandsRegex.count, eventRegex.commandsRegexNoName.
  */
 async function clone(msg: TelegramBot.Message, match: RegExpExecArray) {
   // get the drive filed id from url
-  const fileId = getIdFromUrl(match[4]);
+  const fileId = downloadUtils.getIdFromUrl(match[4]);
   if (fileId) {
     let cloneMsg = await bot.sendMessage(msg.chat.id, `Cloning: <code>` + match[4] + `</code>`, {
       reply_to_message_id: msg.message_id,
@@ -369,28 +369,6 @@ async function clone(msg: TelegramBot.Message, match: RegExpExecArray) {
     });
   } else {
     msgTools.sendMessage(bot, msg, `Google drive ID could not be found in the provided link`);
-  }
-}
-
-function getIdFromUrl(url: string) {
-  var id: any = '';
-  if (url.includes('uc?id=')) {
-    const driveId = url.match(/[-\w]{25,}/);
-    const fileId: string = Array.isArray(driveId) && driveId.length > 0 ? driveId[0] : '';
-    if (fileId) {
-      return fileId;
-    }
-  }
-  var parts = url.split(/^(([^:\/?#]+):)?(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?/);
-  if (url.indexOf('?id=') >= 0) {
-    id = (parts[6].split("=")[1]).replace("&usp", "");
-    return id;
-  } else {
-    id = parts[5].split("/");
-    //Using sort to get the id as it is the longest element. 
-    var sortArr = id.sort((a: any, b: any) => { return b.length - a.length });
-    id = sortArr[0];
-    return id;
   }
 }
 
@@ -421,14 +399,8 @@ setEventCallback(eventRegex.commandsRegex.getLink, eventRegex.commandsRegexNoNam
     msgTools.sendUnauthorizedMessage(bot, msg);
   } else {
     if (constants.INDEX_DOMAIN) {
-      // driveDirectLink.getLink(match[2], false, (err, res) => {
-      //   if (err) {
-      //     msgTools.sendMessage(bot, msg, err, 6000);
-      //   } else {
-      //     msgTools.sendMessage(bot, msg, res, -1);
-      //   }
-      // });
-      await driveDirectLink.getGDindexLink(match[4], true).then((gdIndex: { url: string, name: string }) => {
+      const fileId = downloadUtils.getIdFromUrl(match[4]);
+      await driveDirectLink.getGDindexLink(fileId, true).then((gdIndex: { url: string, name: string }) => {
         let res = 'Direct Shareable Link: <a href = "' + gdIndex.url + '">' + gdIndex.name + '</a>';
         msgTools.sendMessage(bot, msg, res, 60000);
       }).catch((err: string) => {
