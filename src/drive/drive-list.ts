@@ -106,14 +106,14 @@ function generateFilesListMessage(files: any[], fileName: string): string {
         message += ' (' + dlUtils.formatSize(files[i]['size']) + ')';
         //uncomment the below filename === '*' if u want gdindex link ony in 'list *'
         if (/*fileName === '*'  && */ constants.INDEX_DOMAIN) {
-          message += ` | <a href="` + constants.INDEX_DOMAIN + encodeURIComponent(files[i]['name']) + `">Index URL</a>`;
+          message += ` | <a href="` + dlUtils.checkTrailingSlash(constants.INDEX_DOMAIN) + encodeURIComponent(files[i]['name']) + `">Index URL</a>`;
         }
         message += '\n';
       } else if (files[i]['mimeType'] === 'application/vnd.google-apps.folder') {
         message += ' (folder)';
         //uncomment the below filename === '*' if u want gdindex link ony in 'list *'
         if (/* fileName === '*' && */ constants.INDEX_DOMAIN) {
-          message += ` | <a href="` + constants.INDEX_DOMAIN + encodeURIComponent(files[i]['name']) + `/">Index URL</a>`;
+          message += ` | <a href="` + dlUtils.checkTrailingSlash(constants.INDEX_DOMAIN) + encodeURIComponent(files[i]['name']) + `/">Index URL</a>`;
         }
         message += '\n';
       } else {

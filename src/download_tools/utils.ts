@@ -221,3 +221,27 @@ export function isDownloadAllowed(url: string): boolean {
   }
   return true;
 }
+
+export function getIdFromUrl(url: string) {
+  var id: any = '';
+  if (url.includes('uc?id=')) {
+    const driveId = url.match(/[-\w]{25,}/);
+    const fileId: string = Array.isArray(driveId) && driveId.length > 0 ? driveId[0] : '';
+    return fileId;
+  }
+  var parts = url.split(/^(([^:\/?#]+):)?(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?/);
+  if (url.indexOf('?id=') >= 0) {
+    id = (parts[6].split("=")[1]).replace("&usp", "");
+    return id;
+  } else {
+    id = parts[5].split("/");
+    //Using sort to get the id as it is the longest element. 
+    var sortArr = id.sort((a: any, b: any) => { return b.length - a.length });
+    id = sortArr[0];
+    return id;
+  }
+}
+
+export function checkTrailingSlash(str: string) {
+  return str += str.endsWith("/") ? "" : "/";
+}
