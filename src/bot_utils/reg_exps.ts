@@ -16,6 +16,7 @@ export class RegExps {
   readonly unzipMirror: RegExp;
   readonly removeText: RegExp;
   readonly count: RegExp;
+  readonly help: RegExp;
 
   constructor(commands: string[]) {
     this.start = new RegExp(commands[0], 'i');
@@ -35,5 +36,6 @@ export class RegExps {
     this.unzipMirror = new RegExp(commands[14], 'i');
     this.removeText = new RegExp(commands[15], 'i');
     this.count = new RegExp(commands[16], 'i');
+    this.help = new RegExp(commands[17], 'i');
   }
 }

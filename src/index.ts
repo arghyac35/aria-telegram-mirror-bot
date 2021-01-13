@@ -59,31 +59,42 @@ setEventCallback(eventRegex.commandsRegex.id, eventRegex.commandsRegexNoName.id,
   }
 });
 
-setEventCallback(eventRegex.commandsRegex.mirrorTar, eventRegex.commandsRegexNoName.mirrorTar, (msg, match) => {
+setEventCallback(eventRegex.commandsRegex.mirrorTar, eventRegex.commandsRegexNoName.mirrorTar, async (msg, match) => {
   if (msgTools.isAuthorized(msg) < 0) {
     msgTools.sendUnauthorizedMessage(bot, msg);
   } else {
-    mirror(msg, match, true);
-  }
-});
-
-setEventCallback(eventRegex.commandsRegex.mirror, eventRegex.commandsRegexNoName.mirror, (msg, match) => {
-  if (msgTools.isAuthorized(msg) < 0) {
-    msgTools.sendUnauthorizedMessage(bot, msg);
-  } else {
-    if (match[4] === "file" && msg.hasOwnProperty("reply_to_message") && msg.reply_to_message.hasOwnProperty("document") && msg.reply_to_message.document.hasOwnProperty("file_id")) {
-      bot.getFileLink(msg.reply_to_message.document.file_id).then((res) => {
-        match[4] = res;
-        mirror(msg, match);
-      }).catch(err => {
-        console.log("couldn't get file link: ", err.message);
-        msgTools.sendMessage(bot, msg, err.message, 60000);
-      });
-    } else {
-      mirror(msg, match);
+    try {
+      mirror(msg, await checkIfTorrentFile(msg, match), true);
+    } catch (error) {
+      console.log("Error in mirror: ", error.message);
+      msgTools.sendMessage(bot, msg, error.message, 60000);
     }
   }
 });
+
+setEventCallback(eventRegex.commandsRegex.mirror, eventRegex.commandsRegexNoName.mirror, async (msg, match) => {
+  if (msgTools.isAuthorized(msg) < 0) {
+    msgTools.sendUnauthorizedMessage(bot, msg);
+  } else {
+    try {
+      mirror(msg, await checkIfTorrentFile(msg, match));
+    } catch (error) {
+      console.log("Error in mirror: ", error.message);
+      msgTools.sendMessage(bot, msg, error.message, 60000);
+    }
+  }
+});
+
+async function checkIfTorrentFile(msg: TelegramBot.Message, match: RegExpExecArray) {
+  if (msg.hasOwnProperty("reply_to_message") && msg.reply_to_message.hasOwnProperty("document") && msg.reply_to_message.document.hasOwnProperty("file_id")) {
+    if (msg.reply_to_message.document.mime_type === 'application/x-bittorrent') {
+      match[4] = await bot.getFileLink(msg.reply_to_message.document.file_id);
+    } else {
+      throw new Error('Reply to a torrent file only for mirroring.');
+    }
+  }
+  return match;
+}
 
 setEventCallback(eventRegex.commandsRegex.disk, eventRegex.commandsRegexNoName.disk, (msg) => {
   if (msgTools.isAuthorized(msg) < 0) {
@@ -142,7 +153,9 @@ setEventCallback(eventRegex.commandsRegex.unzipMirror, eventRegex.commandsRegexN
  * @param {boolean} isUnZip Decides if this download should be extracted before upload
  */
 function mirror(msg: TelegramBot.Message, match: RegExpExecArray, isTar?: boolean, isUnZip?: boolean): void {
+  if (match.length < 5 || !match[4]) return;
   if (websocketOpened) {
+    match[4] = match[4].trim();
     if (downloadUtils.isDownloadAllowed(match[4])) {
       prepDownload(msg, match[4], isTar, isUnZip);
     } else {
