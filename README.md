@@ -158,6 +158,13 @@ This is a description of the fields in src/.constants.js:
 * `USE_SERVICE_ACCOUNT`: Set to `true` if you want to use Service Accounts to clone, this only works when IS_TEAM_DRIVE is true. Keep all the SAs in accounts folder.
    * TODO: Add script and instructions to generate SAs, for now follow: https://github.com/lzzy12/python-aria-mirror-bot#generating-service-accounts
 * `INDEX_DOMAIN`: Link for gdindex
+* `TELEGRAPH_TOKEN`: Telegraph token, if you want to show search results in telegra.ph else keep it blank. See [below](#Generating-Telegra.ph-token) for how to generate telegra.ph token.
+
+## Generating Telegra.ph token
+
+   ```bash
+   npm run generateTelegraphToken
+   ```
 
 ## Starting after installation
 

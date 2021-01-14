@@ -18,6 +18,8 @@ import checkDiskSpace = require('check-disk-space');
 import removeFn = require('./bot_utils/remove_text');
 import gdUtils = require('./drive/gd-utils');
 
+const telegraph = require('telegraph-node')
+const ph = new telegraph();
 const eventRegex = new EventRegex();
 const bot = new TelegramBot(constants.TOKEN, { polling: true });
 var websocketOpened = false;
@@ -174,19 +176,47 @@ setEventCallback(eventRegex.commandsRegex.mirrorStatus, eventRegex.commandsRegex
   }
 });
 
-setEventCallback(eventRegex.commandsRegex.list, eventRegex.commandsRegexNoName.list, (msg, match) => {
+setEventCallback(eventRegex.commandsRegex.list, eventRegex.commandsRegexNoName.list, async (msg, match) => {
   if (msgTools.isAuthorized(msg) < 0) {
     msgTools.sendUnauthorizedMessage(bot, msg);
   } else {
-    driveList.listFiles(match[4], (err, res) => {
+    const searchingMsg = await bot.sendMessage(msg.chat.id, `🔍Searching for files.... Please wait.`, {
+      reply_to_message_id: msg.message_id,
+      parse_mode: 'HTML'
+    });
+    driveList.listFiles(match[4], async (err, res) => {
+      msgTools.deleteMsg(bot, searchingMsg);
       if (err) {
         msgTools.sendMessage(bot, msg, 'Failed to fetch the list of files');
       } else {
-        msgTools.sendMessage(bot, msg, res, 60000);
+        if (constants.TELEGRAPH_TOKEN) {
+          try {
+            if (res.length === 0) {
+              msgTools.sendMessage(bot, msg, 'There are no files matching your parameters');
+              return;
+            }
+            var g = JSON.stringify(res).replace(/[\[\]\,\"]/g, ''); //stringify and remove all "stringification" extra data
+            console.log('Size of telegraph node-->', g.length);
+            const telegraPhObj = await createTelegraphPage(res);
+            msgTools.sendMessageAsync(bot, msg, `Search results for ${match[4]} 👇🏼`, 60000, false, [{ buttonName: 'Here', url: telegraPhObj.url }]).catch(console.error);
+          } catch (error) {
+            msgTools.sendMessage(bot, msg, 'Failed to fetch the list of files, Telegra.ph error: ' + error);
+          }
+        } else {
+          msgTools.sendMessage(bot, msg, res.toString(), 60000);
+        }
       }
     });
   }
 });
+
+async function createTelegraphPage(content: any) {
+  return ph.createPage(constants.TELEGRAPH_TOKEN, 'Mirror Bot Search', content, {
+    return_content: true,
+    author_name: 'aria-telegram-mirror-bot',
+    author_url: 'https://github.com/arghyac35/aria-telegram-mirror-bot'
+  });
+}
 
 setEventCallback(eventRegex.commandsRegex.getFolder, eventRegex.commandsRegexNoName.getFolder, (msg) => {
   if (msgTools.isAuthorized(msg) < 0) {
@@ -345,6 +375,8 @@ setEventCallback(eventRegex.commandsRegex.count, eventRegex.commandsRegexNoName.
             const limit = 20
             const table = await gdUtils.gen_count_body({ fid: fileId, limit });
             msgTools.sendMessage(bot, msg, `<b>Source Folder Name:</b> <code>${name}</code>\n<b>Source Folder Link:</b> <code>${match[4]}</code>\nThe table is too long and exceeds the telegram message limit, only the first ${limit} will be displayed:\n<pre>${table}</pre>`, -1)
+          } else {
+            msgTools.sendMessage(bot, msg, err.message, 10000);
           }
         });
       } catch (error) {

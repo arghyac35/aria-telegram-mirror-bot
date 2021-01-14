@@ -59,12 +59,21 @@ export function sendMessage(bot: TelegramBot, msg: TelegramBot.Message, text: st
     });
 }
 
-export async function sendMessageAsync(bot: TelegramBot, msg: TelegramBot.Message, text: string, delay?: number, quickDeleteOriginal?: boolean) {
+export async function sendMessageAsync(bot: TelegramBot, msg: TelegramBot.Message, text: string, delay?: number, quickDeleteOriginal?: boolean, buttons?: [{ buttonName: string, url: string }]) {
   if (!delay) delay = 10000;
   return new Promise((resolve, reject) => {
+    let inlineKeyboard: TelegramBot.InlineKeyboardButton[] = [];
+    if (buttons && buttons.length > 0) {
+      buttons.forEach(button => {
+        inlineKeyboard.push({ text: button.buttonName, url: button.url });
+      });
+    }
     bot.sendMessage(msg.chat.id, text, {
       reply_to_message_id: msg.message_id,
-      parse_mode: 'HTML'
+      parse_mode: 'HTML',
+      reply_markup: {
+        inline_keyboard: [inlineKeyboard]
+      }
     })
       .then((res) => {
         if (delay > -1) {
