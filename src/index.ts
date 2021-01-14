@@ -9,7 +9,7 @@ import driveList = require('./drive/drive-list');
 import driveUtils = require('./drive/drive-utils');
 import driveDirectLink = require('./drive/drive-directLink');
 import cloneFn = require('./drive/drive-clone2');
-import driveDownload = require('./drive/download-file');
+import driveDownload = require('./drive/drive-tar');
 import details = require('./dl_model/detail');
 import filenameUtils = require('./download_tools/filename-utils');
 import { EventRegex } from './bot_utils/event_regex';
