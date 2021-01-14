@@ -57,7 +57,9 @@ async function getFilePathDrive(parents: any, drive: drive_v3.Drive) {
     }
     tree.reverse();
     for (const folder of tree) {
-        path += folder.name + '/';
+        if (folder.name !== 'Stuffs') {
+            path += folder.name + '/';
+        }
     }
     return path;
 }

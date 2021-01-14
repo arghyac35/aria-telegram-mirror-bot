@@ -47,13 +47,17 @@ export function listFiles(fileName: string, callback: (err: string, message: str
 
 async function driveListFiles(drive: drive_v3.Drive, searchQuery: string, pageSize?: number): Promise<any[]> {
   return new Promise<any[]>((resolve, reject) => {
-    const qs = {
+    const qs: any = {
       includeItemsFromAllDrives: true,
       supportsAllDrives: true,
       q: searchQuery,
       orderBy: 'modifiedTime desc',
       fields: 'files(id, name, mimeType, size)',
       pageSize: pageSize || 20
+    };
+    if (constants.SHARED_DRIVE_ID) {
+      qs.corpora = 'drive';
+      qs.driveId = constants.SHARED_DRIVE_ID;
     }
     drive.files.list(
       qs
@@ -126,14 +130,14 @@ function generateFilesListMessage(files: any[], fileName: string): string {
       if (files[i]['size']) {
         message += ' (' + dlUtils.formatSize(files[i]['size']) + ')';
         //uncomment the below filename === '*' if u want gdindex link ony in 'list *'
-        if (/*fileName === '*'  && */ constants.INDEX_DOMAIN) {
+        if (fileName === '*' && constants.INDEX_DOMAIN) {
           message += ` | <a href="` + INDEX_DOMAIN + `GdriveBot/` + encodeURIComponent(files[i]['name']) + `">Index URL</a>`;
         }
         message += '\n';
       } else if (files[i]['mimeType'] === 'application/vnd.google-apps.folder') {
         message += ' (folder)';
         //uncomment the below filename === '*' if u want gdindex link ony in 'list *'
-        if (/* fileName === '*' && */ constants.INDEX_DOMAIN) {
+        if (fileName === '*' && constants.INDEX_DOMAIN) {
           message += ` | <a href="` + INDEX_DOMAIN + `GdriveBot/` + encodeURIComponent(files[i]['name']) + `/">Index URL</a>`;
         }
         message += '\n';
