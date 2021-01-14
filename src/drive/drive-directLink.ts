@@ -1,6 +1,6 @@
 import constants = require('../.constants');
 import driveAuth = require('./drive-auth');
-import { google } from 'googleapis';
+import { drive_v3, google } from 'googleapis';
 import dlUtils = require('../download_tools/utils');
 
 export async function getGDindexLink(fileId: string, isGetLink?: boolean) {
@@ -35,17 +35,25 @@ export async function getGDindexLink(fileId: string, isGetLink?: boolean) {
     });
 }
 
-async function getFilePathDrive(parents: any, drive: any) {
+async function getFilePathDrive(parents: any, drive: drive_v3.Drive) {
+    const getFileInfo = async (fileId: string) => {
+        return drive.files.get({ fileId, fields: 'id, name, parents', supportsAllDrives: true })
+    }
     let parent = parents;
     let tree = [];
     let path: string = '';
     if (parent) {
-        do {
-            const f = await drive.files.get({ fileId: parent[0], fields: 'id, name, parents', supportsAllDrives: true });
-            parent = f.data.parents;
-            if (!parent) break;
-            tree.push({ 'id': parent[0], 'name': f.data.name })
-        } while (true);
+        if (parent[0] === constants.GDRIVE_PARENT_DIR_ID) {
+            const f = await getFileInfo(parent[0]);
+            tree.push({ id: f.data.parents[0], name: f.data.name });
+        } else {
+            do {
+                const f = await getFileInfo(parent[0]);
+                parent = f.data.parents;
+                if (!parent) break;
+                tree.push({ 'id': parent[0], 'name': f.data.name })
+            } while (true);
+        }
     }
     tree.reverse();
     for (const folder of tree) {
