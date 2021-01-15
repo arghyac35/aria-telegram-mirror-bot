@@ -18,7 +18,12 @@ export async function getGDindexLink(fileId: string, isGetLink?: boolean) {
                             reject(err.message);
                         } else {
                             if (res.data) {
-                                let url = dlUtils.checkTrailingSlash(constants.INDEX_DOMAIN) + encodeURIComponent(await getFilePathDrive(res.data.parents, drive) + res.data.name);
+                                let url = '';
+                                if (res.data.parents[0] === constants.GDRIVE_PARENT_DIR_ID) {
+                                    url = dlUtils.checkTrailingSlash(constants.INDEX_DOMAIN) + encodeURIComponent(res.data.name);
+                                } else {
+                                    url = dlUtils.checkTrailingSlash(constants.INDEX_DOMAIN) + encodeURIComponent(await getFilePathDrive(res.data.parents, drive) + res.data.name);
+                                }
                                 if (res.data.mimeType === 'application/vnd.google-apps.folder') {
                                     url += '/'
                                 }
@@ -43,17 +48,15 @@ async function getFilePathDrive(parents: any, drive: drive_v3.Drive) {
     let tree = [];
     let path: string = '';
     if (parent) {
-        if (parent[0] === constants.GDRIVE_PARENT_DIR_ID) {
+        do {
             const f = await getFileInfo(parent[0]);
-            tree.push({ id: f.data.parents[0], name: f.data.name });
-        } else {
-            do {
-                const f = await getFileInfo(parent[0]);
-                parent = f.data.parents;
-                if (!parent) break;
-                tree.push({ 'id': parent[0], 'name': f.data.name })
-            } while (true);
-        }
+            parent = f.data.parents;
+            if (!parent || parent.length === 0) break;
+            tree.push({ 'id': parent[0], 'name': f.data.name });
+            if (parent[0] === constants.GDRIVE_PARENT_DIR_ID) {
+                break;
+            }
+        } while (true);
     }
     tree.reverse();
     for (const folder of tree) {
