@@ -77,10 +77,10 @@ export function getAriaFilePath(gid: string, callback: (err: string, file: strin
  */
 export function getStatus(dlDetails: DlVars,
   callback: (err: string, message: string, filename: string, filesizeStr: string) => void): void {
-  aria2.call('tellStatus', dlDetails.gid, ['status', 'totalLength', 'completedLength', 'downloadSpeed', 'files']).then((res: any) => {
+  aria2.call('tellStatus', dlDetails.gid, ['status', 'totalLength', 'completedLength', 'downloadSpeed', 'files', 'numSeeders', 'connections']).then((res: any) => {
     if (res.status === 'active') {
       var statusMessage = downloadUtils.generateStatusMessage(parseFloat(res.totalLength),
-        parseFloat(res.completedLength), parseFloat(res.downloadSpeed), res.files, dlDetails);
+        parseFloat(res.completedLength), parseFloat(res.downloadSpeed), res.files, res.numSeeders, res.connections, dlDetails);
       callback(null, statusMessage.message, statusMessage.filename, statusMessage.filesize);
     } else if (dlDetails.isUploading) {
       var downloadSpeed: number;
@@ -95,10 +95,10 @@ export function getStatus(dlDetails: DlVars,
       dlDetails.lastUploadCheckTimestamp = time;
 
       var statusMessage = downloadUtils.generateStatusMessage(parseFloat(res.totalLength),
-        dlDetails.uploadedBytes, downloadSpeed, res.files, dlDetails);
+        dlDetails.uploadedBytes, downloadSpeed, res.files, '', '', dlDetails);
       callback(null, statusMessage.message, statusMessage.filename, statusMessage.filesize);
     } else if (dlDetails.isExtracting) {
-      let message = `<b>Extracting</b>: <code>${dlDetails.extractedFileName}</code>\n<b>Size</b>: <code>${dlDetails.extractedFileSize}</code>\n<b>GID</b>: <code>${dlDetails.gid}</code>`;
+      let message = `<b>Extracting</b>: <code>${dlDetails.extractedFileName}</code>\n<b>Size</b>: <code>${dlDetails.extractedFileSize}</code>`;
       callback(null, message, dlDetails.extractedFileName, dlDetails.extractedFileSize);
     } else {
       var filePath = filenameUtils.findAriaFilePath(res['files']);
