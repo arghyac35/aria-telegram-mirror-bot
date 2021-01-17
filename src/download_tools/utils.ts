@@ -132,7 +132,7 @@ export function getStatusMessage(): Promise<StatusAll> {
  * @returns {StatusMessage} An object containing a printable status message and the file name
  */
 export function generateStatusMessage(totalLength: number, completedLength: number, speed: number,
-  files: any[], dlDetails: details.DlVars): StatusMessage {
+  files: any[], seeders: string, peers: string, dlDetails: details.DlVars): StatusMessage {
   var filePath = filenameUtils.findAriaFilePath(files);
   var fileName = filenameUtils.getFileNameFromPath(filePath.path, filePath.inputPath, filePath.downloadUri);
   var progress;
@@ -149,7 +149,13 @@ export function generateStatusMessage(totalLength: number, completedLength: numb
   var speedStr = formatSize(speed);
   var eta = downloadETA(totalLength, completedLength, speed);
   var type = dlDetails.isUploading ? 'Uploading' : 'Filename';
-  var message = `<b>${type}</b>: <code>${fileName}</code>\n<b>Size</b>: <code>${totalLengthStr}</code>\n<b>Progress</b>: <code>${progressString}</code>\n<b>Speed</b>: <code>${speedStr}ps</code>\n<b>ETA</b>: <code>${eta}</code>\n<b>GID</b>: <code>${dlDetails.gid}</code>`;
+  var message = `<b>${type}</b>: <code>${fileName}</code>\n<b>Size</b>: <code>${totalLengthStr}</code>\n<b>Progress</b>: <code>${progressString}</code>\n<b>Speed</b>: <code>${speedStr}ps</code>\n<b>ETA</b>: <code>${eta}</code>`;
+  if (seeders || peers) {
+    message += `\n<b>Seeders</b>: <code>${seeders || 0}</code> | <b>Peers</b>: <code>${peers || 0}</code>`;
+  }
+  if (!dlDetails.isUploading) {
+    message += `\n<b>GID</b>: <code>${dlDetails.gid}</code>`;
+  }
   var status = {
     message: message,
     filename: fileName,
