@@ -3,7 +3,7 @@
 if [[ -n $SA_ZIP_URL ]]; then
 	echo "Usage of Service Accounts Detected"
 	wget -q $ SA_ZIP_URL -O accounts.zip && unzip -qq accounts.zip
-elif [[ -n $TOKEN_URL && -n $CRED_JSON]]; then
+elif [[ -n $CLIENT_SECRET && -n $CREDENTIALS ]]; then
 	echo "Usage of token detected"
 	wget -q CREDENTIALS -O credentials.json
 	wget -q CLIENT_SECRET -O client_secrect.json
