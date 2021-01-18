@@ -1,24 +1,23 @@
-FROM alpine:edge
-
-# install ca-certificates so that HTTPS works consistently
-RUN apk add --no-cache ca-certificates
-
+#NodeJS Alpine Build
+FROM node:alpine3.10
+#Setting Work Directory
+WORKDIR /app/
+# Setting Up All Permissions to all users to the Workdir
+RUN chmod 777 /app
+#Installation of dependencies
 RUN apk add --no-cache --update \
+      ca-certificates \
       git \
       bash \
-      nodejs \
-      npm \
-      aria2
-
-# To handle not get uid/gid error while installing a npm package
-RUN npm config set unsafe-perm true
-
-RUN npm install -g typescript
-
-RUN mkdir /bot
-RUN chmod 777 /bot
-WORKDIR /bot
-
-ADD 69.tar /bot/
-
-CMD ["bash","start.sh"]
+      aria2 \
+      wget \
+      unzip
+# Copy all files from BuildDir to Workdir
+COPY . .
+#Building and Installation
+RUN mv src/.constants.js.example src/.constants.js && \
+    npm i -g typescript && \
+    yarn && \
+    tsc && \
+    rm -rf src/.constants.js && \
+    rm -rf out/.constants.js
