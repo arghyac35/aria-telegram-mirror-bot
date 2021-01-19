@@ -51,6 +51,7 @@ elif [[ -n "$CLIENT_SECRET" && -n "$CREDENTIALS" && -n "$CONFIG_URL" ]]; then
 else
 	echo "Config error Check Secrets For Reference check README"
 	exit 2
+fi
 	
 if [[ -n "$MAX_CONCURRENT_DOWNLOADS" ]]; then
 	heroku config:set -a "$HEROKU_APP" } MAX_CONCURRENT_DOWNLOADS="$MAX_CONCURRENT_DOWNLOADS"
