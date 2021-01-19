@@ -41,6 +41,8 @@ elif [[ -n ${{secrets.HEROKU_APP}} ]]; then
 	heroku container:push worker -a ${{secrets.HEROKU_APP}}
 	echo "Deploying"
 	heroku container:release worker -a ${{secrets.HEROKU_APP}}
+else 
+	echo "Heroku App name Not Provided"
 fi
 
 echo "Deployment Success"
@@ -55,7 +57,7 @@ else
 	echo "Config error Check Secrets For Reference check README"
 	exit 2
 	
-if [[ -n $MAX_CONCURRENT_DOWNLOADS ]]; then
+if [[ -n ${{secrets.MAX_CONCURRENT_DOWNLOADS}} ]]; then
 	heroku config:set -a ${{secrets.HEROKU_APP}} MAX_CONCURRENT_DOWNLOADS=${{secrets.MAX_CONCURRENT_DOWNLOADS}}
 else
 	echo "Max Concurrent Downloads Var Not given, so Defaults to 3"
