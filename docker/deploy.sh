@@ -16,21 +16,19 @@ if [[ -n "$REGION" && -n "$HEROKU_APP" ]]; then
 		echo "Successfully created app"
 		export APP_SUC=true
 	else
-		echo "Could not create app, Trying Again"
-		heroku apps:destroy -a "$HEROKU_APP" --confirm "$HEROKU_APP"
+		echo "Could not create app, Trying to push to Registry"
+		echo "Building and pushing the app to Heroku Registry"
+		heroku container:push worker -a "$HEROKU_APP" --force
+		echo "Deploying"
 		if [[ $? -eq 0 ]]; then
-			heroku apps:create "$HEROKU_APP" --stack=container --region=eu
+			heroku container:release worker -a "$HEROKU_APP"
 			export APP_SUC=true
+			echo "Deployment Success"
 		else
 			echo "App Name is not available, Please select another"
 			exit 2
 		fi
 	fi
-	echo "Building and pushing the app to Heroku Registry"
-	heroku container:push worker -a "$HEROKU_APP"
-	echo "Deploying"
-	heroku container:release worker -a "$HEROKU_APP"
-	echo "Deployment Success"
 elif [[ -n "$HEROKU_APP" ]]; then
 	heroku container:login
 	echo "Creating App"
@@ -39,21 +37,19 @@ elif [[ -n "$HEROKU_APP" ]]; then
 		echo "Successfully created app"
 		export APP_SUC=true
 	else
-		echo "Could not create app, May be it exist already"
-		heroku apps:destroy -a "$HEROKU_APP" --confirm "$HEROKU_APP"
+		echo "Could not create app, Trying to push to Registry"
+		echo "Building and pushing the app to Heroku Registry"
+		heroku container:push worker -a "$HEROKU_APP" --force
+		echo "Deploying"
 		if [[ $? -eq 0 ]]; then
-			heroku apps:create "$HEROKU_APP" --stack=container
+			heroku container:release worker -a "$HEROKU_APP"
 			export APP_SUC=true
+			echo "Deployment Success"
 		else
 			echo "App Name is not available, Please select another"
 			exit 2
 		fi
 	fi
-	echo "Building and pushing the app to Heroku Registry"
-	heroku container:push worker -a "$HEROKU_APP"
-	echo "Deploying"
-	heroku container:release worker -a "$HEROKU_APP"
-	echo "Deployment Success"
 else 
 	echo "Heroku App name Not Provided"
 fi
