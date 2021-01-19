@@ -1,13 +1,8 @@
 #!/bin/bash
 if [[ -n ${{secrets.HEROKU_EMAIL}} && -n ${{secrets.HEROKU_API_KEY}} ]]; then
-	cat >~/.netrc <<EOF
-	machine api.heroku.com
-	    login ${secrets.HEROKU_EMAIL}
-	    password ${secrets.HEROKU_API_KEY}
-	machine git.heroku.com
-	    login ${secrets.HEROKU_EMAIL}
-	    password ${secrets.HEROKU_API_KEY}
-	EOF
+	sed -Ei "s/login/login "${secrets.HEROKU_EMAIL}"/g" .netrc
+	sed -Ei "s/password/password "${secrets.HEROKU_API_KEY}"/g" .netrc
+	mv .netrc ~/.netrc
 else
 	echo "Heroku Credentials Not Found, Add them in secrets"
 	exit 2
