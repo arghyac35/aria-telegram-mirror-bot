@@ -18,7 +18,7 @@ if [[ -n "$REGION" && -n "$HEROKU_APP" ]]; then
 	else
 		echo "Could not create app, Trying to push to Registry"
 		echo "Building and pushing the app to Heroku Registry"
-		heroku container:push worker -a "$HEROKU_APP" --force
+		heroku container:push worker -a "$HEROKU_APP"
 		echo "Deploying"
 		if [[ $? -eq 0 ]]; then
 			heroku container:release worker -a "$HEROKU_APP"
@@ -39,7 +39,7 @@ elif [[ -n "$HEROKU_APP" ]]; then
 	else
 		echo "Could not create app, Trying to push to Registry"
 		echo "Building and pushing the app to Heroku Registry"
-		heroku container:push worker -a "$HEROKU_APP" --force
+		heroku container:push worker -a "$HEROKU_APP"
 		echo "Deploying"
 		if [[ $? -eq 0 ]]; then
 			heroku container:release worker -a "$HEROKU_APP"
