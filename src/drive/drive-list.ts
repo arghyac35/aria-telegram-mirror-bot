@@ -213,7 +213,7 @@ function generateTelegraphContent(files: any[], fileName: string): any[] {
             {
               "tag": "a",
               "attrs": {
-                "href": INDEX_DOMAIN + encodeURIComponent(file.name),
+                "href": file.mimeType === 'application/vnd.google-apps.folder' ? INDEX_DOMAIN + encodeURIComponent(file.name) + '/' : INDEX_DOMAIN + encodeURIComponent(file.name),
                 "target": "_blank"
               },
               "children": [
