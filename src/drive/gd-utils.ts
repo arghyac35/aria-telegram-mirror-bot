@@ -58,8 +58,8 @@ export async function real_copy(source: string, target: string, tg?: any) {
     console.log('Number of folders to be copied：', folders.length)
     console.log('Number of files to be copied：', files.length)
 
-    if (folders.length === 0 || files.length) {
-        throw new Error("No files/folder found for copying.");
+    if (files.length === 0) {
+        throw new Error("No files found for copying.");
     }
 
     const mapping = await create_folders(
