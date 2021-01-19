@@ -546,7 +546,7 @@ export async function copy_file(id: string, parent: string, limit?: any) {
     }
 }
 
-export async function gen_count_body({ fid, limit, tg }: any) {
+export async function gen_count_body({ fid, limit, tg, smy }: any) {
     function render_smy(smy: any, unfinished_number?: string) {
         if (!smy) return
         smy = (typeof smy === 'object') ? smy : JSON.parse(smy)
@@ -562,8 +562,10 @@ export async function gen_count_body({ fid, limit, tg }: any) {
         throw new Error(`Unable to access the link, please check if the link is valid and SA has the appropriate permissions：https://drive.google.com/drive/folders/${fid}`)
     }
 
-    let smy = summary(await walk_and_save(fid, tg));
-    return render_smy(smy);
+    if (!smy) {
+        smy = summary(await walk_and_save(fid, tg));
+    }
+    return { table: render_smy(smy), smy };
 }
 
 function make_tg_table({ file_count, folder_count, total_size, details }: any, limit?: number) {

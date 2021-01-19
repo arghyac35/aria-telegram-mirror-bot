@@ -359,10 +359,11 @@ setEventCallback(eventRegex.commandsRegex.count, eventRegex.commandsRegexNoName.
         return `<b>Name:</b> ${name}\n<b>Number of Files:</b> ${obj_count || ''}\n${pending_count ? ('<b>Pending:</b> ' + pending_count) : ''}\n${processing_count ? ('<b>Ongoing:</b> ' + processing_count) : ''}`
       }
 
-      const message_updater = async (payload: any) => await msgTools.editMessage(bot, countMsg, gen_text(payload));
+      const message_updater = async (payload: any) => await msgTools.editMessage(bot, countMsg, gen_text(payload)).catch(err => console.error(err.message));
 
       try {
-        const table = await gdUtils.gen_count_body({ fid: fileId, tg: message_updater });
+        let countResult = await gdUtils.gen_count_body({ fid: fileId, tg: message_updater });
+        let table = countResult.table;
         if (!table) {
           msgTools.deleteMsg(bot, countMsg);
           msgTools.sendMessage(bot, msg, `Failed to obtain info for: ${name}`, 10000);
@@ -371,9 +372,10 @@ setEventCallback(eventRegex.commandsRegex.count, eventRegex.commandsRegexNoName.
 
         msgTools.deleteMsg(bot, countMsg);
         msgTools.sendMessageAsync(bot, msg, `<b>Source Folder Name:</b> <code>${name}</code>\n<b>Source Folder Link:</b> <code>${match[4]}</code>\n<pre>${table}</pre>`, -1).catch(async err => {
-          if (err && err.body && err.body.error_code == 413 && err.body.description.includes('Entity Too Large')) {
+          if (err && ((err.body && err.body.error_code == 413 && err.body.description.includes('Entity Too Large')) || (err.response && err.response.body && err.response.body.error_code == 400 && err.response.body.description.includes('message is too long')))) {
             const limit = 20
-            const table = await gdUtils.gen_count_body({ fid: fileId, limit });
+            countResult = await gdUtils.gen_count_body({ fid: fileId, limit, smy: countResult.smy });
+            table = countResult.table;
             msgTools.sendMessage(bot, msg, `<b>Source Folder Name:</b> <code>${name}</code>\n<b>Source Folder Link:</b> <code>${match[4]}</code>\nThe table is too long and exceeds the telegram message limit, only the first ${limit} will be displayed:\n<pre>${table}</pre>`, -1)
           } else {
             msgTools.sendMessage(bot, msg, err.message, 10000);
