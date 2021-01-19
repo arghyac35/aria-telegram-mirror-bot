@@ -19,10 +19,10 @@ if [[ -n ${{secrets.REGION}} && -n ${{secrets.HEROKU_APP}} ]]; then
 	echo "Creating App"
 	heroku apps:create ${{secrets.HEROKU_APP}} --stack=container --region=eu
 	if [ $? -eq 0 ];then
-	  echo "Successfully created app"
+		echo "Successfully created app"
 	else
-	  echo "Could not create app, May be it exist already"
-	  exit 2
+		echo "Could not create app, May be it exist already"
+		exit 2
 	fi
 	echo "Building and pushing the app to Heroku Registry"
 	heroku container:push worker -a ${{secrets.HEROKU_APP}}
@@ -32,10 +32,10 @@ elif [[ -n ${{secrets.HEROKU_APP}} ]]; then
 	echo "Creating App"
 	heroku apps:create ${{secrets.HEROKU_APP}} --stack=container
 	if [ $? -eq 0 ];then
-	  echo "Successfully created app"
+		echo "Successfully created app"
 	else
-	  echo "Could not create app, May be it exist already"
-	  exit 2
+		echo "Could not create app, May be it exist already"
+		exit 2
 	fi
 	echo "Building and pushing the app to Heroku Registry"
 	heroku container:push worker -a ${{secrets.HEROKU_APP}}
@@ -60,5 +60,5 @@ else
 if [[ -n ${{secrets.MAX_CONCURRENT_DOWNLOADS}} ]]; then
 	heroku config:set -a ${{secrets.HEROKU_APP}} MAX_CONCURRENT_DOWNLOADS=${{secrets.MAX_CONCURRENT_DOWNLOADS}}
 else
-	echo "Max Concurrent Downloads Var Not given, so Defaults to 3"
+	echo "Max Concurrent Downloads Var Not given so Defaults to 3"
 fi
