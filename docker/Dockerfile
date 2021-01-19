@@ -11,7 +11,8 @@ RUN apk add --no-cache --update \
       bash \
       aria2 \
       wget \
-      unzip
+      unzip \
+      curl
 # Copy all files from BuildDir to Workdir
 COPY . .
 #Building and Installation
