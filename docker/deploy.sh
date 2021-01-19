@@ -29,6 +29,7 @@ elif [[ -n "$HEROKU_APP" ]]; then
 	if [[ $? -eq 0 ]]; then
 		echo "Successfully created app"
 	else
+		echo $?
 		echo "Could not create app, May be it exist already"
 		exit 2
 	fi
