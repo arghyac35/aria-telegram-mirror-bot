@@ -1,0 +1,17 @@
+name: Deploy to heroku
+
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Heroku
+        run: curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+      - name: Build and Push to heroku
+        run: |
+          cd docker
+          bash deploy.sh
