@@ -18,7 +18,8 @@ jobs:
           usedocker: true
           appdir: "docker"
           docker_heroku_process_type: worker
-          branch: master 
+          branch: master
+          dontuseforce: true  
           #region: eu  ## use this when you need to change location
         env:
           SA_ZIP_URL: ${{secrets.SA_ZIP_URL}}
