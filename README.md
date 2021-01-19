@@ -8,6 +8,10 @@ Join https://t.me/aria2tg for any support related to this repo or just post in i
 
 This bot is meant to be used in small, closed groups. So, once deployed, it only works in whitelisted groups.
 
+## Heroku
+
+Follow the heroku [guide](heroku_guide.md) for deployment in heroku
+
 ## Warning
 
 There is very little preventing users from using this to mirror pirated content. Hence, make sure that only trusted groups are whitelisted in `AUTHORIZED_CHATS`.
