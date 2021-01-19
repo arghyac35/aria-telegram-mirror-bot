@@ -4,23 +4,22 @@ on:
   push:
     branches:
       - master
-env:
-	HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
-	HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-	REGION: ${{ secrets.REGION }}
-	HEROKU_APP: ${{ secrets.HEROKU_APP }}
-	SA_ZIP_URL: ${{ secrets.SA_ZIP_URL }}
-	CONFIG_URL: ${{ secrets.CONFIG_URL }}
-	CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-	CREDENTIALS: ${{ secrets.CREDENTIALS }}
-	MAX_CONCURRENT_DOWNLOADS: ${{ secrets.MAX_CONCURRENT_DOWNLOADS }}
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Heroku Login
+      - name: Deploy
+        env:
+          HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          REGION: ${{ secrets.REGION }}
+          HEROKU_APP: ${{ secrets.HEROKU_APP }}
+          SA_ZIP_URL: ${{ secrets.SA_ZIP_URL }}
+          CONFIG_URL: ${{ secrets.CONFIG_URL }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          CREDENTIALS: ${{ secrets.CREDENTIALS }}
+          MAX_CONCURRENT_DOWNLOADS: ${{ secrets.MAX_CONCURRENT_DOWNLOADS }}
         run: |
           cd docker
           bash deploy.sh
