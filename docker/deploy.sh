@@ -18,7 +18,7 @@ heroku container:login
 if [[ -n ${{secrets.REGION}} && -n ${{secrets.HEROKU_APP}} ]]; then
 	echo "Creating App"
 	heroku apps:create ${{secrets.HEROKU_APP}} --stack=container --region=eu
-	if [ $? -eq 0 ];then
+	if [[ $? -eq 0 ]]; then
 		echo "Successfully created app"
 	else
 		echo "Could not create app, May be it exist already"
@@ -31,7 +31,7 @@ if [[ -n ${{secrets.REGION}} && -n ${{secrets.HEROKU_APP}} ]]; then
 elif [[ -n ${{secrets.HEROKU_APP}} ]]; then
 	echo "Creating App"
 	heroku apps:create ${{secrets.HEROKU_APP}} --stack=container
-	if [ $? -eq 0 ];then
+	if [[ $? -eq 0 ]]; then
 		echo "Successfully created app"
 	else
 		echo "Could not create app, May be it exist already"
@@ -62,3 +62,5 @@ if [[ -n ${{secrets.MAX_CONCURRENT_DOWNLOADS}} ]]; then
 else
 	echo "Max Concurrent Downloads Var Not given so Defaults to 3"
 fi
+
+echo "Deployment Completed"
