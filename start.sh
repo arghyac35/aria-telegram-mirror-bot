@@ -22,5 +22,6 @@ if [[ -n $MAX_CONCURRENT_DOWNLOADS ]]; then
 	echo -e "\nmax-concurrent-downloads=$MAX_CONCURRENT_DOWNLOADS\nbt-tracker=$tracker_list" >> /app/aria.conf
 else
 	echo -e "\nmax-concurrent-downloads=3\nbt-tracker=$tracker_list" >> /app/aria.conf
+fi
 aria2c --conf-path=aria.conf
 npm start
