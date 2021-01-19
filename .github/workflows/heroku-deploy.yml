@@ -11,7 +11,12 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install Heroku
         run: curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
-      - name: Build and Push to heroku
+      - name: Heroku Login
         run: |
           cd docker
-          bash deploy.sh
+          sed -Ei "s/login/login "${{secrets.HEROKU_EMAIL}}"/g" .netrc
+          sed -Ei "s/password/password "${{secrets.HEROKU_API_KEY}}"/g" .netrc
+	     mv .netrc ~/.netrc
+	     cat ~/.netrc
+	 - name: Container Build and Deploy
+	   run:

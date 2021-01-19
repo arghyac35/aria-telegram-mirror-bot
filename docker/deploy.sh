@@ -1,8 +1,7 @@
 #!/bin/bash
-echo "${{secrets.HEROKU_EMAIL}}"
-if [[ -n "${ secrets.HEROKU_EMAIL }" && -n "${ secrets.HEROKU_API_KEY }" ]]; then
-	sed -Ei "s/login/login "${secrets.HEROKU_EMAIL}"/g" .netrc
-	sed -Ei "s/password/password "${secrets.HEROKU_API_KEY}"/g" .netrc
+if [[ -n "${{ secrets.HEROKU_EMAIL }}" && -n "${{ secrets.HEROKU_API_KEY }}" ]]; then
+	sed -Ei "s/login/login "${{secrets.HEROKU_EMAIL}}"/g" .netrc
+	sed -Ei "s/password/password "${{secrets.HEROKU_API_KEY}}"/g" .netrc
 	mv .netrc ~/.netrc
 else
 	echo "Heroku Credentials Not Found, Add them in secrets"
