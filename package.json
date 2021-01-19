@@ -7,6 +7,7 @@
     "start": "NTBA_FIX_319=1 node --max_old_space_size=128 ./out/index.js",
     "start:dev": "nodemon",
     "generateTelegraphToken": "ts-node src/generateTelegraphAccount",
+    "generateDriveCredentials": "ts-node src/generateCredentials",
     "postinstall": "node ./src/unpackAll/postinstall.mjs"
   },
   "author": "Ritayan Chakraborty",
