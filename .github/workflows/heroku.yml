@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,7 +15,6 @@ jobs:
           heroku_app_name: ${{secrets.HEROKU_APP}}
           heroku_email: ${{secrets.HEROKU_EMAIL}}
           usedocker: true
-          appdir: "docker"
           docker_heroku_process_type: worker
         env:
           SA_ZIP_URL: ${{secrets.SA_ZIP_URL}}

@@ -33,7 +33,7 @@ jobs:
           
           echo VERSION=$VERSION
           echo "Building"
-          docker build . -t ${{ env.IMAGE }}:$VERSION
+          docker build . -f docker/Dockerfile -t ${{ env.IMAGE }}:$VERSION
           
           echo "Pushing"
           
