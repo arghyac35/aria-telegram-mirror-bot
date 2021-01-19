@@ -17,6 +17,7 @@ jobs:
           heroku_email: ${{secrets.HEROKU_EMAIL}}
           usedocker: true
           appdir: "docker"
+          docker_heroku_process_type: worker
         env:
           SA_ZIP_URL: ${{secrets.SA_ZIP_URL}}
           CREDENTIALS: ${{secrets.CREDENTIALS}}
