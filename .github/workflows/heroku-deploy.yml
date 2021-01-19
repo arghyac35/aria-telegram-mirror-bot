@@ -16,7 +16,5 @@ jobs:
           cd docker
           sed -Ei "s/login/login "${{secrets.HEROKU_EMAIL}}"/g" .netrc
           sed -Ei "s/password/password "${{secrets.HEROKU_API_KEY}}"/g" .netrc
-	     mv .netrc ~/.netrc
-	     cat ~/.netrc
-	 - name: Container Build and Deploy
-	   run:
+          mv .netrc ~/.netrc
+          cat ~/.netrc
