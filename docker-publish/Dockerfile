@@ -1,9 +1,9 @@
 #NodeJS Alpine Build
 FROM node:alpine3.10
 #Setting Work Directory
-WORKDIR /app/
+WORKDIR /bot/
 # Setting Up All Permissions to all users to the Workdir
-RUN chmod 777 /app
+RUN chmod 777 /bot
 #Installation of dependencies
 RUN apk add --no-cache --update \
       ca-certificates \
