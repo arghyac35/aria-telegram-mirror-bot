@@ -2,11 +2,11 @@
 if [[ -n ${{secrets.HEROKU_EMAIL}} && -n ${{secrets.HEROKU_API_KEY}} ]]; then
 	cat >~/.netrc <<EOF
 	machine api.heroku.com
-	    login ${{secrets.HEROKU_EMAIL}}
-	    password ${{secrets.HEROKU_API_KEY}}
+	    login ${secrets.HEROKU_EMAIL}
+	    password ${secrets.HEROKU_API_KEY}
 	machine git.heroku.com
-	    login ${{secrets.HEROKU_EMAIL}}
-	    password ${{secrets.HEROKU_API_KEY}}
+	    login ${secrets.HEROKU_EMAIL}
+	    password ${secrets.HEROKU_API_KEY}
 	EOF
 else
 	echo "Heroku Credentials Not Found, Add them in secrets"
