@@ -14,11 +14,16 @@ env:
   IMAGE: ghcr.io/${{ github.repository }}
 
 jobs:
-  push:
+  build:
+    name: BuildDockerImage
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
+
+      - if: github.event.pusher.name != 'arghyac35'
+        name: Check last commit author
+        run: echo "Author mismatch existing..." && exit 1
 
       - name: Login to ghcr.io registry
         run: docker login https://ghcr.io -u token -p ${{ secrets.GH_TOKEN }}
@@ -33,7 +38,7 @@ jobs:
 
           echo VERSION=$VERSION
           echo "Building"
-          docker build . -t ${{ env.IMAGE }}:$VERSION
+          docker build . -f docker-publish/Dockerfile -t ${{ env.IMAGE }}:$VERSION
 
           echo "Pushing"
 
