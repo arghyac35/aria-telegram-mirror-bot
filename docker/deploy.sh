@@ -64,7 +64,7 @@ if [[ -n "$APP_SUC" ]]; then
 	if [[ -n "$SA_ZIP_URL" && -n "$CONFIG_URL" ]]; then
 		heroku config:set -a "$HEROKU_APP" SA_ZIP_URL="$SA_ZIP_URL" CONFIG_URL="$CONFIG_URL" 
 	elif [[ -n "$CLIENT_SECRET" && -n "$CREDENTIALS" && -n "$CONFIG_URL" ]]; then
-		heroku config:set -a "$HEROKU_APP" CONFIG_URL="$CONFIG_URL" CREDENTIALS="$CREDENTIALS" CLIENT_SECRET="$CLIENT_SECRET"
+		heroku config:set -a "$HEROKU_APP" CONFIG_URL="$CONFIG_URL" CREDENTIALS="$CREDENTIALS" CLIENT_SECRET="$CLIENT_SECRET"		
 	else
 		echo "Config error Check Secrets For Reference check README"
 		exit 2
@@ -72,8 +72,10 @@ if [[ -n "$APP_SUC" ]]; then
 	
 	if [[ -n "$MAX_CONCURRENT_DOWNLOADS" ]]; then
 		heroku config:set -a "$HEROKU_APP" } MAX_CONCURRENT_DOWNLOADS="$MAX_CONCURRENT_DOWNLOADS"
+		heroku ps:scale worker=1 -a "$HEROKU_APP"
 	else
 		echo "Max Concurrent Downloads Var Not given so Defaults to 3"
+		heroku ps:scale worker=1 -a "$HEROKU_APP"
 	fi
 	echo "Deployment Completed"
 else
