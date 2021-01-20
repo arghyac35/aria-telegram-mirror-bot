@@ -55,7 +55,7 @@
 	HEROKU_EMAIL
 	```
 	### Description of the above variables
-	* `CLIENT_SECRECT` is url for client_secret.json *# Not required if `SA_ZIP_URL` is given*
+	* `CLIENT_SECRET` is url for client_secret.json *# Not required if `SA_ZIP_URL` is given*
 	* `CREDENTIALS` is url for credentials.json *# Not required if `SA_ZIP_URL` is given*
 	* `CONFIG_URL` is for .constants.js, not sure about .constants.js? then read the description for it in actual [Readme](README.md) *# Required*
 	* `MAX_CONCURRENT_DOWNLOADS` maximum number of download jobs that will be active at a time
