@@ -24,7 +24,7 @@
 5. Clone the repo:
 
    ```bash
-   git clone https://github.com/out386/aria-telegram-mirror-bot
+   git clone https://github.com/arghyac35/aria-telegram-mirror-bot
    cd aria-telegram-mirror-bot
    ```
 
@@ -43,7 +43,7 @@
 3. Add the below variables one by one
 
 	* All the URLs should be direct and publicly accessible, Example of a CONFIG_URL https://gist.githubusercontent.com/arghyac35/04c2e78a89f00b21303dd45274b2c4c4/raw/4182c22062b80072b82ab0c290ed40784752dd48/.constants.js.
-	* It will be easier to create this URLs using secret github gists
+	* It will be easier to create this URLs using secret github [gists](https://gist.github.com/), don't create public gists cause this files will contain you credentials
 	```
 	CLIENT_SECRET
 	CREDENTIALS							
@@ -74,3 +74,5 @@
 	![Run workflow](.github/run_workflow.png?raw=true)
 
 7. _Voila!_ your bot will be deployed now.
+
+8. For updating the bot just run the action again, it will handle the rest. Also, while updating do keep a look at the .constants.js if anything new got added then you need to add that too in your link.
