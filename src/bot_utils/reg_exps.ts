@@ -17,6 +17,8 @@ export class RegExps {
   readonly removeText: RegExp;
   readonly count: RegExp;
   readonly help: RegExp;
+  readonly authorize: RegExp;
+  readonly unauthorize: RegExp;
 
   constructor(commands: string[]) {
     this.start = new RegExp(commands[0], 'i');
@@ -37,5 +39,7 @@ export class RegExps {
     this.removeText = new RegExp(commands[15], 'i');
     this.count = new RegExp(commands[16], 'i');
     this.help = new RegExp(commands[17], 'i');
+    this.authorize = new RegExp(commands[18], 'i');
+    this.unauthorize = new RegExp(commands[19], 'i');
   }
 }

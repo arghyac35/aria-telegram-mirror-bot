@@ -16,6 +16,7 @@ import { EventRegex } from './bot_utils/event_regex';
 import checkDiskSpace = require('check-disk-space');
 import removeFn = require('./bot_utils/remove_text');
 import gdUtils = require('./drive/gd-utils');
+import { readFile, writeFile } from 'fs-extra';
 
 const telegraph = require('telegraph-node')
 const ph = new telegraph();
@@ -112,6 +113,60 @@ setEventCallback(eventRegex.commandsRegex.stats, eventRegex.commandsRegexNoName.
     } catch (error) {
       console.log('stats: ', error.message);
       msgTools.sendMessage(bot, msg, `Error checking stats: ${error.message}`);
+    }
+  }
+});
+
+setEventCallback(eventRegex.commandsRegex.authorize, eventRegex.commandsRegexNoName.authorize, async (msg) => {
+  if (msgTools.isAuthorized(msg) !== 0) {
+    msgTools.sendMessage(bot, msg, `This command is only for SUDO_USERS`);
+  } else {
+    try {
+      let alreadyAuthorizedChats: any = await readFile('./authorizedChats.json', 'utf8');
+      if (alreadyAuthorizedChats) {
+        alreadyAuthorizedChats = JSON.parse(alreadyAuthorizedChats);
+      } else {
+        alreadyAuthorizedChats = [];
+      }
+      const allAuthorizedChats: number[] = constants.AUTHORIZED_CHATS.concat(alreadyAuthorizedChats, constants.SUDO_USERS);
+      if (allAuthorizedChats.includes(msg.chat.id)) {
+        msgTools.sendMessage(bot, msg, `Chat already authorized.`);
+      } else {
+        alreadyAuthorizedChats.push(msg.chat.id);
+        await writeFile('./authorizedChats.json', JSON.stringify(alreadyAuthorizedChats)).then(() => {
+          msgTools.sendMessage(bot, msg, `Chat authorized successfully.`, -1);
+        });
+      }
+    } catch (error) {
+      console.log('authorize: ', error.message);
+      msgTools.sendMessage(bot, msg, `Error authorizing: ${error.message}`);
+    }
+  }
+});
+
+setEventCallback(eventRegex.commandsRegex.unauthorize, eventRegex.commandsRegexNoName.unauthorize, async (msg) => {
+  if (msgTools.isAuthorized(msg) !== 0) {
+    msgTools.sendMessage(bot, msg, `This command is only for SUDO_USERS`);
+  } else {
+    try {
+      let alreadyAuthorizedChats: any = await readFile('./authorizedChats.json', 'utf8');
+      if (alreadyAuthorizedChats) {
+        alreadyAuthorizedChats = JSON.parse(alreadyAuthorizedChats);
+        const index = alreadyAuthorizedChats.indexOf(msg.chat.id);
+        if (index > -1) {
+          alreadyAuthorizedChats.splice(index, 1);
+          await writeFile('./authorizedChats.json', JSON.stringify(alreadyAuthorizedChats)).then(() => {
+            msgTools.sendMessage(bot, msg, `Chat unauthorized successfully.`, -1);
+          });
+        } else {
+          msgTools.sendMessage(bot, msg, `Cannot unauthorize this chat. Please make sure this chat was authorized using /authorize command only.`);
+        }
+      } else {
+        msgTools.sendMessage(bot, msg, `No authorized chats found. Please make use this chat was authorized using /authorize command only.`);
+      }
+    } catch (error) {
+      console.log('authorize: ', error.message);
+      msgTools.sendMessage(bot, msg, `Error authorizing: ${error.message}`);
     }
   }
 });
