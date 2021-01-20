@@ -111,7 +111,7 @@ Aria-telegram-mirror-bot is now written in TypeScript. If you are migrating from
    * Visit the [Google Cloud Console](https://console.developers.google.com/apis/credentials)
    * Go to the OAuth Consent tab, fill it, and save.
    * Go to the Credentials tab and click Create Credentials -> OAuth Client ID
-   * Choose Other and Create.
+   * Choose Desktop App and Create.
    * Use the download button to download your credentials.
    * Move that file to the root of aria-telegram-mirror-bot, and rename it to `client_secret.json`
 
