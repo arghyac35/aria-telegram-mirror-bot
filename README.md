@@ -28,7 +28,7 @@ There is very little preventing users from using this to mirror pirated content.
 * `/cancelAll` or `/ca`: Cancel all mirroring tasks in all chats if a [SUDO_USERS](#Constants-description) member uses it, or cancel all mirroring tasks for a particular chat if one of that chat's admins use it. No one else can use this command.
 * `/list <filename>` or `/l <filename>`: Send links to downloads with the `filename` substring in the name. In case of too many downloads, only show the most recent few. 
 * `/getfolder` or `/gf`: Send link of drive mirror folder.
-* `/disk`: Send disk information of the machine.
+* `/stats`: Send disk information, cpu load of the machine & bot uptime.
 * `/getlink <driveUrl>` or `/gl <driveUrl>`: Send index link of the file.
 * `/clone <driveUrl>` or `/clone <diveUrl>`: Clone any shareable drive link. ~~(TODO: Add service account in it so that if 750GB per account limit is over we can switch to service account.)~~
 * `/mirror file` or `/mf`: Forward any torrent file and reply to the forwared message with this command it will start mirroring the torrent.

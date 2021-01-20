@@ -13,7 +13,6 @@ import driveDownload = require('./drive/drive-tar');
 import details = require('./dl_model/detail');
 import filenameUtils = require('./download_tools/filename-utils');
 import { EventRegex } from './bot_utils/event_regex';
-// import { exec } from 'child_process';
 import checkDiskSpace = require('check-disk-space');
 import removeFn = require('./bot_utils/remove_text');
 import gdUtils = require('./drive/gd-utils');
@@ -98,23 +97,22 @@ async function checkIfTorrentFile(msg: TelegramBot.Message, match: RegExpExecArr
   return match;
 }
 
-setEventCallback(eventRegex.commandsRegex.disk, eventRegex.commandsRegexNoName.disk, (msg) => {
+setEventCallback(eventRegex.commandsRegex.stats, eventRegex.commandsRegexNoName.stats, async (msg) => {
   if (msgTools.isAuthorized(msg) < 0) {
     msgTools.sendUnauthorizedMessage(bot, msg);
   } else {
-    // exec(`df --output="size,used,avail" -h "${constants.ARIA_DOWNLOAD_LOCATION_ROOT}" | tail -n1`,
-    //   (err, res) => {
-    //     var disk = res.trim().split(/\s+/);
-    //     msgTools.sendMessage(bot, msg, `Total space: ${disk[0]}B\nUsed: ${disk[1]}B\nAvailable: ${disk[2]}B`);
-    //   }
-    // );
-    checkDiskSpace(constants.ARIA_DOWNLOAD_LOCATION_ROOT).then(res => {
-      let used = res.size - res.free;
-      msgTools.sendMessage(bot, msg, `Total space: ${downloadUtils.formatSize(res.size)}\nUsed: ${downloadUtils.formatSize(used)}\nAvailable: ${downloadUtils.formatSize(res.free)}`);
-    }).catch(error => {
-      console.log('checkDiskSpace: ', error.message);
-      msgTools.sendMessage(bot, msg, `Error checking disk space: ${error.message}`);
-    });
+    try {
+      const diskSpace = await checkDiskSpace(constants.ARIA_DOWNLOAD_LOCATION_ROOT);
+      const avgCpuLoad = await downloadUtils.getCPULoadAVG();
+      const botUptime = downloadUtils.getProcessUptime()
+
+      const usedDiskSpace = diskSpace.size - diskSpace.free;
+
+      msgTools.sendMessage(bot, msg, `Total space: ${downloadUtils.formatSize(diskSpace.size)}\nUsed: ${downloadUtils.formatSize(usedDiskSpace)}\nAvailable: ${downloadUtils.formatSize(diskSpace.free)}\nCPU Load: ${avgCpuLoad}\nBot Uptime: ${botUptime}`);
+    } catch (error) {
+      console.log('stats: ', error.message);
+      msgTools.sendMessage(bot, msg, `Error checking stats: ${error.message}`);
+    }
   }
 });
 
@@ -492,7 +490,7 @@ setEventCallback(eventRegex.commandsRegex.help, eventRegex.commandsRegexNoName.h
     ➖➖➖➖➖➖➖➖➖➖➖➖
     <code>/getfolder</code> or <code>/gf</code> <b>|</b> Send link of drive mirror folder.
     ➖➖➖➖➖➖➖➖➖➖➖➖
-    <code>/disk</code> or <code>/d</code> <b>|</b> Send disk information of the machine.
+    <code>/stats</code> <b>|</b> Send disk information, cpu load of the machine & bot uptime.
     ➖➖➖➖➖➖➖➖➖➖➖➖
     <code>/help</code> or <code>/h</code> <b>|</b> You already know what it does.
     ➖➖➖➖➖➖➖➖➖➖➖➖\n<i>Note: All the above command can also be called using dot(.) instead of slash(/). For e.x: <code>.mirror </code>url or <code>.m </code>url</i>
