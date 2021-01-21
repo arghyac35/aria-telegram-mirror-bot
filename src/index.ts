@@ -122,7 +122,14 @@ setEventCallback(eventRegex.commandsRegex.authorize, eventRegex.commandsRegexNoN
     msgTools.sendMessage(bot, msg, `This command is only for SUDO_USERS`);
   } else {
     try {
-      let alreadyAuthorizedChats: any = await readFile('./authorizedChats.json', 'utf8');
+      let alreadyAuthorizedChats: any = await readFile('./authorizedChats.json', 'utf8').catch(async err => {
+        if (err.code === 'ENOENT') {
+          // create authorizedChats.json
+          await writeFile('./authorizedChats.json', JSON.stringify([]));
+        } else {
+          throw new Error(err);
+        }
+      });
       if (alreadyAuthorizedChats) {
         alreadyAuthorizedChats = JSON.parse(alreadyAuthorizedChats);
       } else {
@@ -149,7 +156,13 @@ setEventCallback(eventRegex.commandsRegex.unauthorize, eventRegex.commandsRegexN
     msgTools.sendMessage(bot, msg, `This command is only for SUDO_USERS`);
   } else {
     try {
-      let alreadyAuthorizedChats: any = await readFile('./authorizedChats.json', 'utf8');
+      let alreadyAuthorizedChats: any = await readFile('./authorizedChats.json', 'utf8').catch(err => {
+        if (err.code === 'ENOENT') {
+          return '';
+        } else {
+          throw new Error(err);
+        }
+      });
       if (alreadyAuthorizedChats) {
         alreadyAuthorizedChats = JSON.parse(alreadyAuthorizedChats);
         const index = alreadyAuthorizedChats.indexOf(msg.chat.id);
@@ -165,8 +178,8 @@ setEventCallback(eventRegex.commandsRegex.unauthorize, eventRegex.commandsRegexN
         msgTools.sendMessage(bot, msg, `No authorized chats found. Please make use this chat was authorized using /authorize command only.`);
       }
     } catch (error) {
-      console.log('authorize: ', error.message);
-      msgTools.sendMessage(bot, msg, `Error authorizing: ${error.message}`);
+      console.log('unauthorize: ', error.message);
+      msgTools.sendMessage(bot, msg, `Error unauthorizing: ${error.message}`);
     }
   }
 });
