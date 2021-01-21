@@ -293,11 +293,12 @@ function cpuAverage() {
 }
 
 // function to calculate average of array
-const arrAvg = function (arr: any[]) {
+const arrAvg = (arr: any[]) => {
   if (arr && arr.length >= 1) {
     const sumArr = arr.reduce((a, b) => a + b, 0)
     return sumArr / arr.length;
   }
+  return 0;
 };
 
 // load average for the past 1000 milliseconds calculated every 100
@@ -317,7 +318,7 @@ export function getCPULoadAVG(avgTime = 1000, delay = 100) {
     let interval = setInterval(() => {
       if (i >= n) {
         clearInterval(interval);
-        resolve(~~((arrAvg(samples) * 100)));
+        resolve(~~(arrAvg(samples) * 100));
       }
 
       const avg2 = cpuAverage();
