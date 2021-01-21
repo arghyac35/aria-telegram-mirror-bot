@@ -16,11 +16,13 @@ jobs:
           usedocker: true
           docker_heroku_process_type: worker
         env:
-          HD_SA_ZIP_URL: ${{secrets.SA_ZIP_URL}}
           HD_CREDENTIALS: ${{secrets.CREDENTIALS}}
           HD_CLIENT_SECRET: ${{secrets.CLIENT_SECRET}}
           HD_CONFIG_URL: ${{secrets.CONFIG_URL}}
           HD_MAX_CONCURRENT_DOWNLOADS: ${{secrets.MAX_CONCURRENT_DOWNLOADS}}
+          HD_GIT_TOKEN: ${{secrets.GIT_TOKEN}}
+          HD_GIT_USER: ${{secrets.GIT_USER}}
+          HD_GIT_REPO: ${{secrets.GIT_REPO}}
   restart:
     needs: [deploy]
     name: Restart Worker Dyno
