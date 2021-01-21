@@ -43,7 +43,7 @@ There is very little preventing users from using this to mirror pirated content.
       Supported filetypes:
       .zip, .gz, .bz2, .tar, tar.gz, tar.bz2, .tgz, .tbz2
 * `/count <driveUrl>` or `/cnt <driveUrl>`: Obtain informations about a drive folder and send it as a table. Idea taken from: https://github.com/iwestlin/gd-utils/blob/master/count
-* `/authorize` or `/a`: To authorize a chat, only run by SUDO_USERS
+* `/authorize` or `/a`: To authorize a chat, only run by SUDO_USERS. As this is stored in a file, so might get reset at every restart(not sure tho). To make it sustain need to use a db like redis which I may implement later.
 * `/unauthorize` or `/ua`: To unauthorize a chat, only run by SUDO_USERS
 
 #### Notes
