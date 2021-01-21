@@ -250,7 +250,10 @@ export function getIdFromUrl(url: string) {
 }
 
 export function checkTrailingSlash(str: string) {
-  return str += str.endsWith("/") ? "" : "/";
+  if (str) {
+    str += str.endsWith("/") ? "" : "/"
+  }
+  return str;
 }
 
 export function getProcessUptime() {
