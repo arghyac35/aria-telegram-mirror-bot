@@ -1,8 +1,9 @@
 #!/bin/bash
 
-if [[ -n $SA_ZIP_URL ]]; then
-	echo "Usage of Service Accounts Detected"
-	wget -q $SA_ZIP_URL -O /bot/accounts.zip && unzip -qq -o accounts.zip
+if [[ -n $GIT_USER && -n $GIT_TOKEN && -n $GIT_REPO ]]; then
+	echo "Usage of Service Accounts Detected, Clonning git"
+	git clone https://"$GIT_TOKEN"@github.com/"$GIT_USER"/"$GIT_REPO" /bot/accounts
+	rm -rf /bot/accounts/.git
 elif [[ -n $CLIENT_SECRET && -n $CREDENTIALS ]]; then
 	echo "Usage of token detected"
 	wget -q $CREDENTIALS -O /bot/credentials.json

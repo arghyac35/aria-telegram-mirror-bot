@@ -49,7 +49,11 @@
 	CREDENTIALS							
 	CONFIG_URL
 	MAX_CONCURRENT_DOWNLOADS
-	SA_ZIP_URL
+
+	GIT_TOKEN
+	GIT_USER
+	GIT_REPO
+
 	HEROKU_API_KEY
 	HEROKU_APP_NAME
 	HEROKU_EMAIL
@@ -59,10 +63,14 @@
 	* `CREDENTIALS` is url for credentials.json *# Not required if `SA_ZIP_URL` is given*
 	* `CONFIG_URL` is for .constants.js, not sure about .constants.js? then read the description for it in actual [Readme](README.md) *# Required*
 	* `MAX_CONCURRENT_DOWNLOADS` maximum number of download jobs that will be active at a time
-	* `SA_ZIP_URL` zip file link of all the SAs, must be inside accounts folder
 	* `HEROKU_API_KEY` Go to your Heroku account and go to Account Settings. Scroll to the bottom until you see API Key. Copy this key and add it *# Required*
 	* `HEROKU_APP_NAME` Heroku appname *# Required*
 	* `HEROKU_EMAIL` Heroku Account email Id in which the above app will be deployed *# Required*
+		### _Below three are only needed when using SAs, it will clone the SAs from a github repo using token_
+		- Create a github private repo and upload all the service accounts
+	* `GIT_TOKEN` Create a Personal Access Token with repo scope. Go to github profile settings->Developer Settings->Personal Access Tokens->Generate new token->Add any note and then select only repo scope save it and copy the token->add in this secrect.
+	* `GIT_USER` Your github username
+	* `GIT_REPO` Repo name in which the SAs are.
 
 4. After adding all the above required variables go to github Actions tab in your repo
 5. Select `Manually Deploy to heroku` workflow as shown below:
