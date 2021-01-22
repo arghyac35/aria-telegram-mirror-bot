@@ -20,7 +20,7 @@ export async function getGDindexLink(fileId: string, isGetLink?: boolean) {
                             if (res.data) {
                                 let url = '';
                                 if (res.data.parents[0] === constants.GDRIVE_PARENT_DIR_ID) {
-                                    url = dlUtils.checkTrailingSlash(constants.INDEX_DOMAIN) + encodeURIComponent(res.data.name);
+                                    url = dlUtils.checkTrailingSlash(constants.INDEX_DOMAIN) + 'GdriveBot/'  + encodeURIComponent(res.data.name);
                                 } else {
                                     url = dlUtils.checkTrailingSlash(constants.INDEX_DOMAIN) + encodeURIComponent(await getFilePathDrive(res.data.parents, drive) + res.data.name);
                                 }
@@ -53,9 +53,6 @@ async function getFilePathDrive(parents: any, drive: drive_v3.Drive) {
             parent = f.data.parents;
             if (!parent || parent.length === 0) break;
             tree.push({ 'id': parent[0], 'name': f.data.name });
-            if (parent[0] === constants.GDRIVE_PARENT_DIR_ID) {
-                break;
-            }
         } while (true);
     }
     tree.reverse();
