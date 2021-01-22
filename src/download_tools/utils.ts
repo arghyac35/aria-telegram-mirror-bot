@@ -151,8 +151,8 @@ export function generateStatusMessage(totalLength: number, completedLength: numb
   var eta = downloadETA(totalLength, completedLength, speed);
   var type = dlDetails.isUploading ? 'Uploading' : 'Filename';
   var message = `<b>${type}</b>: <code>${fileName}</code>\n<b>Size</b>: <code>${totalLengthStr}</code>\n<b>Progress</b>: <code>${progressString}</code>\n<b>Speed</b>: <code>${speedStr}ps</code>\n<b>ETA</b>: <code>${eta}</code>`;
-  if (seeders || peers) {
-    message += `\n<b>Seeders</b>: <code>${seeders || 0}</code> | <b>Peers</b>: <code>${peers || 0}</code>`;
+  if (seeders) {
+    message += `\n<b>Seeders</b>: <code>${seeders}</code> | <b>Peers</b>: <code>${peers || 0}</code>`;
   }
   if (!dlDetails.isUploading) {
     message += `\n<b>GID</b>: <code>${dlDetails.gid}</code>`;
