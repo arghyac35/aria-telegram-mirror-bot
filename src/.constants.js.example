@@ -26,7 +26,7 @@ module.exports = Object.freeze({
     NAME: "@nameOf_bot"
   },
   IS_TEAM_DRIVE: false,
-  SHARED_DRIVE_ID: "", # Add the TD id, it helps in querying multiple folders in TD
+  SHARED_DRIVE_ID: "", // Add the TD id, it helps in querying multiple folders in TD
   USE_SERVICE_ACCOUNT: false,
   INDEX_DOMAIN: "",
   TELEGRAPH_TOKEN: '' // Telegraph token, if you want to show search results in telegra.ph else keep it blank
