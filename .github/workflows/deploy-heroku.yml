@@ -23,3 +23,5 @@ jobs:
           HD_GIT_TOKEN: ${{secrets.GIT_TOKEN}}
           HD_GIT_USER: ${{secrets.GIT_USER}}
           HD_GIT_REPO: ${{secrets.GIT_REPO}}
+          HD_HEROKU_API_KEY: ${{secrets.HEROKU_API_KEY}}
+          HD_HEROKU_APP_NAME: ${{secrets.HEROKU_APP_NAME}}

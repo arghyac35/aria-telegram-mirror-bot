@@ -25,8 +25,11 @@ const bot = new TelegramBot(constants.TOKEN, { polling: true });
 var websocketOpened = false;
 var statusInterval: NodeJS.Timeout;
 var dlManager = dlm.DlManager.getInstance();
+const Heroku = require('heroku-client')
+const heroku = new Heroku({ token: process.env.HEROKU_API_KEY })
 
 initAria2();
+// checkIfPreviouslyRestarted();
 
 if (constants.USE_SERVICE_ACCOUNT && !constants.IS_TEAM_DRIVE) {
   console.log('In order to use Service account for clone the drive should be Team drive. Please set IS_TEAM_DRIVE to true in .constants.js');
@@ -42,6 +45,21 @@ function setEventCallback(regexp: RegExp, regexpNoName: RegExp,
     if (msg.chat.type !== 'private' && !match[0].match(regexp))
       return;
     callback(msg, match);
+  });
+}
+
+function checkIfPreviouslyRestarted() {
+  readFile('./restartObj.json', 'utf8', (err, data) => {
+    if (err) {
+      console.log('Error reading file after restart: ', err.message);
+    } else {
+      if (data) {
+        const msg = JSON.parse(data);
+        msgTools.deleteMsg(bot, msg.restartingMsg);
+        msgTools.sendMessage(bot, msg.originalMsg, 'Restarted successfully.', 60000);
+        writeFile('./restartObj.json', '').catch(console.error);
+      }
+    }
   });
 }
 
@@ -209,6 +227,28 @@ setEventCallback(eventRegex.commandsRegex.unzipMirror, eventRegex.commandsRegexN
     msgTools.sendUnauthorizedMessage(bot, msg);
   } else {
     mirror(msg, match, false, true);
+  }
+});
+
+setEventCallback(eventRegex.commandsRegex.restart, eventRegex.commandsRegexNoName.restart, async (msg, match) => {
+  if (msgTools.isAuthorized(msg) !== 0) {
+    msgTools.sendMessage(bot, msg, `This command is only for SUDO_USERS`);
+  } else {
+    try {
+      if (!process.env.HEROKU_API_KEY) {
+        msgTools.sendMessage(bot, msg, `Can't restart as <code>HEROKU_API_KEY</code> is not provided`);
+      } else {
+        let restartingMsg = await bot.sendMessage(msg.chat.id, `Heroku dyno will be restarted now.`, {
+          reply_to_message_id: msg.message_id,
+          parse_mode: 'HTML'
+        });
+        await writeFile('./restartObj.json', JSON.stringify({ originalMsg: msg, restartingMsg }));
+        const response = await heroku.delete(`/apps/${process.env.HEROKU_APP_NAME}/dynos`);
+      }
+    } catch (error) {
+      console.log("Error while restart: ", error.message);
+      msgTools.sendMessage(bot, msg, error.message, 60000);
+    }
   }
 });
 
