@@ -18,6 +18,7 @@ export class RegExps {
   readonly help: RegExp;
   readonly authorize: RegExp;
   readonly unauthorize: RegExp;
+  readonly restart: RegExp;
 
   constructor(commands: string[]) {
     this.start = new RegExp(commands[0], 'i');
@@ -39,5 +40,6 @@ export class RegExps {
     this.help = new RegExp(commands[16], 'i');
     this.authorize = new RegExp(commands[17], 'i');
     this.unauthorize = new RegExp(commands[18], 'i');
+    this.restart = new RegExp(commands[19], 'i');
   }
 }

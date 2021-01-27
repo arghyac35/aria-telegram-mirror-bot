@@ -17,7 +17,8 @@ export const commands = {
     COUT:           'count|cnt',
     HELP:           'help|h',
     AUTHORIZE:      'authorize|a',
-    UNAUTHORIZE:    'unauthorize|ua'
+    UNAUTHORIZE:    'unauthorize|ua',
+    RESTART:        'restart|r'
 };
 
 export const commandsAfter: any = {
@@ -39,5 +40,6 @@ export const commandsAfter: any = {
     COUT:           ' (.+)',
     HELP:           '$',
     AUTHORIZE:      '$',
-    UNAUTHORIZE:    '$'
+    UNAUTHORIZE:    '$',
+    RESTART:        '$'
 };
