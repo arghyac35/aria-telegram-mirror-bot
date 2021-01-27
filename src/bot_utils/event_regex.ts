@@ -1,5 +1,6 @@
 import constants = require('../.constants');
 import regexps = require('./reg_exps');
+import * as commandFile from './commands';
 
 export class EventRegex {
 
@@ -7,9 +8,19 @@ export class EventRegex {
   readonly commandsRegexNoName: regexps.RegExps;
 
   constructor() {
-    var commands = ['^[/|.]start', '^[/|.](mirrorTar|mt)', '^[/|.](mirror|m)', '^[/|.](mirrorStatus|ms)', '^[/|.](list|l)', '^[/|.](getFolder|gf)', '^[/|.](cancelMirror|cm)', '^[/|.](cancelAll|ca)', '^[/|.]stats', '^[/|.](getLink|gl)', '^[/|.](clone|c)', '^[/|.]id', '^[/|.]mf', '^[/|.](tar|t)', '^[/|.](unzipMirror|um)', '^[/|.](count|cnt)', '^[/|.](help|h)', '^[/|.](authorize|a)', '^[/|.](unauthorize|ua)'];
+    // var commands = ['^[/|.]start', '^[/|.](mirrorTar|mt)', '^[/|.](mirror|m)', '^[/|.](mirrorStatus|ms)', '^[/|.](list|l)', '^[/|.](getFolder|gf)', '^[/|.](cancelMirror|cm)', '^[/|.](cancelAll|ca)', '^[/|.](stats)', '^[/|.](getLink|gl)', '^[/|.](clone|c)', '^[/|.]id', '^[/|.]mf', '^[/|.](tar|t)', '^[/|.](unzipMirror|um)', '^[/|.](count|cnt)', '^[/|.](help|h)', '^[/|.](authorize|a)', '^[/|.](unauthorize|ua)'];
+
+    var commands: string[] = [];
+    var commandAfter: string[] = [];
     var commandsNoName: string[] = [];
-    var commandAfter = ['$', '($| (.+))', '($| (.+))', '$', ' (.+)', '$', '($| (.+))', '$', '$', ' (.+)', ' (.+)', '$', '$', ' (.+)', ' (.+)', ' (.+)', '$', '$', '$'];
+    // var commandAfter = ['$', '($| (.+))', '($| (.+))', '$', ' (.+)', '$', '($| (.+))', '$', '$', ' (.+)', ' (.+)', '$', '$', ' (.+)', ' (.+)', ' (.+)', '$', '$', '$'];
+
+    Object.entries(commandFile.commands).forEach(
+      ([key, command]) => {
+        commands.push(`^[/|.](${command})`);
+        commandAfter.push(commandFile.commandsAfter[key]);
+      }
+    );
 
     if (constants.COMMANDS_USE_BOT_NAME && constants.COMMANDS_USE_BOT_NAME.ENABLED) {
       commands.forEach((command, i) => {
