@@ -23,18 +23,3 @@ jobs:
           HD_GIT_TOKEN: ${{secrets.GIT_TOKEN}}
           HD_GIT_USER: ${{secrets.GIT_USER}}
           HD_GIT_REPO: ${{secrets.GIT_REPO}}
-  restart:
-    needs: [deploy]
-    name: Restart Worker Dyno
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: akhileshns/heroku-deploy@v3.8.9 # This is the action
-        with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: ${{secrets.HEROKU_APP_NAME}}
-          heroku_email: ${{secrets.HEROKU_EMAIL}}
-          justlogin: true
-      - run: |
-            heroku ps:scale worker=0 --app ${{secrets.HEROKU_APP_NAME}}
-            heroku ps:scale worker=1 --app ${{secrets.HEROKU_APP_NAME}}
