@@ -332,10 +332,10 @@ argparse@^1.0.7:
   dependencies:
     sprintf-js "~1.0.2"
 
-aria2@^4.1.1:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/aria2/-/aria2-4.1.1.tgz#6b9cda9f99f2680188a582fbcef9a17a125a34a2"
-  integrity sha512-X6KwHm6Vf3RqHN3xU7AWK6u3DJZLFu9/9clQ8cw6sfVQNzh6ik35+D6Vsd3IE/EiTNTvsTk1/aZchT81nuHnrw==
+aria2@^4.1.2:
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/aria2/-/aria2-4.1.2.tgz#0ecbc50beea82856c88b4de71dac336154f67362"
+  integrity sha512-qTBr2RY8RZQmiUmbj2KXFvkErNxU4aTHZszszzwhE8svy2PEVX+IYR/c4Rp9Tuw4QkeU8cylGy6McV6Yl8i7Qw==
   dependencies:
     node-fetch "^2.6.1"
     ws "^7.4.0"
