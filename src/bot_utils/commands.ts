@@ -30,7 +30,7 @@ export const commandsAfter: any = {
     GET_FOLDER:     '$',
     CANCEL_MIRROR:  '($| (.+))',
     CANCEL_ALL:     '$',
-    STATS:          'stats',
+    STATS:          '$',
     GET_LINK:       ' (.+)',
     CLONE:          ' (.+)',
     ID:             '$',
