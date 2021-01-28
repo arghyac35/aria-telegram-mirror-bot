@@ -22,7 +22,7 @@
     "@types/shell-quote": "^1.7.0",
     "@types/tar": "^4.0.4",
     "@types/uuid": "^8.3.0",
-    "aria2": "^4.1.1",
+    "aria2": "^4.1.2",
     "async": "^3.2.0",
     "axios": "^0.21.1",
     "check-disk-space": "^2.1.0",
