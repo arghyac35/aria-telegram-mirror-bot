@@ -352,13 +352,18 @@ setEventCallback(eventRegex.commandsRegex.cancelMirror, eventRegex.commandsRegex
     if (authorizedCode > -1 && authorizedCode < 3) {
       cancelMirror(dlDetails, msg);
     } else if (authorizedCode === 3) {
-      msgTools.isAdmin(bot, msg, (e, res) => {
-        if (res) {
-          cancelMirror(dlDetails, msg);
-        } else {
-          msgTools.sendMessage(bot, msg, 'You do not have permission to do that.');
-        }
-      });
+      if (msg.from.id === dlDetails.tgFromId) {
+        cancelMirror(dlDetails, msg);
+      } else {
+        msgTools.isAdmin(bot, msg, (e, res) => {
+          console.log('Cta admins-->', res);
+          if (res) {
+            cancelMirror(dlDetails, msg);
+          } else {
+            msgTools.sendMessage(bot, msg, 'You do not have permission to do that.');
+          }
+        });
+      }
     } else {
       msgTools.sendUnauthorizedMessage(bot, msg);
     }
