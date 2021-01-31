@@ -15,6 +15,7 @@ export async function getGDindexLink(fileId: string, isGetLink?: boolean) {
                 drive.files.get({ fileId: fileId, fields: 'id, name, parents, mimeType', supportsAllDrives: true },
                     async (err: Error, res: any) => {
                         if (err) {
+                            console.log('Error in index link get file: ', err);
                             reject(err.message);
                         } else {
                             if (res.data) {
