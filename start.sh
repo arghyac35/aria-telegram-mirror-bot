@@ -13,8 +13,8 @@ else
 	exit 0
 fi
 
-if [[ -n $CONFIG_URL ]]; then
-	wget -q $CONFIG_URL -O /bot/out/.constants.js
+if [[ -n $CONSTANTS_URL ]]; then
+	wget -q $CONSTANTS_URL -O /bot/out/.constants.js
 else
 	echo "Provide constants.js to Run the bot. Exiting..."
 	exit 0
