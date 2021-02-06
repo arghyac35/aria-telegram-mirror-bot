@@ -50,21 +50,21 @@ export async function driveClone(fileId: string, bot: TelegramBot, cloneMsg: Tel
                             resolve(msg);
                         });
                     } catch (err) {
-                        console.error('Error copying folder', err)
-                        throw new Error(err);
+                        console.error('Error copying folder', err.message)
+                        reject(err.message);
                     }
                 } else {
-                    message += `\n\nRuko zara sabar karo...`;
-                    msgTools.editMessage(bot, cloneMsg, message);
+                    // message += `\n\nRuko zara sabar karo...`;
+                    // msgTools.editMessage(bot, cloneMsg, message);
                     //copy file
                     await copy_file(meta.data.id, constants.GDRIVE_PARENT_DIR_ID).then((new_file: any) => {
                         if (new_file) {
                             let msg: string;
-                            message += `\n\nYo boi copy is done getting shareable link...`;
+                            message += `\n\nCopy is done getting shareable link...`;
                             msgTools.editMessage(bot, cloneMsg, message);
                             gdrive.getSharableLink(new_file.id, false, (err, url) => {
                                 if (err) {
-                                    reject(err);
+                                    reject('Error while getting shareablelink: ' + err);
                                 }
                                 msg = `<a href="` + url + `">` + new_file.name + `</a> (` + dlUtils.formatSize(new_file.size) + `)`;
                                 if (constants.INDEX_DOMAIN) {
