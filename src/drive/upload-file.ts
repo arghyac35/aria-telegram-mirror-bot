@@ -6,6 +6,7 @@ import fs = require('fs');
 import driveAuth = require('./drive-auth');
 import driveUtils = require('./drive-utils');
 import { DlVars } from '../dl_model/detail';
+import constants = require('../.constants');
 
 interface Chunk {
   bstart: number;
@@ -119,6 +120,19 @@ export function uploadGoogleDriveFile(dlDetails: DlVars, parent: string, file: {
           }
 
           if (!response.headers || !response.headers.location || response.headers.location.length <= 0) {
+
+            console.log('Errorbody in upload file-->', response.body);
+
+            // Check if SA limit exceeded then switch SA
+            if (response.body && response.body.error && response.body.error.errors && response.body.error.errors.length > 0 && (response.body.error.errors[0].reason === 'userRateLimitExceeded' || response.body.error.errors[0].reason === 'dailyLimitExceeded') && constants.USE_SERVICE_ACCOUNT && driveAuth.SERVICE_ACCOUNT_INDEX !== driveAuth.service_account_count - 1) {
+              console.log('Got error: ', response.body.error.reason, ' while uploading trying again..');
+              driveAuth.switchServiceAccount();
+              return await uploadGoogleDriveFile(dlDetails, parent, file);
+            }
+            if (driveAuth.SERVICE_ACCOUNT_INDEX === driveAuth.service_account_count - 1) {
+              driveAuth.SERVICE_ACCOUNT_INDEX = 0;
+            }
+
             let message = `Get drive resumable url return invalid headers: ${JSON.stringify(response.headers, null, 2)}`;
             if (response.body && response.body.error) {
               message = `\nGet drive resumable url return invalid headers.\nErrorcode: ${response.body.error.code}\nErrorMessage: ${response.body.error.message}`
