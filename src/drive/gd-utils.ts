@@ -37,6 +37,7 @@ const EXCEED_LIMIT = 7;
 const FID_TO_NAME: any = {};
 
 export async function real_copy(source: string, target: string, tg?: any) {
+    SA_FILES.flag = 0; // set this to 0 for every new copy
     async function get_new_root() {
         const file = await get_info_by_id(source)
         if (!file) throw new Error(`Unable to access the link, please check if the link is valid and SA has the appropriate permissions：https://drive.google.com/drive/folders/${source}`)
@@ -461,7 +462,7 @@ async function copy_files(files: any[], mapping: any[], root: string, smy?: any,
             clearInterval(loop)
             if (tg_loop) clearInterval(tg_loop)
             files = null
-            throw err
+            throw new Error(err);
         }
         if (concurrency >= PARALLEL_LIMIT) {
             await sleep(100)
@@ -487,7 +488,7 @@ async function copy_files(files: any[], mapping: any[], root: string, smy?: any,
     } while (concurrency || files.length)
     clearInterval(loop)
     if (tg_loop) clearInterval(tg_loop)
-    if (err) throw err
+    if (err) throw new Error(err);
 }
 
 export async function copy_file(id: string, parent: string, limit?: any) {
@@ -526,7 +527,7 @@ export async function copy_file(id: string, parent: string, limit?: any) {
                 if (gtoken.exceed_count >= EXCEED_LIMIT) {
                     SA_TOKENS = SA_TOKENS.filter((v: any) => v.gtoken !== gtoken)
                     if (!SA_TOKENS.length) SA_TOKENS = get_sa_batch()
-                    console.log(`This account has triggered the daily usage limit${EXCEED_LIMIT} consecutive times, the remaining amount of SA available in this batch：`, SA_TOKENS.length)
+                    console.log(`This account (${gtoken.keyFile}) has triggered the daily usage limit${EXCEED_LIMIT} consecutive times, the remaining amount of SA available in this batch：`, SA_TOKENS.length)
                 } else {
                     // console.log('This account triggers its daily usage limit and has been marked. If the next request is normal, it will be unmarked, otherwise the SA will be removed')
                     if (gtoken.exceed_count) {
