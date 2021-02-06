@@ -56,9 +56,9 @@
 	```
 
 	### Description of the above variables
-	* `CLIENT_SECRET` is URL for client_secret.json, see [below](#How-to-create-direct-URLs) for creating URLs &nbsp;&nbsp;&nbsp;&nbsp;*# Not required when using SA*
-	* `CREDENTIALS` is URL for credentials.json, see [below](#How-to-create-direct-URLs) for creating URLs &nbsp;&nbsp;&nbsp;&nbsp;*# Not required when using SA*
-	* `CONSTANTS_URL` is URL for .constants.js, see [below](#How-to-create-direct-URLs) for creating URLs, not sure about .constants.js? then read the description for it in actual [Readme](README.md) &nbsp;&nbsp;&nbsp;&nbsp;*# Required*
+	* `CLIENT_SECRET` is URL for client_secret.json, see [below](#how-to-create-urls-using-github-gists) for creating URLs &nbsp;&nbsp;&nbsp;&nbsp;*# Not required when using SA*
+	* `CREDENTIALS` is URL for credentials.json, see [below](#how-to-create-urls-using-github-gists) for creating URLs &nbsp;&nbsp;&nbsp;&nbsp;*# Not required when using SA*
+	* `CONSTANTS_URL` is URL for .constants.js, see [below](#how-to-create-urls-using-github-gists) for creating URLs, not sure about .constants.js? then read the description for it in actual [Readme](README.md) &nbsp;&nbsp;&nbsp;&nbsp;*# Required*
 	* `MAX_CONCURRENT_DOWNLOADS` maximum number of download jobs that will be active at a time &nbsp;&nbsp;&nbsp;&nbsp;*#Optional, default is 3*
 	* `HEROKU_API_KEY` Go to your Heroku account and go to Account Settings. Scroll to the bottom until you see API Key. Copy this key and add it &nbsp;&nbsp;&nbsp;&nbsp;*# Required*
 	* `HEROKU_APP_NAME` Heroku appname &nbsp;&nbsp;&nbsp;&nbsp;*# Required, no need to create app manually*
