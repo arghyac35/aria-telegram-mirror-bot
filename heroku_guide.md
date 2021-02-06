@@ -36,18 +36,14 @@
 
 1. Fork this repo
 
-2. Go to Project->Settings->Secrects and Click *New repository secret*.
+2. Create github secret for each variables below. Click [here](#How-to-create-github-secrets) for how to create github secrets.
 
-	![Example Manually Deploy to heroku](.github/secrets.png?raw=true)
+3. Add the below variables one by one by clicking *New repository secret* everytime.
 
-3. Add the below variables one by one
-
-	* All the URLs should be direct and publicly accessible, Example of a CONFIG_URL https://gist.githubusercontent.com/arghyac35/04c2e78a89f00b21303dd45274b2c4c4/raw/4182c22062b80072b82ab0c290ed40784752dd48/.constants.js.
-	* It will be easier to create this URLs using secret github [gists](https://gist.github.com/), don't create public gists cause this files will contain you credentials
 	```
 	CLIENT_SECRET
 	CREDENTIALS							
-	CONFIG_URL
+	CONSTANTS_URL
 	MAX_CONCURRENT_DOWNLOADS
 
 	GIT_TOKEN
@@ -58,19 +54,28 @@
 	HEROKU_APP_NAME
 	HEROKU_EMAIL
 	```
+
 	### Description of the above variables
-	* `CLIENT_SECRET` is url for client_secret.json *# Not required if `SA_ZIP_URL` is given*
-	* `CREDENTIALS` is url for credentials.json *# Not required if `SA_ZIP_URL` is given*
-	* `CONFIG_URL` is for .constants.js, not sure about .constants.js? then read the description for it in actual [Readme](README.md) *# Required*
-	* `MAX_CONCURRENT_DOWNLOADS` maximum number of download jobs that will be active at a time
-	* `HEROKU_API_KEY` Go to your Heroku account and go to Account Settings. Scroll to the bottom until you see API Key. Copy this key and add it *# Required*
-	* `HEROKU_APP_NAME` Heroku appname *# Required*
-	* `HEROKU_EMAIL` Heroku Account email Id in which the above app will be deployed *# Required*
+	* `CLIENT_SECRET` is URL for client_secret.json, see [below](#How-to-create-direct-URLs) for creating URLs &nbsp;&nbsp;&nbsp;&nbsp;*# Not required when using SA*
+	* `CREDENTIALS` is URL for credentials.json, see [below](#How-to-create-direct-URLs) for creating URLs &nbsp;&nbsp;&nbsp;&nbsp;*# Not required when using SA*
+	* `CONSTANTS_URL` is URL for .constants.js, see [below](#How-to-create-direct-URLs) for creating URLs, not sure about .constants.js? then read the description for it in actual [Readme](README.md) &nbsp;&nbsp;&nbsp;&nbsp;*# Required*
+	* `MAX_CONCURRENT_DOWNLOADS` maximum number of download jobs that will be active at a time &nbsp;&nbsp;&nbsp;&nbsp;*#Optional, default is 3*
+	* `HEROKU_API_KEY` Go to your Heroku account and go to Account Settings. Scroll to the bottom until you see API Key. Copy this key and add it &nbsp;&nbsp;&nbsp;&nbsp;*# Required*
+	* `HEROKU_APP_NAME` Heroku appname &nbsp;&nbsp;&nbsp;&nbsp;*# Required, no need to create app manually*
+	* `HEROKU_EMAIL` Heroku Account email Id in which the above app will be deployed &nbsp;&nbsp;&nbsp;&nbsp;*# Required*
+	<br /><br />
 		### _Below three are only needed when using SAs, it will clone the SAs from a github repo using token_
-		- Create a github private repo and upload all the service accounts
-	* `GIT_TOKEN` Create a Personal Access Token with repo scope. Go to github profile settings->Developer Settings->Personal Access Tokens->Generate new token->Add any note and then select only repo scope save it and copy the token->add in this secrect.
-	* `GIT_USER` Your github username
-	* `GIT_REPO` Repo name in which the SAs are.
+
+		- Create a github private repo withy any name and upload all the service accounts as shown in below screenshot:
+
+			![SA Repo](.github/accounts.png?raw=true)
+
+		1. `GIT_TOKEN:` Create a Personal Access Token with repo scope. Go to github [profile settings->Developer Settings->Personal Access Tokens->Generate new token](https://github.com/settings/tokens/new)->Add any note and then select only repo scope & click on Generate token and copy the token->add in this secrect.
+
+			![credentials](.github/pat.png?raw=true)
+		
+		2. `GIT_USER:` Your github username
+		3. `GIT_REPO:` Repo name in which the SAs are.
 
 4. After adding all the above required variables go to github Actions tab in your repo
 5. Select `Manually Deploy to heroku` workflow as shown below:
@@ -84,3 +89,27 @@
 7. _Voila!_ your bot will be deployed now.
 
 8. For updating the bot just run the action again, it will handle the rest. Also, while updating do keep a look at the .constants.js if anything new got added then you need to add that too in your link.
+
+## How to create URLs using github [gists](https://gist.github.com/)
+
+* All the URLs should be direct and publicly accessible, Example of a CONSTANTS_URL https://gist.githubusercontent.com/arghyac35/04c2e78a89f00b21303dd45274b2c4c4/raw/4182c22062b80072b82ab0c290ed40784752dd48/.constants.js.
+* Open https://gist.github.com
+* Add the values for said secret as below:
+	* .constants.js
+	![Constants](.github/constants.png?raw=true)
+	* client_secret
+	![client_secret](.github/client_secret.png?raw=true)
+	* credentials
+	![credentials](.github/credentials.png?raw=true)
+* Now, copy the raw URL for each gist:
+	![credentials](.github/raw.png?raw=true)
+
+## How to create github secrets
+* Go to Project->Settings->Secrets and Click *New repository secret*. Click [here](.github/all_secrets.png) to see the final view after adding al secrets.
+
+	![secrets](.github/secrets.png?raw=true)
+* Add secrets like below:
+
+	![add_secret1](.github/add_secret1.png?raw=true)
+
+	![add_secret2](.github/add_secret2.png?raw=true)
