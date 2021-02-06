@@ -3,12 +3,12 @@ import readline = require('readline');
 import { google } from 'googleapis';
 import { OAuth2Client, JWT } from 'google-auth-library';
 import constants = require('../.constants');
-import { readdirSync } from 'fs-extra';
 
 const SCOPE = 'https://www.googleapis.com/auth/drive';
 const TOKEN_PATH = './credentials.json';
 export var SERVICE_ACCOUNT_INDEX: number = 0;
-export const service_account_count = constants.USE_SERVICE_ACCOUNT ? readdirSync('./accounts').length : 0;
+const SA_FILES: any = constants.USE_SERVICE_ACCOUNT ? fs.readdirSync('./accounts').filter(v => v.endsWith('.json')) : [];
+export const service_account_count = SA_FILES.length;
 
 /**
  * Authorize a client with credentials, then call the Google Drive API.
@@ -16,7 +16,9 @@ export const service_account_count = constants.USE_SERVICE_ACCOUNT ? readdirSync
  */
 export function call(callback: (err: string, client: OAuth2Client | JWT) => void): void {
   if (constants.USE_SERVICE_ACCOUNT) {
-    const key = require(`../../accounts/${SERVICE_ACCOUNT_INDEX}.json`);
+    const SA_FILE = SA_FILES[SERVICE_ACCOUNT_INDEX];
+    console.log(`Authorizing with ${SA_FILE} service account`);
+    const key = require(`../../accounts/${SA_FILE}`);
     callback(null, new google.auth.JWT(
       key.client_email,
       undefined,
@@ -56,8 +58,9 @@ export function callAsync(): Promise<OAuth2Client | JWT> {
         }
       });
     } else {
-      console.log(`Authorizing with ${SERVICE_ACCOUNT_INDEX}.json service account`);
-      const key = require(`../../accounts/${SERVICE_ACCOUNT_INDEX}.json`);
+      const SA_FILE = SA_FILES[SERVICE_ACCOUNT_INDEX];
+      console.log(`Authorizing with ${SA_FILE} service account`);
+      const key = require(`../../accounts/${SA_FILE}`);
       res(new google.auth.JWT(
         key.client_email,
         undefined,
