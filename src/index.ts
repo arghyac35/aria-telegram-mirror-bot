@@ -561,6 +561,12 @@ setEventCallback(eventRegex.commandsRegex.help, eventRegex.commandsRegexNoName.h
     ➖➖➖➖➖➖➖➖➖➖➖➖
     <code>/stats</code> <b>|</b> Send disk information, cpu load of the machine & bot uptime.
     ➖➖➖➖➖➖➖➖➖➖➖➖
+    <code>/authorize</code> or <code>/a</code> <b>|</b> To authorize a chat, only run by SUDO_USERS.
+    ➖➖➖➖➖➖➖➖➖➖➖➖
+    <code>/unauthorize</code> or <code>/ua</code> <b>|</b> To Unauthorize a chat, only run by SUDO_USERS.
+    ➖➖➖➖➖➖➖➖➖➖➖➖
+    <code>/restart</code> or <code>/r</code> <b>|</b> Restart Heroku dyno, only run by SUDO_USERS.
+    ➖➖➖➖➖➖➖➖➖➖➖➖
     <code>/help</code> or <code>/h</code> <b>|</b> You already know what it does.
     ➖➖➖➖➖➖➖➖➖➖➖➖\n<i>Note: All the above command can also be called using dot(.) instead of slash(/). For e.x: <code>.mirror </code>url or <code>.m </code>url</i>
     `
