@@ -2,7 +2,7 @@ export function getFileLink(fileId: string, isFolder: boolean): string {
   if (isFolder) {
     return 'https://drive.google.com/drive/folders/' + fileId;
   } else {
-    return 'https://drive.google.com/uc?id=' + fileId + '&export=download';
+    return 'https://drive.google.com/open?id=' + fileId + '&export=download';
   }
 }
 
