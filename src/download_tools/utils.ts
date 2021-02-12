@@ -231,7 +231,7 @@ export function isDownloadAllowed(url: string): boolean {
 
 export function getIdFromUrl(url: string) {
   var id: any = '';
-  if (url.includes('uc?id=')) {
+  if (url.includes('uc?id=') || url.includes('open?id=')) {
     const driveId = url.match(/[-\w]{25,}/);
     const fileId: string = Array.isArray(driveId) && driveId.length > 0 ? driveId[0] : '';
     return fileId;
