@@ -7,8 +7,7 @@ Restart=on-abort
 Type=simple
 User=bots
 WorkingDirectory=/home/bots/aria-telegram-mirror-bot
-ExecStartPre=/usr/bin/env bash aria.sh
-ExecStart=/usr/bin/npm start
+ExecStart=/usr/bin/env bash start.sh
 ExecReload=/bin/kill -USR1 $MAINPID
 
 ; Use graceful shutdown with a reasonable timeout
