@@ -61,8 +61,8 @@ async function driveListFiles(drive: drive_v3.Drive, searchQuery: string, pageSi
         if (err) {
           reject(err);
         }
-        if (!res.data || !res.data.files) {
-          reject('No data found');
+        if (!res || !res.data || !res.data.files) {
+          return reject('No data found');
         }
         resolve(res.data.files);
       });
