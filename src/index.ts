@@ -293,7 +293,7 @@ setEventCallback(eventRegex.commandsRegex.list, eventRegex.commandsRegexNoName.l
     driveList.listFiles(match[4], async (err, res) => {
       msgTools.deleteMsg(bot, searchingMsg);
       if (err) {
-        msgTools.sendMessage(bot, msg, 'Failed to fetch the list of files');
+        msgTools.sendMessage(bot, msg, 'Failed to fetch the list of files: ' + err);
       } else {
         if (constants.TELEGRAPH_TOKEN) {
           try {
