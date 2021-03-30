@@ -9,7 +9,7 @@ export const commands = {
     CANCEL_ALL:     'cancelAll|ca',
     STATS:          'stats',
     GET_LINK:       'getLink|gl',
-    CLONE:          'clone|c',
+    CLONE:          'copy|c',
     ID:             'id',
     MF:             'mf',
     TAR:            'tar|t',
