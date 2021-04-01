@@ -82,7 +82,7 @@ Aria-telegram-mirror-bot is now written in TypeScript. If you are migrating from
 2. Clone the repo:
 
    ```bash
-   git clone https://github.com/out386/aria-telegram-mirror-bot
+   git clone https://github.com/arghyac35/aria-telegram-mirror-bot
    cd aria-telegram-mirror-bot
    ```
 
