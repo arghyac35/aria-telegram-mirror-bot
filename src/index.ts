@@ -17,6 +17,7 @@ import checkDiskSpace = require('check-disk-space');
 import removeFn = require('./bot_utils/remove_text');
 import gdUtils = require('./drive/gd-utils');
 import { readFile, writeFile } from 'fs-extra';
+import ytdlFn = require('./download_tools/ytdl');
 
 const telegraph = require('telegraph-node')
 const ph = new telegraph();
@@ -502,6 +503,29 @@ setEventCallback(eventRegex.commandsRegex.count, eventRegex.commandsRegexNoName.
     }
   }
 });
+
+setEventCallback(eventRegex.commandsRegex.ytdl, eventRegex.commandsRegexNoName.ytdl, async (msg, match) => {
+  if (msgTools.isAuthorized(msg) < 0) {
+    msgTools.sendUnauthorizedMessage(bot, msg);
+  } else {
+    ytdl(msg, match);
+  }
+});
+
+async function ytdl(msg: TelegramBot.Message, match: RegExpExecArray) {
+  try {
+    let ytdlMsg = await bot.sendMessage(msg.chat.id, `Downloading: <code>` + match[4] + `</code>`, {
+      reply_to_message_id: msg.message_id,
+      parse_mode: 'HTML'
+    });
+    await ytdlFn.ytdlWrapper(match[4], bot, ytdlMsg, msg).catch(e => {
+      msgTools.deleteMsg(bot, ytdlMsg);
+      msgTools.sendMessage(bot, msg, e.message || e, 10000);
+    });
+  } catch (error) {
+    msgTools.sendMessage(bot, msg, error);
+  }
+}
 
 /**
  * Start a clonning Google Drive files. Make sure that this is triggered by an

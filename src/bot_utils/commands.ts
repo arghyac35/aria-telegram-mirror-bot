@@ -19,7 +19,8 @@ export const commands = {
     HELP:           'help|h',
     AUTHORIZE:      'authorize|a',
     UNAUTHORIZE:    'unauthorize|ua',
-    RESTART:        'restart|r'
+    RESTART:        'restart|r',
+    YTDL:           'ytdl|y'
 };
 
 export const commandsAfter: any = {
@@ -43,5 +44,6 @@ export const commandsAfter: any = {
     HELP:           '$',
     AUTHORIZE:      '$',
     UNAUTHORIZE:    '$',
-    RESTART:        '$'
+    RESTART:        '$',
+    YTDL:           '($| (.+))'
 };
