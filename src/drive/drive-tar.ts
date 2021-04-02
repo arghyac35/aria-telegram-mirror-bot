@@ -136,7 +136,7 @@ interface DriveUploadCompleteCallback {
     (err: string, url: string, isFolder: boolean, indexLink?: string): void;
 }
 
-function driveUploadFile(filePath: string, dlDetails: DlVars, callback: DriveUploadCompleteCallback): void {
+export function driveUploadFile(filePath: string, dlDetails: DlVars, callback: DriveUploadCompleteCallback): void {
     fsWalk.uploadRecursive(dlDetails,
         filePath,
         constants.GDRIVE_PARENT_DIR_ID,
@@ -157,7 +157,7 @@ function driveUploadFile(filePath: string, dlDetails: DlVars, callback: DriveUpl
         });
 }
 var lastMessage = '';
-function updateStatus(dlDetails: DlVars, totalsize: number, message: string, bot: TelegramBot, tarringMsg: TelegramBot.Message): void {
+export function updateStatus(dlDetails: DlVars, totalsize: number, message: string, bot: TelegramBot, tarringMsg: TelegramBot.Message): void {
     let sm = getStatus(dlDetails, totalsize);
     message += `\n\n` + sm.message;
     if (lastMessage !== message) {
