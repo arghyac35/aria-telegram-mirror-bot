@@ -42,7 +42,8 @@ export function sendMessage(bot: TelegramBot, msg: TelegramBot.Message, text: st
   if (!delay) delay = 10000;
   bot.sendMessage(msg.chat.id, text, {
     reply_to_message_id: msg.message_id,
-    parse_mode: 'HTML'
+    parse_mode: 'HTML',
+    disable_web_page_preview: true
   })
     .then((res) => {
       if (callback) callback(res);
@@ -72,6 +73,7 @@ export async function sendMessageAsync(bot: TelegramBot, msg: TelegramBot.Messag
     bot.sendMessage(msg.chat.id, text, {
       reply_to_message_id: msg.message_id,
       parse_mode: 'HTML',
+      disable_web_page_preview: true,
       reply_markup: {
         inline_keyboard: [inlineKeyboard]
       }
