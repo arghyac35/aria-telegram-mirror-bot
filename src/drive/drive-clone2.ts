@@ -57,11 +57,11 @@ export async function driveClone(fileId: string, bot: TelegramBot, cloneMsg: Tel
                     // message += `\n\nRuko zara sabar karo...`;
                     // msgTools.editMessage(bot, cloneMsg, message);
                     //copy file
-                    await copy_file(meta.data.id, constants.GDRIVE_PARENT_DIR_ID).then((new_file: any) => {
+                    await copy_file(meta.data.id, constants.GDRIVE_PARENT_DIR_ID).then(async (new_file: any) => {
                         if (new_file) {
                             let msg: string;
                             message += `\n\nCopy is done getting shareable link...`;
-                            msgTools.editMessage(bot, cloneMsg, message);
+                            await msgTools.editMessage(bot, cloneMsg, message).catch(console.error);
                             gdrive.getSharableLink(new_file.id, false, (err, url) => {
                                 if (err) {
                                     reject('Error while getting shareablelink: ' + err);
