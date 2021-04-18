@@ -45,6 +45,8 @@ There is very little preventing users from using this to mirror pirated content.
 * `/count <driveUrl>` or `/cnt <driveUrl>`: Obtain informations about a drive folder and send it as a table. Idea taken from: https://github.com/iwestlin/gd-utils/blob/master/count
 * `/authorize` or `/a`: To authorize a chat, only run by SUDO_USERS. As this is stored in a file, so might get reset at every restart(not sure tho). To make it sustain need to use a db like redis which I may implement later.
 * `/unauthorize` or `/ua`: To unauthorize a chat, only run by SUDO_USERS
+* `/restart` or `/r`: Restart Heroku dyno, only run by SUDO_USERS.
+* `/help` or `/h`: Sends a list of bot commands
 
 #### Notes
 
@@ -82,7 +84,7 @@ Aria-telegram-mirror-bot is now written in TypeScript. If you are migrating from
 2. Clone the repo:
 
    ```bash
-   git clone https://github.com/arghyac35/aria-telegram-mirror-bot
+   git clone https://github.com/out386/aria-telegram-mirror-bot
    cd aria-telegram-mirror-bot
    ```
 
@@ -92,23 +94,17 @@ Aria-telegram-mirror-bot is now written in TypeScript. If you are migrating from
 
    ```bash
    cp src/.constants.js.example src/.constants.js
-   cp aria.sh.example aria.sh
    ```
 
-5. Configure the aria2 startup script:
-
-   * `nano aria.sh`
-   * `ARIA_RPC_SECRET` is the secret (password) used to connect to aria2. Set this to whatever you want, and save the file with `ctrl + x`.
-   * `MAX_CONCURRENT_DOWNLOADS` is the number of download jobs that can be active at the same time. Note that this does not affect the number of concurrent uploads. There is currently no limit for the number of concurrent uploads.
-
-6. Configure the bot:
+5. Configure the bot:
 
    * `nano src/.constants.js`
    * Now replace the placeholder values in this file with your values. Use the [Constants description](#Constants-description) section below for reference.
+   * `MAX_CONCURRENT_DOWNLOADS` is the number of download jobs that can be active at the same time. Note that this does not affect the number of concurrent uploads. Default is set to 5, to change edit `start.sh` file.
 
-7. Compile the project by running `tsc`
+6. Compile the project by running `tsc`
 
-8. Set up OAuth:
+7. Set up OAuth:
 
    * Visit the [Google Cloud Console](https://console.developers.google.com/apis/credentials)
    * Go to the OAuth Consent tab, fill it, and save.
@@ -117,17 +113,15 @@ Aria-telegram-mirror-bot is now written in TypeScript. If you are migrating from
    * Use the download button to download your credentials.
    * Move that file to the root of aria-telegram-mirror-bot, and rename it to `client_secret.json`
 
-9. Enable the Drive API:
+8. Enable the Drive API:
 
    * Visit the [Google API Library](https://console.developers.google.com/apis/library) page.
    * Search for Drive.
    * Make sure that it's enabled. Enable it if not.
 
-10. Start aria2 with `./aria.sh`
+9. Start the bot with `./start.sh`
 
-11. Start the bot with `npm start`
-
-12. Open Telegram, and send `/mirror https://raw.githubusercontent.com/out386/aria-telegram-mirror-bot/master/README.md` to the bot.
+10. Open Telegram, and send `/mirror https://raw.githubusercontent.com/out386/aria-telegram-mirror-bot/master/README.md` to the bot.
 
 11. In the terminal, it'll ask you to visit an authentication URL. Visit it, grant access, copy the code on that page, and paste it in the terminal.
 
@@ -143,7 +137,7 @@ This is a description of the fields in src/.constants.js:
 * `ARIA_DOWNLOAD_LOCATION_ROOT`: This is the mountpoint that contains ARIA_DOWNLOAD_LOCATION. This is used internally to calculate the space available before downloading.
 * `ARIA_FILTERED_DOMAINS`: The bot will refuse to download files from these domains. Can be an empty list.
 * `ARIA_FILTERED_FILENAMES`: The bot will refuse to completely download (or if already downloaded, then upload) files with any of these substrings in the file/top level directory name. Can be an empty list or left undefined.
-* `ARIA_PORT`: The port for the Aria2c RPC server. If you change this, make sure to update your aria.sh as well. Safe to leave this at the default value unless something else on your system is using that port.
+* `ARIA_PORT`: The port for the Aria2c RPC server. If you change this, make sure to update your aria.conf as well. Safe to leave this at the default value unless something else on your system is using that port.
 * `GDRIVE_PARENT_DIR_ID`: This is the ID of the Google Drive folder that files will be uploaded into. You will get this from step 4 of Pre-installation.
 * `OTHER_GDRIVE_DIR_IDS`: This is needed if u want to look for files in multiple dirs on list command
 * `SUDO_USERS`: This is a list of Telegram user IDs. These users can use the bot in any chat. Can be an empty list, if AUTHORIZED_CHATS is not empty.
@@ -178,9 +172,8 @@ After the initial installation, use these instructions to (re)start the bot.
 
 ### Using tmux
 
-1. Start aria2 by running `./aria.sh`
-2. Start a new tmux session with `tmux new -s tgbot`, or connect to an existing session with `tmux a -t tgbot`. Running the bot inside tmux will let you disconnect from the server without terminating the bot. You can also use nohup instead.
-3. Start the bot with `npm start`
+1. Start a new tmux session with `tmux new -s tgbot`, or connect to an existing session with `tmux a -t tgbot`. Running the bot inside tmux will let you disconnect from the server without terminating the bot. You can also use nohup instead.
+2. Start the bot with `./start.sh`
 
 ### Using systemd
 
@@ -219,7 +212,7 @@ If `successful` is false, any or all of the fields of `file` might be absent. Ho
 
 ## Updating
 
-Run `git pull`, then run `tsc`. After compilation has finished, you can start the bot as described in [the above section](#Starting-after-installation).
+Run `git pull`, then run `tsc`. After compilation has finished, you can start the bot as described in [the above section](#Starting-after-installation) or run `./start.sh`.
 
 ## Common issues
 
