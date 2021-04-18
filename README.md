@@ -84,7 +84,7 @@ Aria-telegram-mirror-bot is now written in TypeScript. If you are migrating from
 2. Clone the repo:
 
    ```bash
-   git clone https://github.com/out386/aria-telegram-mirror-bot
+   git clone https://github.com/arghyac35/aria-telegram-mirror-bot
    cd aria-telegram-mirror-bot
    ```
 
@@ -121,7 +121,7 @@ Aria-telegram-mirror-bot is now written in TypeScript. If you are migrating from
 
 9. Start the bot with `./start.sh`
 
-10. Open Telegram, and send `/mirror https://raw.githubusercontent.com/out386/aria-telegram-mirror-bot/master/README.md` to the bot.
+10. Open Telegram, and send `/mirror https://raw.githubusercontent.com/arghyac35/aria-telegram-mirror-bot/master/README.md` to the bot.
 
 11. In the terminal, it'll ask you to visit an authentication URL. Visit it, grant access, copy the code on that page, and paste it in the terminal.
 
