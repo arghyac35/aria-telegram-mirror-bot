@@ -19,7 +19,7 @@
     "@types/get-folder-size": "^2.0.0",
     "@types/mime-types": "^2.1.0",
     "@types/node": "^14.14.25",
-    "@types/node-telegram-bot-api": "^0.51.0",
+    "@types/node-telegram-bot-api": "^0.51.1",
     "@types/shell-quote": "^1.7.0",
     "@types/tar": "^4.0.4",
     "@types/uuid": "^8.3.0",
