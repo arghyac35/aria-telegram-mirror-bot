@@ -7,7 +7,7 @@ Restart=on-abort
 Type=simple
 User=bots
 WorkingDirectory=/home/bots/aria-telegram-mirror-bot
-ExecStartPre=/usr/bin/env bash aria.sh
+ExecStartPre=/usr/bin/env bash start.sh
 ExecStart=/usr/bin/npm start
 ExecReload=/bin/kill -USR1 $MAINPID
 

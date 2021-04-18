@@ -1,5 +1,4 @@
 src/.constants.js
-aria*.sh
 node_modules/
 downloads/
 client_secret.json
@@ -12,3 +11,4 @@ lsar
 unar
 __MACOSX/
 authorizedChats.json
+.DS_Store
