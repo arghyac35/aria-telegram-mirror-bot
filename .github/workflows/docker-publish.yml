@@ -5,6 +5,7 @@ on:
     # Publish `master` as Docker `latest` image.
     branches:
       - master
+      - dev
 
     # Publish `v1.2.3` tags as releases.
     tags:
@@ -34,12 +35,11 @@ jobs:
 
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
 
-          [ "$VERSION" == "main" ] && VERSION=latest
-
           echo VERSION=$VERSION
           echo "Building"
           docker build . -f docker-publish/Dockerfile -t ${{ env.IMAGE }}:$VERSION
+          [ "$VERSION" == "master" ] && docker tag ${{ env.IMAGE }}:$VERSION ${{ env.IMAGE }}:latest
 
           echo "Pushing"
 
-          docker push ${{ env.IMAGE }}:$VERSION
+          docker push --all-tags ${{ env.IMAGE }}
