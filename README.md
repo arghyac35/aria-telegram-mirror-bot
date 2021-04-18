@@ -119,11 +119,13 @@ Aria-telegram-mirror-bot is now written in TypeScript. If you are migrating from
    * Search for Drive.
    * Make sure that it's enabled. Enable it if not.
 
-9. Start the bot with `./start.sh`
+9. Start aria2 with `./start.sh`
 
-10. Open Telegram, and send `/mirror https://raw.githubusercontent.com/arghyac35/aria-telegram-mirror-bot/master/README.md` to the bot.
+10. Start the bot with `npm start`
 
-11. In the terminal, it'll ask you to visit an authentication URL. Visit it, grant access, copy the code on that page, and paste it in the terminal.
+11. Open Telegram, and send `/mirror https://raw.githubusercontent.com/arghyac35/aria-telegram-mirror-bot/master/README.md` to the bot.
+
+12. In the terminal, it'll ask you to visit an authentication URL. Visit it, grant access, copy the code on that page, and paste it in the terminal.
 
 That's it.
 
@@ -173,7 +175,8 @@ After the initial installation, use these instructions to (re)start the bot.
 ### Using tmux
 
 1. Start a new tmux session with `tmux new -s tgbot`, or connect to an existing session with `tmux a -t tgbot`. Running the bot inside tmux will let you disconnect from the server without terminating the bot. You can also use nohup instead.
-2. Start the bot with `./start.sh`
+2. Start aria2 by running `./start.sh`
+3. Start the bot with `npm start`
 
 ### Using systemd
 
@@ -212,7 +215,7 @@ If `successful` is false, any or all of the fields of `file` might be absent. Ho
 
 ## Updating
 
-Run `git pull`, then run `tsc`. After compilation has finished, you can start the bot as described in [the above section](#Starting-after-installation) or run `./start.sh`.
+Run `git pull`, then run `tsc`. After compilation has finished, you can start the bot as described in [the above section](#Starting-after-installation).
 
 ## Common issues
 
