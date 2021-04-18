@@ -42,4 +42,8 @@ test -f $(pwd)/aria.conf-e && rm $(pwd)/aria.conf-e
 
 aria2c --conf-path=aria.conf
 echo "Aria2c daemon started"
-npm start
+
+# Only start the bot if deployed to heroku, as in local the start command might be different for development
+if [[ -n $DYNO ]]; then
+	npm start
+fi
