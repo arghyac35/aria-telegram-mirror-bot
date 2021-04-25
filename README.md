@@ -161,6 +161,7 @@ This is a description of the fields in src/.constants.js:
    * TODO: Add script and instructions to generate SAs, for now follow: https://github.com/lzzy12/python-aria-mirror-bot#generating-service-accounts
 * `INDEX_DOMAIN`: Link for gdindex
 * `TELEGRAPH_TOKEN`: Telegraph token, if you want to show search results in telegra.ph else keep it blank. See [below](#Generating-Telegra.ph-token) for how to generate telegra.ph token.
+* `STOP_DUPLICATE_MIRRORS`: Set it to true for stopping duplicate mirrors.
 
 ## Generating Telegra.ph token
 

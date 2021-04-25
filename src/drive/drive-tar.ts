@@ -14,6 +14,7 @@ import { v4 as uuidv4 } from 'uuid';
 const perf = require('execution-time')();
 import path from 'path';
 import gdUtils = require('./gd-utils');
+import { isDuplicateMirror } from './drive-list';
 
 const FOLDER_TYPE = 'application/vnd.google-apps.folder'
 const PARALLEL_LIMIT = 10 // The number of parallel network requests can be adjusted according to the network environment
@@ -32,6 +33,7 @@ export async function driveDownloadAndTar(fileId: string, bot: TelegramBot, tarr
         isDownloadAllowed: 1,
         isDownloading: true,
         isUploading: true,
+        isDuplicateMirror: 0,
         uploadedBytes: 0,
         uploadedBytesLast: 0,
         startTime: 0,
@@ -51,11 +53,19 @@ export async function driveDownloadAndTar(fileId: string, bot: TelegramBot, tarr
             await drive.files.get({ fileId: fileId, fields: 'id, name, mimeType, size', supportsAllDrives: true }).then(async meta => {
                 // check if its folder or not
                 if (meta.data.mimeType === FOLDER_TYPE) {
+                    let originalFileName = meta.data.name;
+
+                    // Check for duplicate mirror starts
+                    const duplicate = await isDuplicateMirror(originalFileName + '.tar');
+                    if (duplicate) {
+                        return resolve(`File(s) to be cloned already exists:\n\n${duplicate}`);
+                    }
+                    // Check for duplicate mirror ends
+
                     message += meta.data.name + `</code>`;
                     msgTools.editMessage(bot, tarringMsg, message);
                     var dlDir = uuidv4();
                     let folderPath = `${constants.ARIA_DOWNLOAD_LOCATION}/${dlDir}/${meta.data.name}/`;
-                    let originalFileName = meta.data.name;
 
                     let res = await downloadAllFiles(meta.data, drive, folderPath, bot, tarringMsg, message);
                     if (res.message && res.message.includes('found')) {

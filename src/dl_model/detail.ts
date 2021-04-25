@@ -10,6 +10,7 @@ export class DlVars {
   gid: string;
   extractedFileName: string;
   extractedFileSize: string;
+  isDuplicateMirror: number | string;
   readonly tgFromId: number;
   readonly tgUsername: string;
   readonly tgRepliedUsername: string;
