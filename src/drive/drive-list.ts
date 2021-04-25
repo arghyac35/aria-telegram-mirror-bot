@@ -53,8 +53,10 @@ async function driveListFiles(drive: drive_v3.Drive, searchQuery: string, pageSi
       q: searchQuery,
       orderBy: 'modifiedTime desc',
       fields: 'files(id, name, mimeType, size)',
-      pageSize: pageSize || 20
-    }
+      pageSize: pageSize || 20,
+      corpora: 'allDrives'
+    };
+
     drive.files.list(
       qs
       , function (err: Error, res: any) {
