@@ -28,5 +28,6 @@ module.exports = Object.freeze({
   IS_TEAM_DRIVE: false,
   USE_SERVICE_ACCOUNT: false,
   INDEX_DOMAIN: "",
-  TELEGRAPH_TOKEN: '' // Telegraph token, if you want to show search results in telegra.ph else keep it blank
+  TELEGRAPH_TOKEN: '', // Telegraph token, if you want to show search results in telegra.ph else keep it blank,
+  STOP_DUPLICATE_MIRRORS: false // To stop duplicate mirror
 });

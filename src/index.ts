@@ -674,7 +674,7 @@ function sendCancelledMessages(): void {
   });
 }
 
-function cancelMirror(dlDetails: details.DlVars, cancelMsg?: TelegramBot.Message): boolean {
+export function cancelMirror(dlDetails: details.DlVars, cancelMsg?: TelegramBot.Message): boolean {
   if (dlDetails.isUploading || dlDetails.isExtracting) {
     if (cancelMsg) {
       msgTools.sendMessage(bot, cancelMsg, 'Upload in progress. Cannot cancel.');
@@ -792,9 +792,10 @@ function updateAllStatus(): void {
       var staleStatusReply = 'ETELEGRAM: 400 Bad Request: message to edit not found';
 
       if (res.singleStatuses) {
-        res.singleStatuses.forEach(status => {
+        res.singleStatuses.forEach(async status => {
           if (status.dlDetails) {
             handleDisallowedFilename(status.dlDetails, status.filename);
+            await driveList.isDuplicateMirror(status.filename, status.dlDetails).catch(console.log);
           }
         });
       }
@@ -880,9 +881,10 @@ function ariaOnDownloadStart(gid: string, retry: number): void {
     console.log(`${gid}: Started. Dir: ${dlDetails.downloadDir}.`);
     updateAllStatus();
 
-    ariaTools.getStatus(dlDetails, (err, message, filename) => {
+    ariaTools.getStatus(dlDetails, async (err, message, filename) => {
       if (!err) {
         handleDisallowedFilename(dlDetails, filename);
+        await driveList.isDuplicateMirror(filename, dlDetails).catch(console.log);
       }
     });
 
@@ -905,6 +907,8 @@ function ariaOnDownloadStop(gid: string, retry: number): void {
     var message = 'Download stopped.';
     if (dlDetails.isDownloadAllowed === 0) {
       message += ' Blacklisted file name.';
+    } else if (dlDetails.isDuplicateMirror && dlDetails.isDuplicateMirror !== '') {
+      message += ` Duplicate mirror, below matching file(s) found:\n\n${dlDetails.isDuplicateMirror}`;
     }
     cleanupDownload(gid, message);
   } else if (retry <= 8) {
@@ -938,6 +942,14 @@ function ariaOnDownloadComplete(gid: string, retry: number): void {
 
           var filename = filenameUtils.getFileNameFromPath(file, null);
           if (handleDisallowedFilename(dlDetails, filename)) {
+
+            const duplicateMirror = await driveList.isDuplicateMirror(filename, dlDetails).catch(console.log);
+            if (duplicateMirror) {
+              var reason = `Upload failed. Duplicate mirror, below matching file(s) found:\n\n${duplicateMirror}`;
+              console.log(`${gid}: Duplicate mirror. Filename: ${filename}.`);
+              return cleanupDownload(gid, reason);
+            }
+
             let isUnzip = false;
             if (dlDetails.isUnzip) {
               try {

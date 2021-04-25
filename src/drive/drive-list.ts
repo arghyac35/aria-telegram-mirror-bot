@@ -3,7 +3,11 @@ import driveAuth = require('./drive-auth');
 import { drive_v3, google } from 'googleapis';
 import utils = require('./drive-utils');
 import dlUtils = require('../download_tools/utils');
+import details = require('../dl_model/detail');
+import { cancelMirror } from '../index'
+
 const INDEX_DOMAIN = dlUtils.checkTrailingSlash(constants.INDEX_DOMAIN);
+const driveListResults = new Map<string, { fileName: string, result: drive_v3.Schema$File[] }[]>();
 
 /**
  * Searches for a given file on Google Drive. Only search the subfolders and files
@@ -17,9 +21,8 @@ export function listFiles(fileName: string, callback: (err: string, message: str
   // if (fileName === '' || fileName ==='*' || fileName === '%') return;
   let parent_dir_id: string | string[];
   parent_dir_id = constants.GDRIVE_PARENT_DIR_ID;
-  if (fileName !== '*') {
-    constants.OTHER_GDRIVE_DIR_IDS.push(constants.GDRIVE_PARENT_DIR_ID);
-    parent_dir_id = constants.OTHER_GDRIVE_DIR_IDS;
+  if (fileName !== '*' && constants.OTHER_GDRIVE_DIR_IDS.length > 0) {
+    parent_dir_id = [...constants.OTHER_GDRIVE_DIR_IDS, constants.GDRIVE_PARENT_DIR_ID];
   }
   driveAuth.call(async (err, auth) => {
     if (err) {
@@ -45,7 +48,7 @@ export function listFiles(fileName: string, callback: (err: string, message: str
   });
 }
 
-async function driveListFiles(drive: drive_v3.Drive, searchQuery: string, pageSize?: number): Promise<any[]> {
+async function driveListFiles(drive: drive_v3.Drive, searchQuery: string, pageSize?: number): Promise<drive_v3.Schema$File[]> {
   return new Promise<any[]>((resolve, reject) => {
     const qs: any = {
       includeItemsFromAllDrives: true,
@@ -71,7 +74,7 @@ async function driveListFiles(drive: drive_v3.Drive, searchQuery: string, pageSi
   });
 }
 
-function generateSearchQuery(fileName: string, parent: string | string[]): string {
+function generateSearchQuery(fileName: string, parent: string | string[], duplicateMirror = false): string {
   if (Array.isArray(parent)) {
     var q: string;
     q = '(';
@@ -88,7 +91,7 @@ function generateSearchQuery(fileName: string, parent: string | string[]): strin
   }
   if (fileName.indexOf(' ') > -1) {
     for (var i = 0; i < 4; i++) {
-      q += 'name contains \'' + fileName + '\' ';
+      q += duplicateMirror ? 'name = \'' + fileName + '\' ' : 'name contains \'' + fileName + '\' ';
       switch (i) {
         case 0:
           fileName = fileName.replace(/ /g, '.');
@@ -105,7 +108,7 @@ function generateSearchQuery(fileName: string, parent: string | string[]): strin
       }
     }
   } else {
-    q += 'name contains \'' + fileName + '\'';
+    q += duplicateMirror ? 'name = \'' + fileName + '\'' : 'name contains \'' + fileName + '\'';
   }
   q += ') and trashed = false';
   return q;
@@ -225,4 +228,65 @@ function generateTelegraphContent(files: any[], fileName: string): any[] {
   }
 
   return telegraphContent;
+}
+
+export async function isDuplicateMirror(fileName: string, dlDetails?: details.DlVars): Promise<boolean | string> {
+  try {
+
+    const getFiles = async (saveInMap = true) => {
+      const drive = google.drive({ version: 'v3', auth: await driveAuth.callAsync() });
+
+      let parent_dir_id: string | string[];
+      parent_dir_id = constants.GDRIVE_PARENT_DIR_ID;
+      if (fileName !== '*' && constants.OTHER_GDRIVE_DIR_IDS.length > 0) {
+        parent_dir_id = [...constants.OTHER_GDRIVE_DIR_IDS, constants.GDRIVE_PARENT_DIR_ID];
+      }
+
+      const searchquery = generateSearchQuery(fileName.replace(/'/g, "\\'"), parent_dir_id, true);
+
+      console.log('handleDuplicateMirror searchquery-->', searchquery);
+      files = await driveListFiles(drive, searchquery);
+      saveInMap && dlDetails && driveListResults.set(dlDetails.gid, [{ fileName, result: files }]);
+    }
+
+    if (!constants.STOP_DUPLICATE_MIRRORS || !fileName) return false;
+
+    let files: drive_v3.Schema$File[];
+
+    if (dlDetails) {
+      if (dlDetails.isTar) fileName += '.tar';
+      if (dlDetails.isUnzip) {
+        fileName = fileName.substring(0, fileName.lastIndexOf('.'));
+      }
+      if (dlDetails.isDuplicateMirror && dlDetails.isDuplicateMirror !== '') return dlDetails.isDuplicateMirror.toString();
+
+      // this small logic here prevents spamming the drive list api call at every updates, it only calls drive api for once every filename change against a gid
+      if (driveListResults.has(dlDetails.gid)) {
+        const filearr = driveListResults.get(dlDetails.gid).filter(obj => obj.fileName === fileName);
+        if (filearr.length > 0) {
+          files = filearr[0].result;
+        } else {
+          await getFiles(false)
+          driveListResults.get(dlDetails.gid).push({ fileName, result: files });
+        }
+      } else await getFiles();
+    } else await getFiles();
+
+    if (files && files.length > 0) {
+      getMultipleFileLinks(files);
+      const msg = generateFilesListMessage(files, fileName);
+      if (dlDetails) {
+        dlDetails.isDuplicateMirror = msg;
+        if (!dlDetails.isUploading || !dlDetails.isExtracting) {
+          cancelMirror(dlDetails);
+        }
+      }
+      return msg;
+    }
+
+    return false;
+
+  } catch (error) {
+    throw new Error(error);
+  }
 }

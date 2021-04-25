@@ -7,6 +7,7 @@ import msgTools = require('../bot_utils/msg-tools');
 import http = require('http');
 import dlUtils = require('../download_tools/utils');
 import { real_copy, copy_file } from './gd-utils';
+import { isDuplicateMirror } from './drive-list';
 
 
 export async function driveClone(fileId: string, bot: TelegramBot, cloneMsg: TelegramBot.Message) {
@@ -15,6 +16,14 @@ export async function driveClone(fileId: string, bot: TelegramBot, cloneMsg: Tel
             let message = `Cloning: <code>`;
             const drive = google.drive({ version: 'v3', auth });
             await drive.files.get({ fileId: fileId, fields: 'id, name, mimeType, size', supportsAllDrives: true }).then(async (meta) => {
+
+                // Check for duplicate mirror starts
+                const duplicate = await isDuplicateMirror(meta.data.name);
+                if (duplicate) {
+                    return resolve(`File(s) to be cloned already exists:\n\n${duplicate}`);
+                }
+                // Check for duplicate mirror ends
+
                 message += meta.data.name + `</code>`;
                 msgTools.editMessage(bot, cloneMsg, message);
                 // Check for folders

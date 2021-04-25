@@ -25,6 +25,7 @@ const dlDetails: DlVars = {
     isDownloading: true,
     isUploading: true,
     uploadedBytes: 0,
+    isDuplicateMirror: 0,
     uploadedBytesLast: 0,
     startTime: 0,
     lastUploadCheckTimestamp: 0,
