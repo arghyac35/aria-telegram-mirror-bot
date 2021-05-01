@@ -1,6 +1,20 @@
-#Base Image
-FROM ghcr.io/arghyac35/aria-telegram-mirror-bot:master
+#NodeJS Alpine Build
+FROM node:alpine3.10
 
-WORKDIR /bot/
+#Installation of dependencies
+RUN apk add --no-cache --update \
+    ca-certificates \
+    git \
+    bash \
+    aria2 \
+    curl
 
-CMD ["bash", "start.sh"]
+RUN npm i -g typescript
+
+RUN mkdir /bot
+RUN chmod 777 /bot
+WORKDIR /bot
+
+ADD bot.tar /bot/
+
+CMD ["bash","start.sh"]
