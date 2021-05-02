@@ -224,7 +224,7 @@ function driveUploadFile(dlDetails: DlVars, filePath: string, fileName: string, 
 }
 
 export function stopDownload(gid: string, callback: () => void): void {
-  aria2.call('remove', gid).then(callback);
+  aria2.call('remove', gid).then(callback).catch(console.error);
 }
 
 export function addUri(uri: string, dlDir: string, callback: (err: any, gid: string) => void): void {
