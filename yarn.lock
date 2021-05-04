@@ -1364,13 +1364,12 @@ gcp-metadata@^4.2.0:
     gaxios "^4.0.0"
     json-bigint "^1.0.0"
 
-get-folder-size@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/get-folder-size/-/get-folder-size-2.0.1.tgz#3fe0524dd3bad05257ef1311331417bcd020a497"
-  integrity sha512-+CEb+GDCM7tkOS2wdMKTn9vU7DgnKUTuDlehkNJKNSovdCOVxs14OfKCk4cvSaR3za4gj+OBdl9opPN9xrJ0zA==
+get-folder-size@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/get-folder-size/-/get-folder-size-3.0.1.tgz#a5319e55f449845ed102e8dbbb16c521d88dd4a0"
+  integrity sha512-fjN/pT9Mnkz6zlfWtIjTqfC5s2q//5VOgPuj7RXg6Ff4+Dc63dq1eeB3Bk1bK3Qc0NC22ZhOKd+WvP5xMDgkXw==
   dependencies:
     gar "^1.0.4"
-    tiny-each-async "2.0.3"
 
 get-stream@^4.1.0:
   version "4.1.0"
@@ -2841,11 +2840,6 @@ through@^2.3.8:
   version "2.3.8"
   resolved "https://registry.yarnpkg.com/through/-/through-2.3.8.tgz#0dd4c9ffaabc357960b1b724115d7e0e86a2e1f5"
   integrity sha1-DdTJ/6q8NXlgsbckEV1+Doai4fU=
-
-tiny-each-async@2.0.3:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/tiny-each-async/-/tiny-each-async-2.0.3.tgz#8ebbbfd6d6295f1370003fbb37162afe5a0a51d1"
-  integrity sha1-jru/1tYpXxNwAD+7NxYq/loKUdE=
 
 tiny_request@latest:
   version "1.0.13"
