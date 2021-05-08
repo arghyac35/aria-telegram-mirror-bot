@@ -2,9 +2,9 @@ name: Docker Base Image Builds
 
 on:
   push:
-    # Publish `master` as Docker `latest` image.
+    # Publish `main` as Docker `latest` image.
     branches:
-      - master
+      - main
       - dev
 
     # Publish `v1.2.3` tags as releases.
@@ -38,7 +38,7 @@ jobs:
           echo VERSION=$VERSION
           echo "Building"
           docker build . -f docker-publish/Dockerfile -t ${{ env.IMAGE }}:$VERSION
-          [ "$VERSION" == "master" ] && docker tag ${{ env.IMAGE }}:$VERSION ${{ env.IMAGE }}:latest
+          [ "$VERSION" == "main" ] && docker tag ${{ env.IMAGE }}:$VERSION ${{ env.IMAGE }}:latest
 
           echo "Pushing"
 
