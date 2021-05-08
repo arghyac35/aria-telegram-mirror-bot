@@ -54,7 +54,7 @@
     "unzipper": "^0.10.10",
     "uuid": "^8.3.2",
     "wget-improved": "^3.2.0",
-    "ytdl-core": "^4.5.0"
+    "ytdl-core": "^4.7.0"
   },
   "devDependencies": {
     "@types/npmlog": "^4.1.2",
