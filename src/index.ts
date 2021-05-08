@@ -470,11 +470,13 @@ setEventCallback(eventRegex.commandsRegex.ytdl, eventRegex.commandsRegexNoName.y
 
 async function ytdl(msg: TelegramBot.Message, match: RegExpExecArray) {
   try {
-    let ytdlMsg = await bot.sendMessage(msg.chat.id, `Downloading: <code>` + match[4] + `</code>`, {
+    const inputs = match[4].split(/ (.+)/);
+    let ytdlMsg = await bot.sendMessage(msg.chat.id, `Downloading: <code>` + inputs[0] + `</code>`, {
       reply_to_message_id: msg.message_id,
       parse_mode: 'HTML'
     });
-    await ytdlFn.ytdlWrapper(match[4], bot, ytdlMsg, msg).catch(e => {
+    await ytdlFn.ytdlWrapper(inputs[0], bot, ytdlMsg, msg, inputs.length > 1 ? inputs[1] : '').catch(e => {
+      console.error('Error from ytdlwrapper--->', e);
       msgTools.deleteMsg(bot, ytdlMsg);
       msgTools.sendMessage(bot, msg, e.message || e, 10000);
     });
@@ -686,9 +688,9 @@ function handleDisallowedFilename(dlDetails: details.DlVars, filename: string): 
   return true;
 }
 
-function prepDownload(msg: TelegramBot.Message, match: string, isTar: boolean, isUnZip: boolean): void {
+export function prepDownload(msg: TelegramBot.Message, match: string, isTar: boolean, isUnZip: boolean, filename = ''): void {
   var dlDir = uuidv4();
-  ariaTools.addUri(match, dlDir, (err, gid) => {
+  ariaTools.addUri(match, dlDir, filename, (err, gid) => {
     dlManager.addDownload(gid, dlDir, msg, isTar, isUnZip);
     if (err) {
       var message = `Failed to start the download. ${err.message}`;

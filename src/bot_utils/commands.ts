@@ -43,5 +43,5 @@ export const commandsAfter: any = {
     AUTHORIZE:      '$',
     UNAUTHORIZE:    '$',
     RESTART:        '$',
-    YTDL:           '($| (.+))'
+    YTDL:           ' (.+)'
 };

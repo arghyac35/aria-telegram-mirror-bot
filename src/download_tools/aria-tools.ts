@@ -227,8 +227,12 @@ export function stopDownload(gid: string, callback: () => void): void {
   aria2.call('remove', gid).then(callback).catch(console.error);
 }
 
-export function addUri(uri: string, dlDir: string, callback: (err: any, gid: string) => void): void {
-  aria2.call('addUri', [uri], { dir: `${constants.ARIA_DOWNLOAD_LOCATION}/${dlDir}` })
+export function addUri(uri: string, dlDir: string, filename: string, callback: (err: any, gid: string) => void): void {
+  const options: any = { dir: `${constants.ARIA_DOWNLOAD_LOCATION}/${dlDir}` };
+  if (filename) {
+    options.out = filename
+  }
+  aria2.call('addUri', [uri], options)
     .then((gid: string) => {
       callback(null, gid);
     })
