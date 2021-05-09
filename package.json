@@ -16,7 +16,7 @@
     "@types/async": "^3.2.6",
     "@types/extract-zip": "^1.6.2",
     "@types/fs-extra": "^9.0.11",
-    "@types/get-folder-size": "^2.0.0",
+    "@types/get-folder-size": "^3.0.0",
     "@types/mime-types": "^2.1.0",
     "@types/node": "^15.0.2",
     "@types/node-telegram-bot-api": "^0.51.1",
