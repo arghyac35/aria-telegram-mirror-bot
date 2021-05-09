@@ -13,17 +13,7 @@ export function extract(srcPath: string, fileName: string, ext: string, callback
 
     if (ext === 'zip') {
         extractZip(srcPath, { dir: dlDirPath, defaultFileMode: 0o777, defaultDirMode: 0o777 }).then(() => {
-            getSize(dlDirPath, (err, size) => {
-                if (fs.existsSync(dlDirPath + '/' + fileName)) {
-                    dlDirPath = dlDirPath + '/' + fileName;
-                }
-                if (err) {
-                    console.log('Couldn\'t determine file size: ', err.message);
-                    callback(err.message, null, dlDirPath);
-                } else {
-                    callback(null, size, dlDirPath);
-                }
-            });
+            getsizeofFolder(dlDirPath, fileName, callback)
         }).catch(err => callback(err, null, null));
     } else if (ext === 'rar') {
         unpackAll(
@@ -35,17 +25,7 @@ export function extract(srcPath: string, fileName: string, ext: string, callback
                 if (error) callback(error, null, null);
                 if (files) {
                     console.log('files', files);
-                    getSize(dlDirPath, (err, size) => {
-                        if (fs.existsSync(dlDirPath + '/' + fileName)) {
-                            dlDirPath = dlDirPath + '/' + fileName;
-                        }
-                        if (err) {
-                            console.log('Couldn\'t determine file size: ', err.message);
-                            callback(err.message, null, dlDirPath);
-                        } else {
-                            callback(null, size, dlDirPath);
-                        }
-                    });
+                    getsizeofFolder(dlDirPath, fileName, callback)
                 }
                 if (text) console.log('text', text);
             });
@@ -66,18 +46,22 @@ export function extract(srcPath: string, fileName: string, ext: string, callback
         });
 
         extractProcess.on('end', () => {
-            getSize(dlDirPath, (err, size) => {
-                if (fs.existsSync(dlDirPath + '/' + fileName)) {
-                    dlDirPath = dlDirPath + '/' + fileName;
-                }
-                if (err) {
-                    console.log('Couldn\'t determine file size: ', err.message);
-                    callback(err.message, null, dlDirPath);
-                } else {
-                    callback(null, size, dlDirPath);
-                }
-            });
+            getsizeofFolder(dlDirPath, fileName, callback)
         });
     }
+}
+
+function getsizeofFolder(dlDirPath: string, fileName: string, callback: (err: string, size: number, realFilePath: string) => void) {
+    getSize(dlDirPath, (err, size) => {
+        if (fs.existsSync(dlDirPath + '/' + fileName)) {
+            dlDirPath = dlDirPath + '/' + fileName;
+        }
+        if (err) {
+            console.log('Couldn\'t determine file size: ', err.message);
+            callback(err.message, null, dlDirPath);
+        } else {
+            callback(null, size, dlDirPath);
+        }
+    });
 }
 
