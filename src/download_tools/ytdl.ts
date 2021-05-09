@@ -11,6 +11,7 @@ import { DlVars } from '../dl_model/detail';
 import fs from 'fs';
 import downloadUtils = require('../download_tools/utils');
 import { prepDownload } from '../index'
+const fluentffmpeg = require('fluent-ffmpeg');
 
 const dlDetails: DlVars = {
     isTar: false,
@@ -56,14 +57,33 @@ export async function ytdlWrapper(url: string, bot: TelegramBot, tgMsg: Telegram
     if (quality) {
         if (supportedQuality) {
             const options: ytdl.chooseFormatOptions = { quality: supportedQuality.itag };
-            if (supportedQuality.quality === 'audio') {
-                options.filter = 'audioonly';
-            }
+            // if (supportedQuality.quality === 'audio') {
+            //     options.filter = 'audioonly';
+            // }
             const videoformat = ytdl.chooseFormat(info.formats, options);
             if (!videoformat) {
                 throw new Error(`Quality: ${supportedQuality.quality} not found for this video. You may try downloading it without passing any quality, let ytdl choose the best quality.`);
             }
             if (!supportedQuality.onlyvideo) {
+                if (supportedQuality.quality === 'audio') {
+                    const filesavetoinfo = getFileSavetoPath(info, true);
+                    let stream = ytdl.downloadFromInfo(info, {
+                        format: videoformat,
+                    });
+
+                    let start = Date.now();
+                    return fluentffmpeg(stream)
+                        .audioBitrate(320)
+                        .save(filesavetoinfo.realFilePath)
+                        .on('progress', (p: any) => {
+                            readline.cursorTo(process.stdout, 0);
+                            process.stdout.write(`${p.targetSize}kb downloaded`);
+                        })
+                        .on('end', async () => {
+                            console.log(`\ndone, thanks - ${(Date.now() - start) / 1000}s`);
+                            await startUpload(filesavetoinfo.dlDir, filesavetoinfo.realFilePath, info.videoDetails.title + '.mp3', bot, tgMsg, actualMsg, `Downloading: <code>${info.videoDetails.title}</code>`);
+                        });
+                }
                 prepDownload(actualMsg, videoformat.url, false, false, info.videoDetails.title + '.' + videoformat.container);
                 msgTools.deleteMsg(bot, tgMsg);
             } else {
@@ -84,6 +104,14 @@ export async function ytdlWrapper(url: string, bot: TelegramBot, tgMsg: Telegram
 
 }
 
+function getFileSavetoPath(info: ytdl.videoInfo, isAudio = false) {
+    let dlDir = uuidv4();
+    const realFilePath = `${constants.ARIA_DOWNLOAD_LOCATION}/${dlDir}/${info.videoDetails.title}${isAudio ? '.mp3' : '.mkv'}`;
+
+    fs.mkdirSync(`${constants.ARIA_DOWNLOAD_LOCATION}/${dlDir}`, { recursive: true });
+    return { realFilePath, dlDir };
+}
+
 async function downloadSeperateStreamAndMerge(info: ytdl.videoInfo, bot: TelegramBot, tgMsg: TelegramBot.Message, actualMsg: TelegramBot.Message, quality: any = '', audioitag: any = '') {
 
     // Prepare the progress bar
@@ -97,10 +125,7 @@ async function downloadSeperateStreamAndMerge(info: ytdl.videoInfo, bot: Telegra
         merged: { frame: 0, speed: '0x', fps: 0 },
     };
 
-    let dlDir = uuidv4();
-    let realFilePath = `${constants.ARIA_DOWNLOAD_LOCATION}/${dlDir}/${info.videoDetails.title}.mkv`;
-
-    fs.mkdirSync(`${constants.ARIA_DOWNLOAD_LOCATION}/${dlDir}`, { recursive: true });
+    const filesavetoinfo = getFileSavetoPath(info);
 
     // Get audio and video streams
     const audio = ytdl.downloadFromInfo(info, { quality: audioitag ? audioitag : 'highestaudio' })
@@ -127,7 +152,7 @@ async function downloadSeperateStreamAndMerge(info: ytdl.videoInfo, bot: Telegra
         // Keep encoding
         '-c:v', 'copy',
         // Define output file
-        realFilePath,
+        filesavetoinfo.realFilePath,
     ], {
         windowsHide: true,
         stdio: [
@@ -139,7 +164,7 @@ async function downloadSeperateStreamAndMerge(info: ytdl.videoInfo, bot: Telegra
     });
     ffmpegProcess.on('close', async () => {
         console.log('done');
-        await startUpload(dlDir, realFilePath, info.videoDetails.title + '.mkv', bot, tgMsg, actualMsg, `Downloading: <code>${info.videoDetails.title}</code>`);
+        await startUpload(filesavetoinfo.dlDir, filesavetoinfo.realFilePath, info.videoDetails.title + '.mkv', bot, tgMsg, actualMsg, `Downloading: <code>${info.videoDetails.title}</code>`);
         // Cleanup
         process.stdout.write('\n\n\n\n');
         clearInterval(progressbarHandle);

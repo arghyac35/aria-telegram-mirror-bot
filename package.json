@@ -33,6 +33,7 @@
     "execution-time": "^1.4.1",
     "extract-zip": "^2.0.1",
     "ffmpeg-static": "^4.2.8",
+    "fluent-ffmpeg": "^2.1.2",
     "fs-extra": "^10.0.0",
     "get-folder-size": "^2.0.1",
     "googleapis": "^71.0.0",
