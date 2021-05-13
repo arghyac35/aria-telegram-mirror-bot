@@ -2,8 +2,8 @@
 
 This is a Telegram bot that uses [aria2](https://github.com/aria2/aria2) to download files over BitTorrent / HTTP(S) and uploads them to your Google Drive. This can be useful for downloading from slow servers. Parallel downloading and download queuing are supported. There are some features to try to reduce piracy.
 
-## Support group
-Join https://t.me/aria2tg for any support related to this repo or just post in issues.
+## Support
+Post your ideas or want to discuss about anything in [github discussion](https://github.com/arghyac35/aria-telegram-mirror-bot/discussions)
 ## Limitations
 
 This bot is meant to be used in small, closed groups. So, once deployed, it only works in whitelisted groups.
