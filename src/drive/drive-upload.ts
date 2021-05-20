@@ -90,13 +90,13 @@ async function createPermissions(drive: drive_v3.Drive, fileId: string): Promise
     }
     return Promise.all(req);
   } else {
-    return drive.permissions.create({
-      fileId: fileId,
-      supportsAllDrives: true,
-      requestBody: {
-        role: 'reader',
-        type: 'anyone'
-      }
-    });
+    // return drive.permissions.create({
+    //   fileId: fileId,
+    //   supportsAllDrives: true,
+    //   requestBody: {
+    //     role: 'reader',
+    //     type: 'anyone'
+    //   }
+    // });
   }
 }
