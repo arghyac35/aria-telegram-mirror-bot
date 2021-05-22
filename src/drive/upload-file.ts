@@ -125,9 +125,9 @@ export function uploadGoogleDriveFile(dlDetails: DlVars, parent: string, file: {
 
             // Check if SA limit exceeded then switch SA
             if (response.body && response.body.error && response.body.error.errors && response.body.error.errors.length > 0 && (response.body.error.errors[0].reason === 'userRateLimitExceeded' || response.body.error.errors[0].reason === 'dailyLimitExceeded') && constants.USE_SERVICE_ACCOUNT && driveAuth.SERVICE_ACCOUNT_INDEX !== driveAuth.service_account_count - 1) {
-              console.log('Got error: ', response.body.error.reason, ' while uploading trying again..');
+              console.log('Got error: ', response.body.error.message, ' while uploading trying again..');
               driveAuth.switchServiceAccount();
-              return await uploadGoogleDriveFile(dlDetails, parent, file);
+              await uploadGoogleDriveFile(dlDetails, parent, file).then(resolve).catch(reject);
             }
             if (driveAuth.SERVICE_ACCOUNT_INDEX === driveAuth.service_account_count - 1) {
               driveAuth.SERVICE_ACCOUNT_INDEX = 0;
