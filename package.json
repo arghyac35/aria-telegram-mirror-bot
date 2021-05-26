@@ -29,7 +29,7 @@
     "check-disk-space": "^2.1.0",
     "chmodr": "^1.2.0",
     "cli-table3": "^0.6.0",
-    "dayjs": "^1.10.3",
+    "dayjs": "^1.10.5",
     "execution-time": "^1.4.1",
     "extract-zip": "^2.0.1",
     "ffmpeg-static": "^4.2.8",
