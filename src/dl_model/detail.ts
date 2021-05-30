@@ -23,7 +23,7 @@ export class DlVars {
    */
   readonly downloadDir: string;
 
-  constructor(gid: string, msg: TelegramBot.Message, readonly isTar: boolean, readonly isUnzip: boolean, downloadDir: string) {
+  constructor(gid: string, msg: TelegramBot.Message, readonly cmdString: string, readonly isTar: boolean, readonly isUnzip: boolean, downloadDir: string) {
     this.tgUsername = getUsername(msg);
     if (msg.reply_to_message) {
       this.tgRepliedUsername = getUsername(msg.reply_to_message);
@@ -40,6 +40,7 @@ export class DlVars {
     this.extractedFileName = '';
     this.extractedFileSize = '';
     this.isExtracting = false;
+    this.cmdString = cmdString;
   }
 }
 
