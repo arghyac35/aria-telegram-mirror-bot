@@ -1,16 +1,41 @@
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+
+
+
+
+
+
+
+
+[contributors-shield]: https://img.shields.io/github/contributors/arghyac35/aria-telegram-mirror-bot.svg?style=for-the-badge
+[contributors-url]: https://github.com/arghyac35/aria-telegram-mirror-bot/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/arghyac35/aria-telegram-mirror-bot.svg?style=for-the-badge
+[forks-url]: https://github.com/arghyac35/aria-telegram-mirror-bot/network/members
+[stars-shield]: https://img.shields.io/github/stars/arghyac35/aria-telegram-mirror-bot?style=for-the-badge
+[stars-url]: https://github.com/arghyac35/aria-telegram-mirror-bot/stargazers
+[issues-shield]: https://img.shields.io/github/issues/arghyac35/aria-telegram-mirror-bot.svg?style=for-the-badge
+[issues-url]: https://github.com/arghyac35/aria-telegram-mirror-bot/issues
+[product-screenshot]: images/screenshot.png
+
 # aria-telegram-mirror-bot
 
 This is a Telegram bot that uses [aria2](https://github.com/aria2/aria2) to download files over BitTorrent / HTTP(S) and uploads them to your Google Drive. This can be useful for downloading from slow servers. Parallel downloading and download queuing are supported. There are some features to try to reduce piracy.
 
 ## Support
-Post your ideas or want to discuss about anything in [github discussion](https://github.com/arghyac35/aria-telegram-mirror-bot/discussions)
+Post your ideas or want to discuss about anything in github discussion
+<p><a href="https://github.com/arghyac35/aria-telegram-mirror-bot/discussions"> <img src="https://img.shields.io/badge/discussion-gray?style=for-the-badge&logo=github" width="150""/></a></p>
+      
 ## Limitations
 
 This bot is meant to be used in small, closed groups. So, once deployed, it only works in whitelisted groups.
 
 ## Heroku
 
-Follow the heroku [guide](heroku_guide.md) for deployment in heroku
+Follow the heroku guide for deployment in heroku
+<p><a href="https://github.com/arghyac35/aria-telegram-mirror-bot/blob/main/heroku_guide.md"> <img src="https://img.shields.io/badge/Heroku%20guide-blueviolet?style=for-the-badge&logo=heroku" width="150""/></a></p>
 
 ## Warning
 
