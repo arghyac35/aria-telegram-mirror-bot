@@ -6,13 +6,14 @@ WORKDIR /bot/
 RUN chmod 777 /bot
 #Installation of dependencies
 RUN apk add --no-cache --update \
-      ca-certificates \
-      git \
-      bash \
-      aria2 \
-      wget \
-      unzip \
-      curl
+    ca-certificates \
+    git \
+    bash \
+    aria2 \
+    wget \
+    unzip \
+    curl \
+    unrar
 # Copy all files from BuildDir to Workdir
 COPY . .
 #Building and Installation
