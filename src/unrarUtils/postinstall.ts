@@ -1,24 +1,20 @@
-/* Copyright 2020 Marc Kronberg
-
- This code is copied from https://github.com/krocon/node-unpack-all and modified by me. I hereby take no credit of the followong other than modifications. See https://github.com/krocon/node-unpack-all/blob/master/index.mjs for original author. */
-
 'use strict';
 
 import fs from 'fs';
 import path from 'path';
 import wget from 'wget-improved';
-const unzip = require('unzipper');
 const getInstallCmd = require('system-install');
 import child_process from 'child_process';
+import { inlyExtract } from '../drive/extract'
 
 const exec = child_process.exec;
-const unarAppfile = (process.platform === "darwin") ? 'unarMac.zip' : 'unarWindows.zip';
-const unarAppurl = 'https://cdn.theunarchiver.com/downloads/';
+const unrarAppfile = 'unrar_MacOSX_10.13.2_64bit.gz';
+const unrarAppurl = 'https://www.rarlab.com/rar/';
+
 
 const cwd = path.resolve('./');
-const url = unarAppurl + unarAppfile;
-const source = path.join(cwd, unarAppfile);
-const windows = (process.platform === "win32") || (process.platform === "darwin");
+const url = unrarAppurl + unrarAppfile;
+const source = path.join(cwd, unrarAppfile);
 
 function getExtractUnar(urlsource: string, filesource: string, destination: string) {
     console.log('Downloading ' + urlsource + ' ...');
@@ -33,40 +29,44 @@ function getExtractUnar(urlsource: string, filesource: string, destination: stri
         download.on('end', output => {
             console.info('download finsihed.');
 
-            const unzipfile = unzip.Extract({ path: destination });
-            unzipfile.on('error', reject);
-            unzipfile.on('close', resolve);
-            fs.createReadStream(filesource).pipe(unzipfile);
+            inlyExtract(filesource, destination, (err) => {
+                if (err) {
+                    console.log('Error while extracting-->', err);
+                    return reject(err);
+                }
+                const period = unrarAppfile.lastIndexOf('.');
+                let fileNameWithoutExt = unrarAppfile.substring(0, period);
+                fs.rename(fileNameWithoutExt, 'unrar', () => {
+                    resolve('');
+                })
+            })
         });
     });
 }
 
 export function postinstall() {
-    if (windows) {
+    if (process.platform === "darwin") {
         getExtractUnar(url, source, cwd)
             .then(function () {
                 fs.unlink(source, (err) => {
                     if (err) console.error(err);
                 });
-                if (process.platform !== "win32") {
-                    const chmod = ['unar', 'lsar'];
-                    chmod.forEach(s => {
-                        fs.chmodSync(path.join(cwd, s), 755)
-                    });
-                }
-                console.info('Unar installed successful');
+                fs.chmodSync(path.join(cwd, 'unrar'), 755)
+                console.info('Unrar installed successful');
             })
             .catch(console.error);
 
-    } else {
+    } else if (process.platform === "linux") {
         const cmd = getInstallCmd('unrar');
         exec(cmd, (err, stdout, stderr) => {
             if (err) {
                 console.log(err.message);
             } else {
-                console.info('Unar installed successful');
+                console.info('Unrar installed successful');
             }
         });
+    } else {
+        console.log('Rar is not supported in this environment');
     }
 }
 
