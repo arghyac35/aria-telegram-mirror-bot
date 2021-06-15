@@ -4,7 +4,7 @@ import getSize from 'get-folder-size';
 import extractZip from 'extract-zip';
 import { unpackAll } from '../unpackAll/index';
 
-export function extract(srcPath: string, fileName: string, ext: string, callback: (err: string, size: number, realFilePath: string) => void): void {
+export function extract(srcPath: string, fileName: string, ext: string, password: string, callback: (err: string, size: number, realFilePath: string) => void): void {
     var dlDirPath = srcPath.substring(0, srcPath.lastIndexOf('.'));
 
     if (!fs.existsSync(dlDirPath)) {
@@ -19,7 +19,8 @@ export function extract(srcPath: string, fileName: string, ext: string, callback
         unpackAll(
             srcPath,
             {
-                targetDir: dlDirPath
+                targetDir: dlDirPath,
+                password: password
             },
             (error: any, files: any, text: any) => {
                 if (error) callback(error, null, null);

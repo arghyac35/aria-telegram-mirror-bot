@@ -59,7 +59,7 @@ export function postinstall() {
             .catch(console.error);
 
     } else {
-        const cmd = getInstallCmd('unar');
+        const cmd = getInstallCmd('unrar');
         exec(cmd, (err, stdout, stderr) => {
             if (err) {
                 console.log(err.message);
