@@ -658,10 +658,10 @@ chalk@^4.0.0:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
 
-check-disk-space@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.npmjs.org/check-disk-space/-/check-disk-space-2.1.0.tgz"
-  integrity sha512-f0nx9oJF/AVF8nhSYlF1EBvMNnO+CXyLwKhPvN1943iOMI9TWhQigLZm80jAf0wzQhwKkzA8XXjyvuVUeGGcVQ==
+check-disk-space@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/check-disk-space/-/check-disk-space-3.0.1.tgz#c3798f3e4ec56dcc4d4b98dac0b770e2634efad7"
+  integrity sha512-wRG5ZihEZUXAKVCio5YkLgrHsHDrD+GjRBjxJvoJvN9wrze7EdvYGnOYJSsCyZ4b40jBa3lDmWDmESY9QDQGcg==
 
 chmodr@^1.2.0:
   version "1.2.0"
