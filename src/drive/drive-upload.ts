@@ -49,7 +49,7 @@ function createFolderOrEmpty(drive: drive_v3.Drive, filePath: string, parent: st
     });
 }
 
-export function getSharableLink(fileId: string, isFolder: boolean, 
+export function getSharableLink(fileId: string, isFolder: boolean,
   callback: (err: string, url: string, isFolder: boolean, fileId: string) => void): void {
 
   if (!constants.IS_TEAM_DRIVE || (constants.IS_TEAM_DRIVE && !isFolder)) {
@@ -59,6 +59,7 @@ export function getSharableLink(fileId: string, isFolder: boolean,
         return;
       }
       const drive = google.drive({ version: 'v3', auth });
+      console.log('Creating file permissions');
       createPermissions(drive, fileId)
         .then(() => {
           callback(null, utils.getFileLink(fileId, isFolder), isFolder, fileId);
@@ -90,13 +91,23 @@ async function createPermissions(drive: drive_v3.Drive, fileId: string): Promise
     }
     return Promise.all(req);
   } else {
-    return drive.permissions.create({
-      fileId: fileId,
-      supportsAllDrives: true,
-      requestBody: {
-        role: 'reader',
-        type: 'anyone'
-      }
-    });
+    // donot stop user if error occurs here, as the file is already uploaded to drive
+    if (!constants.USE_SERVICE_ACCOUNT) {
+      drive.permissions.create({
+        fileId: fileId,
+        supportsAllDrives: true,
+        requestBody: {
+          role: 'reader',
+          type: 'anyone'
+        }
+      }).catch(error => {
+        if (error.errors && error.errors.length > 0) {
+          console.error('Error while creating permissions--->', error.errors);
+          return;
+        }
+        console.error(error);
+      });
+    }
+    return Promise.resolve();
   }
 }
