@@ -690,8 +690,15 @@ function handleDisallowedFilename(dlDetails: details.DlVars, filename: string): 
 
 export function prepDownload(msg: TelegramBot.Message, match: string, isTar: boolean, isUnZip: boolean, filename = ''): void {
   var dlDir = uuidv4();
+  let unzipPassword = '';
+  if (match && isUnZip) {
+    // check for password in case of unzip
+    let tempMatch = match.split(' ').map(str => str.trim());
+    match = tempMatch[0];
+    if (tempMatch.length > 1) unzipPassword = tempMatch[1];
+  }
   ariaTools.addUri(match, dlDir, filename, (err, gid) => {
-    dlManager.addDownload(gid, dlDir, msg, match, isTar, isUnZip);
+    dlManager.addDownload(gid, dlDir, msg, isTar, isUnZip, unzipPassword);
     if (err) {
       var message = `Failed to start the download. ${err.message}`;
       console.error(message);
@@ -917,7 +924,6 @@ function ariaOnDownloadComplete(gid: string, retry: number): void {
                 filename = extractDetails.filename;
                 size = extractDetails.size; //TODO: To check if size is null
               } catch (error) {
-                console.error(error);
                 cleanupDownload(gid, error.message);
                 return;
               }

@@ -49,7 +49,13 @@ export function runUnrar(archiveFile: any, options: any, callback: any) {
     if (!options.quiet) log.info('cmd', cmd);
 
     exec(cmd, (err, stdout, stderr) => {
-        if (err) return callback(err, null);
+        if (err) {
+            console.error(err.message);
+            if (err.message.indexOf('Corrupt file or wrong password') > -1) {
+                err.message = 'RAR: Invalid password or the file is corrupted'
+            }
+            return callback(err.message, null)
+        };
         if (stderr && stderr.length > 0) return callback('Error: ' + stderr, null);
         if (stdout && stdout.length > 0) {
             if (stdout.indexOf('No files to extract') > -1) return callback('Error: No files to extract', null);
