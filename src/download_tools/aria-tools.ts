@@ -263,7 +263,8 @@ export async function extractFile(dlDetails: DlVars, filePath: string, fileSize:
         return new Promise<{ filePath: string, filename: string, size: number }>((resolve, reject) => {
           dlDetails.extractedFileName = fileNameWithoutExt;
           dlDetails.extractedFileSize = downloadUtils.formatSize(fileSize);
-          unzip.extract(realFilePath, fileNameWithoutExt, fileExtension, (unziperr: string, size: number, rfp: string) => {
+          let password = dlDetails.cmdString.split(' ')[1]
+          unzip.extract(realFilePath, fileNameWithoutExt, fileExtension, password, (unziperr: string, size: number, rfp: string) => {
             if (unziperr && !rfp) {
               reject(unziperr);
             } else {
