@@ -7,8 +7,6 @@ npm-debug.log
 out/
 package-lock.json
 accounts/
-lsar
-unar
-__MACOSX/
 authorizedChats.json
 .DS_Store
+unrar
