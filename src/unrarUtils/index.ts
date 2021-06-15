@@ -51,7 +51,7 @@ export function runUnrar(archiveFile: any, options: any, callback: any) {
     exec(cmd, (err, stdout, stderr) => {
         if (err) {
             console.error(err.message);
-            if (err.message.indexOf('Corrupt file or wrong password')) {
+            if (err.message.indexOf('Corrupt file or wrong password') > -1) {
                 err.message = 'RAR: Invalid password or the file is corrupted'
             }
             return callback(err.message, null)
