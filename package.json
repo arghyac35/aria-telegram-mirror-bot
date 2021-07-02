@@ -35,7 +35,7 @@
     "ffmpeg-static": "^4.2.8",
     "fs-extra": "^10.0.0",
     "get-folder-size": "^2.0.1",
-    "googleapis": "^76.0.0",
+    "googleapis": "^80.1.0",
     "gtoken": "^5.1.0",
     "heroku-client": "^3.1.0",
     "http-range-parse": "^1.0.0",
