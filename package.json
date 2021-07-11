@@ -20,7 +20,7 @@
     "@types/mime-types": "^2.1.0",
     "@types/node": "^16.3.1",
     "@types/node-telegram-bot-api": "^0.51.1",
-    "@types/shell-quote": "^1.7.0",
+    "@types/shell-quote": "^1.7.1",
     "@types/tar": "^4.0.5",
     "@types/uuid": "^8.3.1",
     "aria2": "^4.1.2",
