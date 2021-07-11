@@ -150,10 +150,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/node-telegram-bot-api@^0.51.1":
-  version "0.51.1"
-  resolved "https://registry.npmjs.org/@types/node-telegram-bot-api/-/node-telegram-bot-api-0.51.1.tgz"
-  integrity sha512-1gPuW543XUgJBUCsNx6x+iJ3DuHNfU6edtsLu/0J0jCfDvQtA511BmHiODt+qre09AVIUCpd+vaf02/URS3QZQ==
+"@types/node-telegram-bot-api@^0.51.4":
+  version "0.51.4"
+  resolved "https://registry.yarnpkg.com/@types/node-telegram-bot-api/-/node-telegram-bot-api-0.51.4.tgz#9eec24da79ff549cdd29387b67ac4ba5ee4aee62"
+  integrity sha512-l9MTmTxRBbrcnvnYoQpSo17m7qmEUv6ToDGldb2OwROQp5L56D4U2jcBT46hJFhuTQ4AnUxVfabLmWZqtsFHXw==
   dependencies:
     "@types/node" "*"
     "@types/request" "*"
