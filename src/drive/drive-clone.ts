@@ -70,7 +70,7 @@ export async function driveClone(fileId: string, bot: TelegramBot, cloneMsg: Tel
 }
 
 export async function timeout(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise<void>(resolve => setTimeout(resolve, ms));
 }
 
 async function copyFile(file: any, parent: string, drive: drive_v3.Drive): Promise<any> {
