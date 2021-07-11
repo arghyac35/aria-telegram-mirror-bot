@@ -15,7 +15,7 @@
   "dependencies": {
     "@types/async": "^3.2.6",
     "@types/extract-zip": "^2.0.1",
-    "@types/fs-extra": "^9.0.11",
+    "@types/fs-extra": "^9.0.12",
     "@types/get-folder-size": "^2.0.0",
     "@types/mime-types": "^2.1.0",
     "@types/node": "^16.3.1",
