@@ -114,10 +114,12 @@
   dependencies:
     "@types/node" "*"
 
-"@types/get-folder-size@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.npmjs.org/@types/get-folder-size/-/get-folder-size-2.0.0.tgz"
-  integrity sha512-6VKKrDB20E/6ovi2Pfpy9Pcz8Me1ue/tReaZrwrz9mfVdsr6WAMiDZ+F1oAAcss4U5n2k673i1leDIx2aEBDFQ==
+"@types/get-folder-size@^3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@types/get-folder-size/-/get-folder-size-3.0.1.tgz#bedb72ecdaa03a5b5950d2fa5bd8647d565f66de"
+  integrity sha512-TyUyOJjzBYgfVRLusyb7tB7YXv5OgBz98a7gnSQzdaX+bqW1fqvFHRiDKKaFLAtbkYOD21nbZcAFuBxUuknDOQ==
+  dependencies:
+    "@types/node" "*"
 
 "@types/json-schema@^7.0.3":
   version "7.0.3"
@@ -1229,10 +1231,10 @@ fd-slicer@~1.1.0:
   dependencies:
     pend "~1.2.0"
 
-ffmpeg-static@^4.2.8:
-  version "4.3.0"
-  resolved "https://registry.npmjs.org/ffmpeg-static/-/ffmpeg-static-4.3.0.tgz"
-  integrity sha512-w/tXYGlOSeAkPHjypjzylaChLrG5wRzHFyB47KFRDsGyBxUJJWiq9I/39/e6r9Y4aY1gzpejTLg5Aa0aqb0XXA==
+ffmpeg-static@^4.4.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/ffmpeg-static/-/ffmpeg-static-4.4.0.tgz#56f1fbff5dbfd33e368ce309333c8c12ffdafb77"
+  integrity sha512-NIJHVPXlSsIK9pYvsTPh4ZlppauorpPLLeOaIG7VOXWQck4Fx4Qi7Ahe+j8mj8KZXhWwCg3Hx46JdWAIOWLcpg==
   dependencies:
     "@derhuerst/http-basic" "^8.2.0"
     env-paths "^2.2.0"
@@ -1519,10 +1521,10 @@ graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.2.0, graceful-fs@^4.2.2:
   resolved "https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.2.4.tgz"
   integrity sha512-WjKPNJF79dtJAVniUlGGWHYGz2jWxT6VhN/4m1NdkbZ2nOsEF+cI1Edgql5zCRhs/VsQYRvrXctxktVXZUkixw==
 
-gtoken@^5.0.4, gtoken@^5.1.0:
-  version "5.2.1"
-  resolved "https://registry.npmjs.org/gtoken/-/gtoken-5.2.1.tgz"
-  integrity sha512-OY0BfPKe3QnMsY9MzTHTSKn+Vl2l1CcLe6BwDEQj00mbbkl5nyQ/7EUREstg4fQNZ8iYE7br4JJ7TdKeDOPWmw==
+gtoken@^5.0.4, gtoken@^5.3.0:
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/gtoken/-/gtoken-5.3.0.tgz#6536eb2880d9829f0b9d78f756795d4d9064b217"
+  integrity sha512-mCcISYiaRZrJpfqOs0QWa6lfEM/C1V9ASkzFmuz43XBb5s1Vynh+CZy1ECeeJXVGx2PRByjYzb4Y4/zr1byr0w==
   dependencies:
     gaxios "^4.0.0"
     google-p12-pem "^3.0.3"
