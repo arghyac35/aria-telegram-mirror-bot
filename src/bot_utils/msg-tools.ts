@@ -108,7 +108,7 @@ export function sendMessageReplyOriginal(bot: TelegramBot, dlDetails: details.Dl
 }
 
 export function sleep(ms: number): Promise<any> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise<void>(resolve => setTimeout(resolve, ms));
 }
 
 export function isAuthorized(msg: TelegramBot.Message, skipDlOwner?: boolean): number {

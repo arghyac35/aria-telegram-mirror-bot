@@ -31,7 +31,7 @@ const TIMEOUT_BASE = 7000
 // Maximum timeout setting，For example, for a certain request, the first 7s timeout, the second 14s, the third 28s, the fourth 56s, the fifth is not 112s but 60
 const TIMEOUT_MAX = 60000
 
-const sleep = (ms: number) => new Promise((resolve, reject) => setTimeout(resolve, ms));
+const sleep = (ms: number) => new Promise<void>((resolve, reject) => setTimeout(resolve, ms));
 
 const EXCEED_LIMIT = 7;
 const FID_TO_NAME: any = {};
