@@ -43,7 +43,7 @@
     "node-telegram-bot-api": "^0.54.0",
     "nodemon": "^2.0.12",
     "npmlog": "^5.0.0",
-    "p-limit": "^3.1.0",
+    "p-limit": "^4.0.0",
     "request": "^2.88.2",
     "shell-quote": "^1.7.2",
     "system-install": "^1.0.4",
