@@ -4,6 +4,23 @@ import { drive_v3, google } from "googleapis";
 import dlUtils = require("../download_tools/utils");
 import { GaxiosResponse } from "googleapis-common";
 
+// Use encodeURI for indexes like Bhadoo, which have urls ending with 0:/ and use encodeURIComponent for indexes like gdindex
+const wrapUrl = (url: string): string => {
+  if (url) {
+    if (
+      constants.INDEX_DOMAIN.match(/\d:$/) ||
+      constants.INDEX_DOMAIN.match(/\d:\/$/)
+    ) {
+      console.log("using encodeURI");
+      url = encodeURI(url);
+    } else {
+      console.log("using encodeURIComponent");
+      url = encodeURIComponent(url);
+    }
+  }
+  return url;
+};
+
 export async function getGDindexLink(
   fileId: string,
   isGetLink?: boolean
@@ -36,11 +53,11 @@ export async function getGDindexLink(
                   url =
                     dlUtils.checkTrailingSlash(constants.INDEX_DOMAIN) +
                     "GdriveBot/" +
-                    encodeURIComponent(res.data.name);
+                    wrapUrl(res.data.name);
                 } else {
                   url =
                     dlUtils.checkTrailingSlash(constants.INDEX_DOMAIN) +
-                    encodeURIComponent(
+                    wrapUrl(
                       (await getFilePathDrive(res.data.parents, drive)) +
                         res.data.name
                     );
