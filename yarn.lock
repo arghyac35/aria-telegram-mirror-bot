@@ -106,10 +106,10 @@
   resolved "https://registry.yarnpkg.com/@tsconfig/node16/-/node16-1.0.2.tgz#423c77877d0569db20e1fc80885ac4118314010e"
   integrity sha512-eZxlbI8GZscaGS7kkc/trHTT5xgrjH3/1n2JDwusC9iahPKWMRvRjJSAN5mCXviuTGQ/lHnhvv8Q1YTpnfz9gA==
 
-"@types/async@^3.2.7":
-  version "3.2.7"
-  resolved "https://registry.yarnpkg.com/@types/async/-/async-3.2.7.tgz#f784478440d313941e7b12c2e4db53b0ed55637b"
-  integrity sha512-a+MBBfOTs3ShFMlbH9qsRVFkjIUunEtxrBT0gxRx1cntjKRg2WApuGmNYzHkwKaIhMi3SMbKktaD/rLObQMwIw==
+"@types/async@^3.2.11":
+  version "3.2.11"
+  resolved "https://registry.yarnpkg.com/@types/async/-/async-3.2.11.tgz#72a23be0c678cd227f1777b650ecf21f325f1824"
+  integrity sha512-o+JfsXfUk/JAZTJZjZcovBvpEiu9wM1+tH5E9YiQztFyCessks/e3K06OasRlgKpkh698tbx4C982Te5KcQqKA==
 
 "@types/caseless@*":
   version "0.12.2"
