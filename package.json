@@ -42,7 +42,7 @@
     "inly": "^4.0.8",
     "node-telegram-bot-api": "^0.54.0",
     "nodemon": "^2.0.12",
-    "npmlog": "^5.0.0",
+    "npmlog": "^6.0.1",
     "p-limit": "^3.1.0",
     "request": "^2.88.2",
     "shell-quote": "^1.7.2",
