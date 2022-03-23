@@ -1,5 +1,5 @@
 #NodeJS Alpine Build
-FROM node:alpine3.10
+FROM node:alpine3.14
 #Setting Work Directory
 WORKDIR /bot/
 # Setting Up All Permissions to all users to the Workdir
