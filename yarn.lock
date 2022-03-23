@@ -3121,10 +3121,10 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-wget-improved@^3.2.0:
-  version "3.2.1"
-  resolved "https://registry.npmjs.org/wget-improved/-/wget-improved-3.2.1.tgz"
-  integrity sha512-bZmRufYav/OFRdS8LerCbzP3b/L8tjRwqap6NhqcvEAfZrBMFwqjtFzbVk2gutEWdG78WKJgIn9yveI+ENQSlA==
+wget-improved@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/wget-improved/-/wget-improved-3.3.0.tgz#cd169d27bb0cf8efd30e7694f89a11daaddc8816"
+  integrity sha512-HDwfe2Lggi1dvyvpn6uIF5WjBysVFNvroFgz3YJVTJjZosK+DBPClgSyKfe9ctuRr3NWH+gQeiA45fT3X9J/ag==
   dependencies:
     minimist "1.2.5"
     tunnel "0.0.6"
