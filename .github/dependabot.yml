@@ -9,3 +9,4 @@ updates:
   ignore:
   - dependency-name: "p-limit"
   - dependency-name: "@types/fs-extra"
+  - dependency-name: "fs-extra"
