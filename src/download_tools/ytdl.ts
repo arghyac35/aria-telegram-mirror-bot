@@ -49,7 +49,7 @@ export async function ytdlWrapper(url: string, bot: TelegramBot, tgMsg: Telegram
 
     url = url.trim()
     let info = await ytdl.getInfo(url);
-
+    info.videoDetails.title = info.videoDetails.title.replace(/\//g, ''); // Remove all slash (/);
     let message = `Downloading: <code>${info.videoDetails.title}</code>`;
     await msgTools.editMessage(bot, tgMsg, message);
 
