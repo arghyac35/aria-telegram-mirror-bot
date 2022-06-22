@@ -24,7 +24,7 @@
     "@types/tar": "^6.1.1",
     "@types/uuid": "^8.3.4",
     "aria2": "^4.1.2",
-    "async": "^3.2.1",
+    "async": "^3.2.2",
     "axios": "^0.26.1",
     "check-disk-space": "^2.1.0",
     "chmodr": "^1.2.0",
