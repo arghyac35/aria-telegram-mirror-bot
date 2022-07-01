@@ -13,7 +13,7 @@
   "author": "Ritayan Chakraborty",
   "license": "MIT",
   "dependencies": {
-    "@types/async": "^3.2.12",
+    "@types/async": "^3.2.14",
     "@types/extract-zip": "^2.0.1",
     "@types/fs-extra": "^9.0.12",
     "@types/get-folder-size": "^2.0.0",
@@ -24,7 +24,7 @@
     "@types/tar": "^6.1.1",
     "@types/uuid": "^8.3.4",
     "aria2": "^4.1.2",
-    "async": "^3.2.1",
+    "async": "^3.2.4",
     "axios": "^0.26.1",
     "check-disk-space": "^2.1.0",
     "chmodr": "^1.2.0",
