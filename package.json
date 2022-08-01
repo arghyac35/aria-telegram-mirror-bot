@@ -21,7 +21,7 @@
     "@types/node": "^17.0.22",
     "@types/node-telegram-bot-api": "^0.56.0",
     "@types/shell-quote": "^1.7.1",
-    "@types/tar": "^6.1.1",
+    "@types/tar": "^6.1.2",
     "@types/uuid": "^8.3.4",
     "aria2": "^4.1.2",
     "async": "^3.2.1",
