@@ -3258,10 +3258,10 @@ yocto-queue@^0.1.0:
   resolved "https://registry.npmjs.org/yocto-queue/-/yocto-queue-0.1.0.tgz"
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
 
-ytdl-core@^4.11.0:
-  version "4.11.0"
-  resolved "https://registry.npmjs.org/ytdl-core/-/ytdl-core-4.11.0.tgz"
-  integrity sha512-Q3hCLiUA9AOGQXzPvno14GN+HgF9wsO1ZBHlj0COTcyxjIyFpWvMfii0UC4/cAbVaIjEdbWB71GdcGuc4J1Lmw==
+ytdl-core@^4.11.1:
+  version "4.11.1"
+  resolved "https://registry.yarnpkg.com/ytdl-core/-/ytdl-core-4.11.1.tgz#f29c688f1217957118790d49599569d1fc26d6db"
+  integrity sha512-0H2hl8kv9JA50qEUewPVpDCloyEVkXZfKJ6o2RNmkngfiY99pGVqE7jQbMT6Rs1QwZpF8GiMB50VWXqivpzlgQ==
   dependencies:
     m3u8stream "^0.8.6"
     miniget "^4.2.2"
