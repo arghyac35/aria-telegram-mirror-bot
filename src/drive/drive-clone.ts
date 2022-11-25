@@ -4,7 +4,7 @@ import { google, drive_v3 } from 'googleapis';
 import gdrive = require('./drive-upload');
 import TelegramBot = require('node-telegram-bot-api');
 import msgTools = require('../bot_utils/msg-tools');
-import http = require('http');
+import https = require('https');
 import dlUtils = require('../download_tools/utils');
 
 export async function driveClone(fileId: string, bot: TelegramBot, cloneMsg: TelegramBot.Message) {
@@ -30,7 +30,7 @@ export async function driveClone(fileId: string, bot: TelegramBot, cloneMsg: Tel
                             }
                             msg = `<a href="` + url + `">` + meta.data.name + `</a> (` + dlUtils.formatSize(folderSize) + `)`;
                             if (constants.INDEX_DOMAIN) {
-                                msg += `\n\n<a href="` + dlUtils.checkTrailingSlash(constants.INDEX_DOMAIN) + encodeURIComponent(meta.data.name) + `/">Index URL</a>`
+                                msg += `\n\n<a href="` + dlUtils.checkTrailingSlash(constants.INDEX_DOMAIN) + encodeURIComponent(meta.data.name) + `/">Index URL</a>`;
                             }
                             notifyExternal(true, cloneMsg.chat.id, { name: meta.data.name, url, size: folderSize });
                             folderSize = 0;
@@ -51,7 +51,7 @@ export async function driveClone(fileId: string, bot: TelegramBot, cloneMsg: Tel
                             }
                             msg = `<a href="` + url + `">` + res.data.name + `</a> (` + dlUtils.formatSize(res.data.size) + `)`;
                             if (constants.INDEX_DOMAIN) {
-                                msg += `\n\n<a href="` + dlUtils.checkTrailingSlash(constants.INDEX_DOMAIN) + `GdriveBot/` + encodeURIComponent(res.data.name) + `">Index URL</a>`
+                                msg += `\n\n<a href="` + dlUtils.checkTrailingSlash(constants.INDEX_DOMAIN) + `GdriveBot/` + encodeURIComponent(res.data.name) + `">Index URL</a>`;
                             }
                             res.data.url = url;
                             notifyExternal(true, cloneMsg.chat.id, res.data);
@@ -113,7 +113,7 @@ async function copyFolder(file: drive_v3.Schema$File, dir_id: string, drive: dri
                 folderSize += parseInt(element.size);
                 drive = d.drive;
             }).catch(err => {
-                console.error('Error copying file: ' + element.name + ' Error for: ' + err.message)
+                console.error('Error copying file: ' + element.name + ' Error for: ' + err.message);
             });
 
         }
@@ -133,7 +133,7 @@ export async function driveListFiles(searchQuery: string, drive: drive_v3.Drive)
                     'files(id,name,mimeType,size,modifiedTime,parents),nextPageToken',
                 pageSize: 1000,
                 pageToken: pagetoken
-            }
+            };
             drive.files.list(
                 qs
                 , function (err: Error, res: any) {
@@ -143,7 +143,7 @@ export async function driveListFiles(searchQuery: string, drive: drive_v3.Drive)
                     resolve(res);
                 });
         });
-    }
+    };
     const files = [];
     let pageToken: string;
 
@@ -190,7 +190,7 @@ function notifyExternal(successful: boolean, originGroup: number, values: any) {
         }
     };
 
-    var req = http.request(options);
+    var req = https.request(options);
     req.on('error', (e) => {
         console.error(`notifyExternal failed: ${e.message}`);
     });

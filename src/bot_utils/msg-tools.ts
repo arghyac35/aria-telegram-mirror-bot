@@ -1,5 +1,5 @@
 import constants = require('../.constants');
-import http = require('http');
+import https = require('https');
 import ariaTools = require('../download_tools/aria-tools');
 import TelegramBot = require('node-telegram-bot-api');
 import details = require('../dl_model/detail');
@@ -195,7 +195,7 @@ export function notifyExternal(dlDetails: details.DlVars, successful: boolean, g
       }
     };
 
-    var req = http.request(options);
+    var req = https.request(options);
     req.on('error', (e) => {
       console.error(`notifyExternal failed: ${e.message}`);
     });
