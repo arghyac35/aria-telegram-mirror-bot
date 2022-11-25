@@ -4,7 +4,7 @@ import { google } from 'googleapis';
 import gdrive = require('./drive-upload');
 import TelegramBot = require('node-telegram-bot-api');
 import msgTools = require('../bot_utils/msg-tools');
-import http = require('http');
+import https = require('https');
 import dlUtils = require('../download_tools/utils');
 import { real_copy, copy_file } from './gd-utils';
 import { isDuplicateMirror } from './drive-list';
@@ -40,7 +40,7 @@ export async function driveClone(fileId: string, bot: TelegramBot, cloneMsg: Tel
                             const total_count = (payload.file_count || 0) + (payload.folder_count || 0);
                             return `✔All folders created\n=====Copying files=====\n\nFile Progress: ${payload.copiedCount}/${payload.file_count === undefined ? 'Unknown' : payload.file_count}\nTotal Percentage: ${((payload.copiedCount + totalfoldercopiedcount) * 100 / total_count).toFixed(2)}%\nTotal Size: ${payload.total_size || 'Unknown'}`;
                         }
-                    }
+                    };
 
                     const message_updater = async (payload: any) => await msgTools.editMessage(bot, cloneMsg, `${message}\n${gen_text(payload)}`).catch(err => console.error(err.message));
 
@@ -53,13 +53,13 @@ export async function driveClone(fileId: string, bot: TelegramBot, cloneMsg: Tel
                             }
                             msg = `<a href="` + url + `">` + meta.data.name + `</a> (` + copiedFolder.folderSize + `)`;
                             if (constants.INDEX_DOMAIN) {
-                                msg += `\n\n<a href="` + dlUtils.checkTrailingSlash(constants.INDEX_DOMAIN) + encodeURIComponent(meta.data.name) + `/">Index URL</a>`
+                                msg += `\n\n<a href="` + dlUtils.checkTrailingSlash(constants.INDEX_DOMAIN) + encodeURIComponent(meta.data.name) + `/">Index URL</a>`;
                             }
                             notifyExternal(true, cloneMsg.chat.id, { name: meta.data.name, url, size: copiedFolder.folderSize });
                             resolve(msg);
                         });
                     } catch (err) {
-                        console.error('Error copying folder', err.message)
+                        console.error('Error copying folder', err.message);
                         reject(err.message);
                     }
                 } else {
@@ -77,7 +77,7 @@ export async function driveClone(fileId: string, bot: TelegramBot, cloneMsg: Tel
                                 }
                                 msg = `<a href="` + url + `">` + new_file.name + `</a> (` + dlUtils.formatSize(new_file.size) + `)`;
                                 if (constants.INDEX_DOMAIN) {
-                                    msg += `\n\n<a href="` + dlUtils.checkTrailingSlash(constants.INDEX_DOMAIN) + encodeURIComponent(new_file.name) + `">Index URL</a>`
+                                    msg += `\n\n<a href="` + dlUtils.checkTrailingSlash(constants.INDEX_DOMAIN) + encodeURIComponent(new_file.name) + `">Index URL</a>`;
                                 }
                                 new_file.url = url;
                                 notifyExternal(true, cloneMsg.chat.id, new_file);
@@ -123,7 +123,7 @@ function notifyExternal(successful: boolean, originGroup: number, values: any) {
         }
     };
 
-    var req = http.request(options);
+    var req = https.request(options);
     req.on('error', (e) => {
         console.error(`notifyExternal failed: ${e.message}`);
     });
