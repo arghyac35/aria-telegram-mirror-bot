@@ -165,7 +165,7 @@ export function generateStatusMessage(totalLength: number, completedLength: numb
   return status;
 }
 
-export function generateStatusMessage2(totalLength: number, completedLength: number, speed: number): { message: string, filesize: string } {
+export function generateStatusMessage2(totalLength: number, completedLength: number, speed: number): { message: string; filesize: string } {
   var progress;
   if (totalLength === 0) {
     progress = 0;
@@ -243,7 +243,7 @@ export function getIdFromUrl(url: string) {
   } else {
     id = parts[5].split("/");
     //Using sort to get the id as it is the longest element. 
-    var sortArr = id.sort((a: any, b: any) => { return b.length - a.length });
+    var sortArr = id.sort((a: any, b: any) => { return b.length - a.length; });
     id = sortArr[0];
     return id;
   }
@@ -251,7 +251,7 @@ export function getIdFromUrl(url: string) {
 
 export function checkTrailingSlash(str: string) {
   if (str) {
-    str += str.endsWith("/") ? "" : "/"
+    str += str.endsWith("/") ? "" : "/";
   }
   return str;
 }
@@ -298,7 +298,7 @@ function cpuAverage() {
 // function to calculate average of array
 const arrAvg = (arr: any[]) => {
   if (arr && arr.length >= 1) {
-    const sumArr = arr.reduce((a, b) => a + b, 0)
+    const sumArr = arr.reduce((a, b) => a + b, 0);
     return sumArr / arr.length;
   }
   return 0;
@@ -336,4 +336,12 @@ export function getCPULoadAVG(avgTime = 1000, delay = 100) {
 
   });
 
+}
+
+export function splitFirstOccurrence(str: string, separator: string) {
+  const [first, ...rest] = str.split(separator);
+
+  const remainder = rest.join(separator);
+
+  return {first, remainder};
 }
