@@ -342,37 +342,50 @@ setEventCallback(eventRegex.commandsRegex.cancelMirror, eventRegex.commandsRegex
 
   if (msg.reply_to_message) {
     dlDetails = dlManager.getDownloadByMsgId(msg.reply_to_message);
-  } else if (match && match.length > 5) {
+    batchCancelMirrorsByGids([dlDetails.gid], msg);
+  }
+  
+  if (match && match.length > 5) {
     gidFromMessage = match[4];
-    dlDetails = dlManager.getDownloadByGid(gidFromMessage.trim());
+    batchCancelMirrorsByGids(match[4].split(' '), msg);
   } else {
     msgTools.sendMessage(bot, msg, `Reply to the command message for the download that you want to cancel or enter valid gid.`);
   }
+});
 
-  if (dlDetails) {
-    if (authorizedCode > -1 && authorizedCode < 3) {
-      cancelMirror(dlDetails, msg);
-    } else if (authorizedCode === 3) {
-      if (msg.from.id === dlDetails.tgFromId) {
+
+function batchCancelMirrorsByGids(gidsFromMessage : String[], msg :TelegramBot.Message) {
+  var dlDetails: details.DlVars;
+  var authorizedCode = msgTools.isAuthorized(msg);
+
+  gidsFromMessage.forEach(gidFromMessage => {
+    dlDetails = dlManager.getDownloadByGid(gidFromMessage.trim());
+    if (dlDetails) {
+      if (authorizedCode > -1 && authorizedCode < 3) {
         cancelMirror(dlDetails, msg);
+      } else if (authorizedCode === 3) {
+        if (msg.from.id === dlDetails.tgFromId) {
+          cancelMirror(dlDetails, msg);
+        } else {
+          msgTools.isAdmin(bot, msg, (e, res) => {
+            console.log('Cta admins-->', res);
+            if (res) {
+              cancelMirror(dlDetails, msg);
+            } else {
+              msgTools.sendMessage(bot, msg, 'You do not have permission to do that.');
+            }
+          });
+        }
       } else {
-        msgTools.isAdmin(bot, msg, (e, res) => {
-          console.log('Cta admins-->', res);
-          if (res) {
-            cancelMirror(dlDetails, msg);
-          } else {
-            msgTools.sendMessage(bot, msg, 'You do not have permission to do that.');
-          }
-        });
+        msgTools.sendUnauthorizedMessage(bot, msg);
       }
     } else {
-      msgTools.sendUnauthorizedMessage(bot, msg);
+      const message = gidFromMessage ? `Invalid GID, no download found with gid: <code>${gidFromMessage}</code>.` : `Reply to the command message for the download that you want to cancel. Also make sure that the download is even active.`;
+      msgTools.sendMessage(bot, msg, message);
     }
-  } else {
-    const message = gidFromMessage ? `Invalid GID, no download found with gid: <code>${gidFromMessage}</code>.` : `Reply to the command message for the download that you want to cancel. Also make sure that the download is even active.`;
-    msgTools.sendMessage(bot, msg, message);
-  }
-});
+  })
+  
+}
 
 setEventCallback(eventRegex.commandsRegex.cancelAll, eventRegex.commandsRegexNoName.cancelAll, (msg) => {
   var authorizedCode = msgTools.isAuthorized(msg, true);
