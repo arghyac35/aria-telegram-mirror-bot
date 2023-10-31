@@ -10,7 +10,7 @@ var dlManager = dlm.DlManager.getInstance();
 export async function deleteMsg(bot: TelegramBot, msg: TelegramBot.Message, delay?: number): Promise<any> {
   if (delay) await sleep(delay);
 
-  bot.deleteMessage(msg.chat.id, msg.message_id.toString())
+  bot.deleteMessage(msg.chat.id, msg.message_id)
     .catch(err => {
       console.log(`Failed to delete message. Does the bot have message delete permissions for this chat? ${err.message}`);
     });
