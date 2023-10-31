@@ -352,7 +352,7 @@ async function ls_folder(fid: string, with_modifiedTime?: boolean) {
     // const headers = await gen_headers(use_sa)
     // For Folders with a large number of subfolders（1ctMwpIaBg8S1lrZDxdynLXJpMsm5guAl），The access_token may have expired before listing
     // Because nextPageToken is needed to get the data of the next page，So you cannot use parallel requests，The test found that each request to obtain 1000 files usually takes more than 20 seconds to complete
-    const gtoken = use_sa && (await get_sa_token()).gtoken
+    const gtoken: any = use_sa && (await get_sa_token()).gtoken
     do {
         if (pageToken) params.pageToken = pageToken
         let url = 'https://www.googleapis.com/drive/v3/files'
