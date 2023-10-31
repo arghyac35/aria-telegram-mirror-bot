@@ -19,15 +19,15 @@ import gdUtils = require('./drive/gd-utils');
 import { readFile, writeFile } from 'fs-extra';
 import ytdlFn = require('./download_tools/ytdl');
 
-const telegraph = require('telegraph-node')
+const telegraph = require('telegraph-node');
 const ph = new telegraph();
 const eventRegex = new EventRegex();
 const bot = new TelegramBot(constants.TOKEN, { polling: true });
 var websocketOpened = false;
 var statusInterval: NodeJS.Timeout;
 var dlManager = dlm.DlManager.getInstance();
-const Heroku = require('heroku-client')
-const heroku = new Heroku({ token: process.env.HEROKU_API_KEY })
+const Heroku = require('heroku-client');
+const heroku = new Heroku({ token: process.env.HEROKU_API_KEY });
 
 initAria2();
 // checkIfPreviouslyRestarted();
@@ -124,7 +124,7 @@ setEventCallback(eventRegex.commandsRegex.stats, eventRegex.commandsRegexNoName.
     try {
       const diskSpace = await checkDiskSpace(constants.ARIA_DOWNLOAD_LOCATION_ROOT);
       const avgCpuLoad = await downloadUtils.getCPULoadAVG();
-      const botUptime = downloadUtils.getProcessUptime()
+      const botUptime = downloadUtils.getProcessUptime();
 
       const usedDiskSpace = diskSpace.size - diskSpace.free;
 
@@ -335,30 +335,50 @@ setEventCallback(eventRegex.commandsRegex.getFolder, eventRegex.commandsRegexNoN
   }
 });
 
-setEventCallback(eventRegex.commandsRegex.cancelMirror, eventRegex.commandsRegexNoName.cancelMirror, (msg, match) => {
-  var authorizedCode = msgTools.isAuthorized(msg);
-  var dlDetails: details.DlVars;
-  let gidFromMessage = '';
+setEventCallback(
+  eventRegex.commandsRegex.cancelMirror,
+  eventRegex.commandsRegexNoName.cancelMirror,
+  (msg, match) => {
+    let gids: string[] = [];
 
-  if (msg.reply_to_message) {
-    dlDetails = dlManager.getDownloadByMsgId(msg.reply_to_message);
-    batchCancelMirrorsByGids([dlDetails.gid], msg);
+    if (msg.reply_to_message) {
+      const dlDetails = dlManager.getDownloadByMsgId(msg.reply_to_message);
+      if (dlDetails) {
+        gids.push(dlDetails.gid);
+      }
+    } else if (match && match.length > 5) {
+      gids = match[4].split(" ");
+    }
+
+    gids = gids.filter(gid => gid);
+
+    if (!gids?.length) {
+      msgTools.sendMessage(
+        bot,
+        msg,
+        `Reply to the command message for the download that you want to cancel or enter valid gid.`
+      );
+    } else {
+      batchCancelMirrorsByGids(gids, msg);
+    }
   }
-  
-  if (match && match.length > 5) {
-    gidFromMessage = match[4];
-    batchCancelMirrorsByGids(match[4].split(' '), msg);
-  } else {
-    msgTools.sendMessage(bot, msg, `Reply to the command message for the download that you want to cancel or enter valid gid.`);
-  }
-});
+);
 
-
-function batchCancelMirrorsByGids(gidsFromMessage : String[], msg :TelegramBot.Message) {
+/**
+ * Cancel downloads with multiple gids. This will only cancel the valid gids and will not throw any error for invalid gids. Error will be thrown only when all the gids are invalid.
+ * @param gidsFromMessage
+ * @param msg 
+ */
+function batchCancelMirrorsByGids(
+  gidsFromMessage: string[],
+  msg: TelegramBot.Message
+): void {
   var dlDetails: details.DlVars;
   var authorizedCode = msgTools.isAuthorized(msg);
 
-  gidsFromMessage.forEach(gidFromMessage => {
+  const gidsWithNoDl = [];
+
+  gidsFromMessage.forEach((gidFromMessage) => {
     dlDetails = dlManager.getDownloadByGid(gidFromMessage.trim());
     if (dlDetails) {
       if (authorizedCode > -1 && authorizedCode < 3) {
@@ -368,11 +388,14 @@ function batchCancelMirrorsByGids(gidsFromMessage : String[], msg :TelegramBot.M
           cancelMirror(dlDetails, msg);
         } else {
           msgTools.isAdmin(bot, msg, (e, res) => {
-            console.log('Cta admins-->', res);
             if (res) {
               cancelMirror(dlDetails, msg);
             } else {
-              msgTools.sendMessage(bot, msg, 'You do not have permission to do that.');
+              msgTools.sendMessage(
+                bot,
+                msg,
+                `You do not have permission to cancel download with gid: ${gidFromMessage}.`
+              );
             }
           });
         }
@@ -380,11 +403,18 @@ function batchCancelMirrorsByGids(gidsFromMessage : String[], msg :TelegramBot.M
         msgTools.sendUnauthorizedMessage(bot, msg);
       }
     } else {
-      const message = gidFromMessage ? `Invalid GID, no download found with gid: <code>${gidFromMessage}</code>.` : `Reply to the command message for the download that you want to cancel. Also make sure that the download is even active.`;
-      msgTools.sendMessage(bot, msg, message);
+      gidsWithNoDl.push(gidFromMessage);
     }
-  })
-  
+  });
+
+  // We will send the below error only when all the gids passed are invalid
+  if (gidsWithNoDl.length === gidsFromMessage.length) {
+    msgTools.sendMessage(
+      bot,
+      msg,
+      "No Download details found. Reply to the command message for the download that you want to cancel or give proper gid. Also make sure that the download is even active."
+    );
+  }
 }
 
 setEventCallback(eventRegex.commandsRegex.cancelAll, eventRegex.commandsRegexNoName.cancelAll, (msg) => {
@@ -480,9 +510,9 @@ setEventCallback(eventRegex.commandsRegex.count, eventRegex.commandsRegexNoName.
       const name = await gdUtils.get_folder_name(fileId);
 
       const gen_text = (payload: any) => {
-        const { obj_count, processing_count, pending_count } = payload || {}
-        return `<b>Name:</b> ${name}\n<b>Number of Files:</b> ${obj_count || ''}\n${pending_count ? ('<b>Pending:</b> ' + pending_count) : ''}\n${processing_count ? ('<b>Ongoing:</b> ' + processing_count) : ''}`
-      }
+        const { obj_count, processing_count, pending_count } = payload || {};
+        return `<b>Name:</b> ${name}\n<b>Number of Files:</b> ${obj_count || ''}\n${pending_count ? ('<b>Pending:</b> ' + pending_count) : ''}\n${processing_count ? ('<b>Ongoing:</b> ' + processing_count) : ''}`;
+      };
 
       const message_updater = async (payload: any) => await msgTools.editMessage(bot, countMsg, gen_text(payload)).catch(err => console.error(err.message));
 
@@ -498,10 +528,10 @@ setEventCallback(eventRegex.commandsRegex.count, eventRegex.commandsRegexNoName.
         msgTools.deleteMsg(bot, countMsg);
         msgTools.sendMessageAsync(bot, msg, `<b>Source Folder Name:</b> <code>${name}</code>\n<b>Source Folder Link:</b> <code>${match[4]}</code>\n<pre>${table}</pre>`, -1).catch(async err => {
           if (err && ((err.body && err.body.error_code == 413 && err.body.description.includes('Entity Too Large')) || (err.response && err.response.body && err.response.body.error_code == 400 && err.response.body.description.includes('message is too long')))) {
-            const limit = 20
+            const limit = 20;
             countResult = await gdUtils.gen_count_body({ fid: fileId, limit, smy: countResult.smy });
             table = countResult.table;
-            msgTools.sendMessage(bot, msg, `<b>Source Folder Name:</b> <code>${name}</code>\n<b>Source Folder Link:</b> <code>${match[4]}</code>\nThe table is too long and exceeds the telegram message limit, only the first ${limit} will be displayed:\n<pre>${table}</pre>`, -1)
+            msgTools.sendMessage(bot, msg, `<b>Source Folder Name:</b> <code>${name}</code>\n<b>Source Folder Link:</b> <code>${match[4]}</code>\nThe table is too long and exceeds the telegram message limit, only the first ${limit} will be displayed:\n<pre>${table}</pre>`, -1);
           } else {
             msgTools.sendMessage(bot, msg, err.message, 10000);
           }
@@ -597,7 +627,7 @@ setEventCallback(eventRegex.commandsRegex.getLink, eventRegex.commandsRegexNoNam
   } else {
     if (constants.INDEX_DOMAIN) {
       const fileId = downloadUtils.getIdFromUrl(match[4]);
-      await driveDirectLink.getGDindexLink(fileId, true).then((gdIndex: { url: string, name: string }) => {
+      await driveDirectLink.getGDindexLink(fileId, true).then((gdIndex: { url: string; name: string }) => {
         let res = 'Direct Shareable Link: <a href = "' + gdIndex.url + '">' + gdIndex.name + '</a>';
         msgTools.sendMessage(bot, msg, res, 60000);
       }).catch((err: string) => {
@@ -652,7 +682,7 @@ setEventCallback(eventRegex.commandsRegex.help, eventRegex.commandsRegexNoName.h
     ➖➖➖➖➖➖➖➖➖➖➖➖
     <code>/help</code> or <code>/h</code> <b>|</b> You already know what it does.
     ➖➖➖➖➖➖➖➖➖➖➖➖\n<i>Note: All the above command can also be called using dot(.) instead of slash(/). For e.x: <code>.mirror </code>url or <code>.m </code>url</i>
-    `
+    `;
     msgTools.sendMessage(bot, msg, text, 60000);
   }
 });
