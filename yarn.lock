@@ -2091,10 +2091,10 @@ minimatch@^3.0.4:
   dependencies:
     brace-expansion "^1.1.7"
 
-minimist@1.2.5, minimist@^1.2.0, minimist@^1.2.5:
-  version "1.2.5"
-  resolved "https://registry.npmjs.org/minimist/-/minimist-1.2.5.tgz"
-  integrity sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==
+minimist@1.2.6, minimist@^1.2.0, minimist@^1.2.5:
+  version "1.2.6"
+  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.6.tgz#8637a5b759ea0d6e98702cfb3a9283323c93af44"
+  integrity sha512-Jsjnk4bw3YJqYzbdyBiNsPWHPfO++UGG749Cxs6peCu5Xg4nrena6OVxOYxrQTqww0Jmwt+Ref8rggumkTLz9Q==
 
 minipass@^3.0.0:
   version "3.1.3"
@@ -3139,12 +3139,12 @@ webidl-conversions@^3.0.0:
   resolved "https://registry.yarnpkg.com/webidl-conversions/-/webidl-conversions-3.0.1.tgz#24534275e2a7bc6be7bc86611cc16ae0a5654871"
   integrity sha1-JFNCdeKnvGvnvIZhHMFq4KVlSHE=
 
-wget-improved@^3.3.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/wget-improved/-/wget-improved-3.3.0.tgz#cd169d27bb0cf8efd30e7694f89a11daaddc8816"
-  integrity sha512-HDwfe2Lggi1dvyvpn6uIF5WjBysVFNvroFgz3YJVTJjZosK+DBPClgSyKfe9ctuRr3NWH+gQeiA45fT3X9J/ag==
+wget-improved@^3.4.0:
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/wget-improved/-/wget-improved-3.4.0.tgz#da4d2578e46c6ed8532e6d34cbdf8c7344fdd17c"
+  integrity sha512-mHCdqImHntGzaauaQrfhkcHO0sAOp9Fd/9v5PXwrvHK+nggRWG9en5UH72/WitJFv3d3iFwJSAVMrRaCjW6dAA==
   dependencies:
-    minimist "1.2.5"
+    minimist "1.2.6"
     tunnel "0.0.6"
 
 whatwg-url@^5.0.0:
