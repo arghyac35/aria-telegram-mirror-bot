@@ -217,31 +217,25 @@
   resolved "https://registry.yarnpkg.com/@types/mime-types/-/mime-types-2.1.3.tgz#0688436864f87a0c8e33ca12be60cd791cc24b36"
   integrity sha512-bvxCbHeeS7quxS7uOJShyoOQj/BfLabhF6mk9Rmr+2MRfW8W1yxyyL/0GTxLFTHen41GrIw4K3D4DrLouhb8vg==
 
-"@types/node-telegram-bot-api@^0.61.11":
-  version "0.61.11"
-  resolved "https://registry.yarnpkg.com/@types/node-telegram-bot-api/-/node-telegram-bot-api-0.61.11.tgz#e74143afde4865d9c25039c6f56bb91e0946b1d6"
-  integrity sha512-vRkq/2KCnrI6H2rw3cVM9qVl2WQMPKMvm/dt26ikzZURmpD5xs96wXDvRhgbYvLn7HE9Y/iiso92Tuf/ep8vng==
+"@types/node-telegram-bot-api@^0.63.0":
+  version "0.63.0"
+  resolved "https://registry.yarnpkg.com/@types/node-telegram-bot-api/-/node-telegram-bot-api-0.63.0.tgz#de5fe487ccbc1db44ce09d18adef5beaff2f1709"
+  integrity sha512-3Agid3nzYv4yiEswiMXnVLyOYqm0Bwef0KjbCyLM6ESPPnmjb9YCY/UPAV/aiQgKLXLxagC2oHpBf6vUINSUAw==
   dependencies:
     "@types/node" "*"
     "@types/request" "*"
-    eventemitter3 ">=3.0.0"
 
-"@types/node@*":
-  version "17.0.22"
-  resolved "https://registry.npmjs.org/@types/node/-/node-17.0.22.tgz"
-  integrity sha512-8FwbVoG4fy+ykY86XCAclKZDORttqE5/s7dyWZKLXTdv3vRy5HozBEinG5IqhvPXXzIZEcTVbuHlQEI6iuwcmw==
-
-"@types/node@^10.0.3":
-  version "10.17.56"
-  resolved "https://registry.npmjs.org/@types/node/-/node-10.17.56.tgz"
-  integrity sha512-LuAa6t1t0Bfw4CuSR0UITsm1hP17YL+u82kfHGrHUWdhlBtH7sa7jGY5z7glGaIj/WDYDkRtgGd+KCjCzxBW1w==
-
-"@types/node@^20.8.9":
+"@types/node@*", "@types/node@^20.8.9":
   version "20.8.9"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-20.8.9.tgz#646390b4fab269abce59c308fc286dcd818a2b08"
   integrity sha512-UzykFsT3FhHb1h7yD4CA4YhBHq545JC0YnEz41xkipN88eKQtL6rSgocL5tbAP6Ola9Izm/Aw4Ora8He4x0BHg==
   dependencies:
     undici-types "~5.26.4"
+
+"@types/node@^10.0.3":
+  version "10.17.56"
+  resolved "https://registry.npmjs.org/@types/node/-/node-10.17.56.tgz"
+  integrity sha512-LuAa6t1t0Bfw4CuSR0UITsm1hP17YL+u82kfHGrHUWdhlBtH7sa7jGY5z7glGaIj/WDYDkRtgGd+KCjCzxBW1w==
 
 "@types/npmlog@^4.1.5":
   version "4.1.5"
@@ -1113,11 +1107,6 @@ event-target-shim@^5.0.0:
   version "5.0.1"
   resolved "https://registry.npmjs.org/event-target-shim/-/event-target-shim-5.0.1.tgz"
   integrity sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ==
-
-eventemitter3@>=3.0.0:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-5.0.1.tgz#53f5ffd0a492ac800721bb42c66b841de96423c4"
-  integrity sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==
 
 eventemitter3@^3.0.0:
   version "3.1.2"
