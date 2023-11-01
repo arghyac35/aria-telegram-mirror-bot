@@ -34,7 +34,7 @@
     "extract-zip": "^2.0.1",
     "ffmpeg-static": "^5.2.0",
     "fs-extra": "^10.0.0",
-    "get-folder-size": "^2.0.1",
+    "get-folder-size": "^4.0.0",
     "googleapis": "^128.0.0",
     "gtoken": "^7.0.1",
     "heroku-client": "^3.1.0",
