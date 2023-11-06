@@ -23,22 +23,38 @@ export function deleteDownloadedFile(subdirName: string): void {
 }
 
 function downloadETA(totalLength: number, completedLength: number, speed: number): string {
-  if (speed === 0)
+  if (speed === 0) 
     return '-';
-  var time = (totalLength - completedLength) / speed;
-  var seconds = Math.floor(time % 60);
-  var minutes = Math.floor((time / 60) % 60);
-  var hours = Math.floor(time / 3600);
 
-  if (hours === 0) {
-    if (minutes === 0) {
-      return `${seconds}s`;
-    } else {
-      return `${minutes}m ${seconds}s`;
-    }
-  } else {
-    return `${hours}h ${minutes}m ${seconds}s`;
+  const timeInSeconds = (totalLength - completedLength) / speed;
+
+  const seconds = Math.floor(timeInSeconds % 60);
+  const minutes = Math.floor((timeInSeconds / 60) % 60);
+  const hours = Math.floor((timeInSeconds / 3600) % 24);
+  const days = Math.floor(timeInSeconds / (3600 * 24));
+  const years = Math.floor(days / 365);
+
+  const remainingDays = days - years * 365;
+
+  const timeParts: string[] = [];
+
+  if (years > 0) {
+    timeParts.push(`${years}y`);
   }
+  if (remainingDays > 0) {
+    timeParts.push(`${remainingDays}d`);
+  }
+  if (hours > 0) {
+    timeParts.push(`${hours}h`);
+  }
+  if (minutes > 0) {
+    timeParts.push(`${minutes}m`);
+  }
+  if (seconds > 0) {
+    timeParts.push(`${seconds}s`);
+  }
+
+  return timeParts.join(' ');
 }
 
 interface StatusSingle {
